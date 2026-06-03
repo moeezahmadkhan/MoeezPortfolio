@@ -52,27 +52,4 @@ main {
   color: var(--parchment-dim);
 }
 
-/* ── Placeholder next chapter ── */
-.placeholder {
-  position: relative;
-  background: linear-gradient(180deg, transparent, var(--ink-2) 22%, var(--ink) 100%);
-  padding: 14rem clamp(1.5rem, 7vw, 9rem) 16rem;
-  border-top: 1px solid rgba(231, 194, 125, 0.08);
-}
-
-.placeholder .eyebrow { margin-bottom: 1rem; }
-
-.placeholder h2 {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 3.6rem);
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: var(--parchment);
-}
-
-.placeholder p:last-child {
-  font-size: 1.25rem;
-  color: var(--parchment-dim);
-  max-width: 38rem;
-  line-height: 1.5;
-}
+/* Canvas stays fixed behind everything; the candle layer sits just above it. */

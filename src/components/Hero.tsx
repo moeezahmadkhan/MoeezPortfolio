@@ -20,7 +20,7 @@ const rise = {
 
 export function Hero() {
   return (
-    <header className="hero">
+    <header className="hero" id="top">
       <motion.div className="hero__inner" variants={container} initial="hidden" animate="show">
         <motion.p className="eyebrow hero__eyebrow" variants={rise}>
           ✦ Chapter I — The Conjuring ✦

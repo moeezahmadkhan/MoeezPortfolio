@@ -1,0 +1,62 @@
+.candles {
+  position: fixed;
+  inset: 0;
+  z-index: 3; /* above the canvas (1), below content (this layer is decorative) */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.candle {
+  position: absolute;
+  width: 8px;
+  height: 30px;
+  will-change: transform;
+}
+
+.candle__body {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 22px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #efe3c8, #b8a884);
+  opacity: 0.5;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+.candle__flame {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 7px;
+  height: 13px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle at 50% 70%, #fff6e0 0%, #ffcd6b 45%, #ff8a3d 75%, transparent 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  filter: blur(0.4px);
+  animation: flicker 1.6s ease-in-out infinite alternate;
+}
+
+.candle__halo {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(255, 200, 120, 0.28) 0%, transparent 68%);
+  animation: halo 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes flicker {
+  0% { transform: translateX(-50%) scaleY(1) rotate(-2deg); opacity: 0.9; }
+  50% { transform: translateX(-52%) scaleY(1.12) rotate(1deg); opacity: 1; }
+  100% { transform: translateX(-49%) scaleY(0.94) rotate(2deg); opacity: 0.85; }
+}
+
+@keyframes halo {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}

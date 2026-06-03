@@ -3,6 +3,11 @@ import { useProgress } from '@react-three/drei'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Scene } from './scene/Scene'
 import { Hero } from './components/Hero'
+import { Cursor } from './components/Cursor'
+import { Candles } from './components/Candles'
+import { ScrollRail } from './components/ScrollRail'
+import { About, Spells, Grimoire, Chronicles, OwlPost } from './components/Sections'
+import { useScrollTracker } from './scroll'
 import './App.css'
 
 export default function App() {
@@ -10,6 +15,8 @@ export default function App() {
   const [loaded, setLoaded] = useState(false)
   const [reveal, setReveal] = useState(0)
   const raf = useRef<number>()
+
+  useScrollTracker()
 
   // Once assets finish, hold a beat then drive the conjuring reveal 0 → 1.
   useEffect(() => {
@@ -38,6 +45,10 @@ export default function App() {
         <Scene reveal={reveal} />
       </div>
 
+      <Candles />
+      <Cursor />
+      <ScrollRail />
+
       <AnimatePresence>
         {!loaded && (
           <motion.div
@@ -55,12 +66,11 @@ export default function App() {
 
       <main>
         <Hero />
-        {/* Next chapters (About / Spellbook of projects / Contact) descend below. */}
-        <section id="grimoire" className="placeholder">
-          <p className="eyebrow">Chapter II</p>
-          <h2>The Grimoire — coming next</h2>
-          <p>About, the spellbook of projects, and the owl-post contact section will descend here.</p>
-        </section>
+        <About />
+        <Spells />
+        <Grimoire />
+        <Chronicles />
+        <OwlPost />
       </main>
     </>
   )

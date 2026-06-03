@@ -1,0 +1,58 @@
+.cursor-layer,
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9000;
+}
+
+.cursor-layer { inset: 0; }
+
+.cursor-glow {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(246, 223, 166, 0.95) 0%, rgba(231, 194, 125, 0.5) 35%, transparent 70%);
+  mix-blend-mode: screen;
+  transition: opacity 0.3s;
+  will-change: transform;
+}
+
+.cursor-glow::after {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: #fff6e0;
+  box-shadow: 0 0 12px 3px rgba(246, 223, 166, 0.9);
+}
+
+.cursor-glow--hover {
+  background: radial-gradient(circle, rgba(127, 208, 196, 0.9) 0%, rgba(127, 208, 196, 0.35) 40%, transparent 72%);
+}
+
+.cursor-spark {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6e0 0%, #e7c27d 60%, transparent 75%);
+  transform: translate(-50%, -50%);
+  animation: sparkFade 0.9s ease-out forwards;
+  mix-blend-mode: screen;
+}
+
+@keyframes sparkFade {
+  0% { opacity: 0.95; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, calc(-50% + 16px)) scale(0.2); }
+}
+
+/* Replace the OS cursor with a faint dot so the wand reads as "the" cursor */
+body.has-wand-cursor,
+body.has-wand-cursor a,
+body.has-wand-cursor button {
+  cursor: none;
+}
+
+@media (pointer: coarse) {
+  .cursor-layer, .cursor-glow { display: none; }
+}
