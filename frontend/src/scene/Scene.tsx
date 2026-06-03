@@ -67,7 +67,8 @@ export function Scene({ reveal }: { reveal: number }) {
       <pointLight position={[0, 0.6, 3.5]} intensity={1.8} color="#fff0d6" distance={10} decay={2} />
 
       <Suspense fallback={null}>
-        <Float speed={1.4} rotationIntensity={0.25} floatIntensity={0.5} floatingRange={[-0.05, 0.08]}>
+        {/* rotationIntensity set to 0 so we can fully control Y rotation in WizardModel for scroll-driven intro */}
+        <Float speed={1.4} rotationIntensity={0} floatIntensity={0.5} floatingRange={[-0.05, 0.08]}>
           <WizardModel reveal={reveal} />
         </Float>
 

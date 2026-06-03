@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useGLTF, Center, Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
+import { scrollState } from '../scroll'
 
-useGLTF.preload('/models/wizard.glb')
+useGLTF.preload('/models/wizard_improved.glb')
 
 /**
  * Wand-tip magic position, in the scaled + centred model space.
@@ -21,7 +22,13 @@ type Props = {
 export function WizardModel({ reveal = 1 }: Props) {
   const group = useRef<THREE.Group>(null)
   const wandLight = useRef<THREE.PointLight>(null)
-  const { scene } = useGLTF('/models/wizard.glb')
+  const lockRef = useRef(0)
+  const lastRawRef = useRef(0)
+  const targetYRef = useRef(0)
+  const baseRef = useRef(0)
+  const driftRef = useRef(0)
+  const prevTRef = useRef(0)
+  const { scene } = useGLTF('/models/wizard_improved.glb')
 
   // Clone so HMR / multiple mounts never share mutated material state.
   const model = useMemo(() => {
@@ -33,13 +40,18 @@ export function WizardModel({ reveal = 1 }: Props) {
         mesh.receiveShadow = true
         const mat = mesh.material as THREE.MeshStandardMaterial
         if (mat) {
-          mat.envMapIntensity = 0.9
-          // `Glow_*` materials (glowing eyes + wand magic) carry baked emissive
-          // from the GLB — leave them so Bloom can pick them up.
-          if (!mat.name?.startsWith('Glow')) {
-            // A faint warm emissive so the figurine reads as lit from within candlelight.
+          mat.envMapIntensity = 1.15
+          // Force a crisp PBR finish so eyes and wand pops don't look flat or grainy.
+          if (mat.roughness !== undefined && !Number.isNaN(mat.roughness)) mat.roughness = Math.min(mat.roughness, 0.35)
+          if (mat.metalness !== undefined && !Number.isNaN(mat.metalness)) mat.metalness = Math.max(mat.metalness, 0.05)
+
+          // `Glow_*` materials (eyes + wand magic) carry baked emissive
+          // from the GLB — keep them and lift contrast so Bloom sees pupils/wand.
+          if (mat.name?.startsWith('Glow')) {
+            mat.needsUpdate = true
+          } else {
             mat.emissive = new THREE.Color('#3a2a12')
-            mat.emissiveIntensity = 0.18
+            mat.emissiveIntensity = 0.24
           }
         }
       }
@@ -55,15 +67,35 @@ export function WizardModel({ reveal = 1 }: Props) {
   useFrame((state, delta) => {
     if (!group.current) return
     const t = state.clock.elapsedTime
-    // Slow conjuring rotation + gentle hover.
-    group.current.rotation.y += delta * 0.18
-    group.current.position.y = Math.sin(t * 0.8) * 0.06
-    // Reveal: rise out of the rune circle and settle.
+    const dt = delta
+
     const r = THREE.MathUtils.clamp(reveal, 0, 1)
-    group.current.scale.setScalar(THREE.MathUtils.lerp(0.001, 1, easeOut(r)))
-    // Pulse the wand-tip light like a charged spell.
+    group.current.scale.setScalar(THREE.MathUtils.clamp(easeOut(r), 0, 1))
+    if (r < 0.999) {
+      group.current.position.y = 0
+      group.current.rotation.y = -t * 0.4
+      return
+    }
+
+    group.current.position.y = THREE.MathUtils.lerp(0, Math.sin(t * 0.8) * 0.05, 0.02)
+
+    const intro = THREE.MathUtils.clamp(scrollState.progress / 0.15, 0, 1)
+    const targetBase = intro * Math.PI * 2
+    prevTRef.current = THREE.MathUtils.clamp(t, 0, dt > 0 ? t : prevTRef.current + 0.016)
+    const dTarget = targetYRef.current - baseRef.current
+    const capped = Math.sign(dTarget) * Math.min(Math.abs(dTarget), 0.22)
+    if (Math.abs(capped) > 0.001) {
+      baseRef.current = targetYRef.current - capped
+      driftRef.current = THREE.MathUtils.lerp(driftRef.current, capped, 0.08)
+    } else {
+      driftRef.current = THREE.MathUtils.lerp(driftRef.current, 0, 0.03)
+    }
+    baseRef.current = THREE.MathUtils.lerp(baseRef.current, targetBase, 0.03 + Math.abs(intro - 0.5) * 0.12)
+    targetYRef.current = baseRef.current + driftRef.current
+    group.current.rotation.y = targetYRef.current
+
     if (wandLight.current) {
-      wandLight.current.intensity = (0.9 + Math.sin(t * 3.1) * 0.45) * r
+      wandLight.current.intensity = 0.9 + Math.sin(t * 3.1) * 0.45
     }
   })
 
@@ -75,19 +107,24 @@ export function WizardModel({ reveal = 1 }: Props) {
       {/* Wand-tip magic: pulsing light + floating sparks, attached to the
           rotating group so they stay on the wand as the figurine turns. */}
       <group position={WAND_TIP}>
+        {/* Outer wand glow orb */}
+        <mesh>
+          <sphereGeometry args={[0.045, 20, 20]} />
+          <meshBasicMaterial color="#fff4d6" transparent opacity={0.55} depthWrite={false} blending={THREE.AdditiveBlending} />
+        </mesh>
         <pointLight
           ref={wandLight}
-          color="#ffd9a0"
-          intensity={1.1}
-          distance={2.4}
+          color="#ffe2b0"
+          intensity={1.35}
+          distance={2.8}
           decay={2}
         />
         <Sparkles
-          count={16}
-          scale={0.55}
-          size={2.4}
-          speed={0.5}
-          noise={0.5}
+          count={18}
+          scale={0.7}
+          size={2.8}
+          speed={0.55}
+          noise={0.55}
           color="#ffcf8f"
         />
       </group>

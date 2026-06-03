@@ -12,6 +12,10 @@ export const scrollState = {
   pointerY: 0, // -1 → 1
 }
 
+export const responsiveState = {
+  zoom: 1, // computed once per resize
+}
+
 export function useScrollTracker() {
   useEffect(() => {
     const onScroll = () => {
@@ -23,13 +27,20 @@ export function useScrollTracker() {
       scrollState.pointerX = (e.clientX / window.innerWidth) * 2 - 1
       scrollState.pointerY = (e.clientY / window.innerHeight) * 2 - 1
     }
+    const onResize = () => {
+      const vw = window.innerWidth
+      responsiveState.zoom = vw < 640 ? 0.92 : vw < 1024 ? 0.96 : 1
+    }
     onScroll()
+    onResize()
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll)
+    window.addEventListener('resize', onResize)
     window.addEventListener('pointermove', onPointer, { passive: true })
     return () => {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
+      window.removeEventListener('resize', onResize)
       window.removeEventListener('pointermove', onPointer)
     }
   }, [])
