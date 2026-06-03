@@ -33,7 +33,7 @@ The 3D scene never re-mounts as you scroll. Instead the **camera moves through t
 
 - `Scene.tsx` — the `<Canvas>`: lighting rig (candlelight + spot/rim/key lights), `Environment` with inline `Lightformer`s (no network HDRI), `Sparkles`, `ContactShadows`, and the `EffectComposer` post chain (**Bloom** is what makes the gold glow, plus Vignette + SMAA). Performance is adaptive: `PerformanceMonitor` + `AdaptiveDpr` drop the `dpr` on slow devices.
 - `CameraRig.tsx` — drives the camera. `KEYS` is a keyframe array (`at` = scroll fraction → camera `pos`/`look`). It samples + smoothsteps between keyframes by `scrollState.progress`, adds eased pointer parallax, and lerps frame-rate-independently. **To re-time the camera per chapter, edit `KEYS`.**
-- `WizardModel.tsx` — loads `/models/wizard.glb` (a static, rig-less ~16MB mesh; animated purely in-scene via Float + rotation). The `reveal` prop (0→1) scales it up out of the rune circle during the intro. Materials are cloned + tweaked (emissive warmth) so HMR never mutates shared state.
+- `WizardModel.tsx` — loads `/models/wizard.glb` (a static, rig-less mesh, ~3.6MB after meshopt compression; animated purely in-scene via Float + rotation). The `reveal` prop (0→1) scales it up out of the rune circle during the intro. Materials are cloned + tweaked (emissive warmth) so HMR never mutates shared state. The GLB carries **baked emissive `Glow_*` materials** (glowing eyes + wand magic) — the material traversal skips `Glow_*` so it doesn't clobber them, and Bloom makes them glow. A pulsing `pointLight` + `Sparkles` at `WAND_TIP` give the wand its animated magic. The model is rebuilt from `tools/wizard.original.glb` via `tools/build_wizard.sh` (Blender glow/2K-textures → gltf-transform meshopt); see `docs/wizard-glb-improvement.md`.
 - `RuneCircle.tsx` — procedural sigil on the floor; fades out by ~22% scroll (`scrollState.progress`).
 - `Candlelight.tsx` — a `pointLight` flickering via layered sines.
 
@@ -66,4 +66,4 @@ Three places share the chapter ordering and must stay in sync: the section `id`s
 
 ## Large assets
 
-`wizard.glb` and the CV PDF live under `public/` and are served as-is. Two extra source GLBs and a PDF sit in the repo root (not served). The shipped model is `public/models/wizard.glb`.
+`wizard.glb` and the CV PDF live under `public/` and are served as-is. The shipped model is `public/models/wizard.glb` (~3.6MB, meshopt-compressed). Its uncompressed source is `tools/wizard.original.glb` (kept out of `public/` so it isn't bundled); regenerate the shipped model with `tools/build_wizard.sh`. Two extra source GLBs and a PDF sit in the repo root (not served).
