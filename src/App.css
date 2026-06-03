@@ -1,0 +1,78 @@
+.canvas-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+main {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Preloader ── */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: radial-gradient(circle at 50% 45%, #14101c 0%, #07070d 70%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.preloader__rune {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 1px solid rgba(231, 194, 125, 0.3);
+  border-top-color: var(--gold-bright);
+  border-right-color: var(--gold);
+  box-shadow: 0 0 40px rgba(231, 194, 125, 0.25), inset 0 0 24px rgba(231, 194, 125, 0.12);
+  animation: spin 1.4s cubic-bezier(0.6, 0.1, 0.4, 0.9) infinite;
+  margin-bottom: 1.4rem;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.preloader__pct {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+  text-shadow: 0 0 28px rgba(231, 194, 125, 0.4);
+}
+
+.preloader__hint {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--parchment-dim);
+}
+
+/* ── Placeholder next chapter ── */
+.placeholder {
+  position: relative;
+  background: linear-gradient(180deg, transparent, var(--ink-2) 22%, var(--ink) 100%);
+  padding: 14rem clamp(1.5rem, 7vw, 9rem) 16rem;
+  border-top: 1px solid rgba(231, 194, 125, 0.08);
+}
+
+.placeholder .eyebrow { margin-bottom: 1rem; }
+
+.placeholder h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--parchment);
+}
+
+.placeholder p:last-child {
+  font-size: 1.25rem;
+  color: var(--parchment-dim);
+  max-width: 38rem;
+  line-height: 1.5;
+}
