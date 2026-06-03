@@ -8,11 +8,18 @@ useGLTF.preload('/models/wizard_improved.glb')
 
 /**
  * Wand-tip magic position, in the scaled + centred model space.
- * Baked glow lives at Blender (0.31, -0.24, 0.18) → glTF (0.31, 0.18, 0.24);
- * the in-scene primitive is scaled 2.5, so the FX sits at ×2.5 of that.
+ * For wizard_improved.glb the wooden wand points down-forward; its free tip is
+ * at glTF (0.10, -0.28, -0.20). The model is scaled ×2.5, so the FX sits there ×2.5.
  * Tune here if the model's transform changes.
  */
-const WAND_TIP: [number, number, number] = [0.775, 0.45, 0.6]
+const WAND_TIP: [number, number, number] = [0.28, -0.66, -0.48]
+
+/**
+ * Base facing rotation (radians, Y). wizard_improved.glb faces +X (glTF); rotating
+ * -90° turns the face toward the camera (+Z). Applied to a group that wraps BOTH the
+ * model and the wand FX, so the magic stays locked to the wand at every spin angle.
+ */
+const BASE_FACING_Y = -Math.PI / 2
 
 type Props = {
   /** 0 → 1 reveal progress driven by the intro timeline */
@@ -101,6 +108,9 @@ export function WizardModel({ reveal = 1 }: Props) {
 
   return (
     <group ref={group} position={[0, 0.05, 0]} dispose={null}>
+      {/* Base-facing group wraps BOTH the model and the wand FX so they rotate
+          together — the magic stays locked to the wand at every spin angle. */}
+      <group rotation={[0, BASE_FACING_Y, 0]}>
       <Center>
         <primitive object={model} scale={2.5} />
       </Center>
@@ -127,6 +137,7 @@ export function WizardModel({ reveal = 1 }: Props) {
           noise={0.55}
           color="#ffcf8f"
         />
+      </group>
       </group>
     </group>
   )
