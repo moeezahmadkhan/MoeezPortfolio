@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { scrollState } from '../../scroll'
 import { STATION, localProgress } from './phases'
 import { ScanRings } from './ScanRings'
+import { Heartbeat } from './Heartbeat'
 
 const RING_FLOOR_Y = -1.32
 
@@ -87,6 +88,9 @@ export function TrackerStation() {
 
       {/* pulsing scan rings around the figure */}
       <ScanRings />
+
+      {/* hero ECG trace + climbing BPM at the wrist */}
+      <Heartbeat />
     </group>
   )
 }
