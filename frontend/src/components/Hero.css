@@ -1,11 +1,21 @@
 .hero {
+  /* Tall runway so the figurine can complete a full 360° while the camera
+     holds, before descending. Tune height for spin pacing — keep CameraRig
+     KEYS + WizardModel spin denominator in sync with it. */
   position: relative;
+  height: 200svh;
+  width: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hero__stage {
+  position: sticky;
+  top: 0;
   height: 100svh;
   width: 100%;
   display: flex;
   align-items: center;
-  pointer-events: none;
-  z-index: 10;
 }
 
 .hero__inner {
@@ -131,7 +141,7 @@
 }
 
 @media (max-width: 720px) {
-  .hero { align-items: flex-end; padding-bottom: 16vh; }
+  .hero__stage { align-items: flex-end; padding-bottom: 16vh; }
   .hero__inner {
     padding-right: 1.5rem;
     /* legibility scrim so the figurine doesn't fight the text */

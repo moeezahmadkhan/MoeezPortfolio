@@ -32,11 +32,17 @@
   right: 0;
   top: 0;
   height: 46vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   list-style: none;
-  pointer-events: auto;
+  pointer-events: none;
+}
+
+/* Each dot is pinned to its chapter's real scroll fraction (--at) so the fill
+   bar reaches it exactly as that section arrives. */
+.rail__mark-item {
+  position: absolute;
+  right: 0;
+  top: var(--at);
+  transform: translateY(-50%);
 }
 
 .rail__mark {
@@ -46,6 +52,7 @@
   flex-direction: row-reverse;
   color: var(--parchment-dim);
   transition: color 0.3s;
+  pointer-events: auto;
 }
 .rail__mark:hover { color: var(--gold-bright); }
 
