@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Reveal, IgniteHeading } from './Reveal'
+import { Reveal, IgniteHeading, MaskReveal } from './Reveal'
 import { Tilt } from './Tilt'
 import { projects, spellbook, chronicles } from '../data'
 import './sections.css'
@@ -8,9 +8,9 @@ export function About() {
   return (
     <section id="wizard" className="section section--about">
       <div className="section__wrap about">
-        <Reveal className="about__eyebrow">
-          <p className="eyebrow">Chapter II — The Wizard</p>
-        </Reveal>
+        <MaskReveal className="about__eyebrow">
+          <span className="eyebrow">Chapter II — The Wizard</span>
+        </MaskReveal>
         <IgniteHeading className="section__title" text="The mind behind the wand" />
         <Reveal delay={0.1}>
           <p className="about__lede">
@@ -49,9 +49,9 @@ export function Spells() {
   return (
     <section id="spells" className="section section--spells">
       <div className="section__wrap">
-        <Reveal>
-          <p className="eyebrow">Chapter III — The Arsenal</p>
-        </Reveal>
+        <MaskReveal>
+          <span className="eyebrow">Chapter III — The Arsenal</span>
+        </MaskReveal>
         <IgniteHeading className="section__title" text="Spells & Incantations" />
         <div className="spells__grid">
           {spellbook.map((group, i) => (
@@ -77,9 +77,9 @@ export function Grimoire() {
   return (
     <section id="grimoire" className="section section--grimoire">
       <div className="section__wrap">
-        <Reveal>
-          <p className="eyebrow">Chapter IV — The Grimoire</p>
-        </Reveal>
+        <MaskReveal>
+          <span className="eyebrow">Chapter IV — The Grimoire</span>
+        </MaskReveal>
         <IgniteHeading className="section__title" text="Works of conjuring" />
         <div className="grimoire__grid">
           {projects.map((p, i) => (
@@ -107,9 +107,9 @@ export function Chronicles() {
   return (
     <section id="chronicles" className="section section--chronicles">
       <div className="section__wrap">
-        <Reveal>
-          <p className="eyebrow">Chapter V — Chronicles</p>
-        </Reveal>
+        <MaskReveal>
+          <span className="eyebrow">Chapter V — Chronicles</span>
+        </MaskReveal>
         <IgniteHeading className="section__title" text="The path so far" />
         <div className="timeline">
           <motion.span
@@ -143,9 +143,9 @@ export function OwlPost() {
   return (
     <section id="owlpost" className="section section--owl">
       <div className="section__wrap owl">
-        <Reveal>
-          <p className="eyebrow">Chapter VI — Owl Post</p>
-        </Reveal>
+        <MaskReveal>
+          <span className="eyebrow">Chapter VI — Owl Post</span>
+        </MaskReveal>
         <IgniteHeading className="section__title section__title--center" text="Send an owl" />
         <Reveal delay={0.1}>
           <p className="owl__lede">

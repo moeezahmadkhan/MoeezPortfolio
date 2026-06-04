@@ -28,6 +28,31 @@ export function Reveal({
   )
 }
 
+/** Content wipes up from behind a mask when scrolled into view. */
+export function MaskReveal({
+  children,
+  delay = 0,
+  className,
+}: {
+  children: ReactNode
+  delay?: number
+  className?: string
+}) {
+  return (
+    <span className={className} style={{ display: 'block', overflow: 'hidden' }}>
+      <motion.span
+        style={{ display: 'block' }}
+        initial={{ y: '110%' }}
+        whileInView={{ y: '0%' }}
+        viewport={{ once: true, margin: '-10% 0px' }}
+        transition={{ duration: 0.9, ease, delay }}
+      >
+        {children}
+      </motion.span>
+    </span>
+  )
+}
+
 /** Heading whose words "ignite" one after another, like casting Lumos along the line. */
 export function IgniteHeading({
   text,
