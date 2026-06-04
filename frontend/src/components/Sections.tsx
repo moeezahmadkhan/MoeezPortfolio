@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Reveal, IgniteHeading, MaskReveal } from './Reveal'
 import { Tilt } from './Tilt'
 import { projects, spellbook, chronicles } from '../data'
+import { useParallax } from './useParallax'
 import './sections.css'
 
 export function About() {
@@ -73,6 +74,27 @@ export function Spells() {
   )
 }
 
+function GrimoireCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
+  const [ref, y] = useParallax(40 + (i % 3) * 18)
+  return (
+    <motion.div ref={ref as React.RefObject<HTMLDivElement>} style={{ y }}>
+      <Reveal delay={0.06 * i}>
+        <Tilt className="spell-card">
+          <div className="spell-card__glyph">{p.glyph}</div>
+          <p className="spell-card__incant">“{p.incantation}”</p>
+          <h3 className="spell-card__name">{p.name}</h3>
+          <p className="spell-card__blurb">{p.blurb}</p>
+          <ul className="spell-card__tags">
+            {p.tags.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        </Tilt>
+      </Reveal>
+    </motion.div>
+  )
+}
+
 export function Grimoire() {
   return (
     <section id="grimoire" className="section section--grimoire">
@@ -83,19 +105,7 @@ export function Grimoire() {
         <IgniteHeading className="section__title" text="Works of conjuring" />
         <div className="grimoire__grid">
           {projects.map((p, i) => (
-            <Reveal key={p.name} delay={0.06 * i}>
-              <Tilt className="spell-card">
-                <div className="spell-card__glyph">{p.glyph}</div>
-                <p className="spell-card__incant">“{p.incantation}”</p>
-                <h3 className="spell-card__name">{p.name}</h3>
-                <p className="spell-card__blurb">{p.blurb}</p>
-                <ul className="spell-card__tags">
-                  {p.tags.map((t) => (
-                    <li key={t}>{t}</li>
-                  ))}
-                </ul>
-              </Tilt>
-            </Reveal>
+            <GrimoireCard key={p.name} p={p} i={i} />
           ))}
         </div>
       </div>
