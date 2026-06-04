@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
 import * as THREE from 'three'
@@ -28,7 +28,16 @@ export function Heartbeat() {
   }, [])
 
   const lineMaterial = useMemo(() => new THREE.LineBasicMaterial({ color: '#ff3344' }), [])
-  const line = useMemo(() => new THREE.Line(geometry, lineMaterial), [geometry, lineMaterial])
+  const line = useMemo(() => {
+    const l = new THREE.Line(geometry, lineMaterial)
+    l.frustumCulled = false
+    return l
+  }, [geometry, lineMaterial])
+
+  useEffect(() => () => {
+    geometry.dispose()
+    lineMaterial.dispose()
+  }, [geometry, lineMaterial])
 
   useFrame((state) => {
     const lp = localProgress(scrollState.progress)
@@ -46,7 +55,6 @@ export function Heartbeat() {
       pos.setXYZ(i, (u - 0.5) * WIDTH, y, 0)
     }
     pos.needsUpdate = true
-    geometry.computeBoundingSphere()
 
     // BPM text — only update + re-sync troika when the integer changes
     if (text.current && bpm !== lastBpm.current) {
