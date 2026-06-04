@@ -18,7 +18,7 @@ export const AICORE_POS: [number, number, number] = [0, 2.4, 0]
 export const SECTION_START = 0.705
 export const SECTION_END = 0.857
 
-/** 0→1 progress within the tracker section. */
+/** Maps global scroll progress (0→1 across the page) to 0→1 local progress within the tracker section. */
 export function localProgress(progress: number) {
   return THREE.MathUtils.clamp(
     (progress - SECTION_START) / (SECTION_END - SECTION_START),
@@ -27,7 +27,7 @@ export function localProgress(progress: number) {
   )
 }
 
-/** Eased 0→1 ramp of t across [start,end]. */
+/** Eased 0→1 ramp of t across [start,end]. Requires start < end. */
 export function ramp(t: number, start: number, end: number) {
   return THREE.MathUtils.smoothstep(t, start, end)
 }
