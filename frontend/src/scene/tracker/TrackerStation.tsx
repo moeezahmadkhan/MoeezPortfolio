@@ -8,6 +8,7 @@ import { ScanRings } from './ScanRings'
 import { Heartbeat } from './Heartbeat'
 import { DataStream } from './DataStream'
 import { AICore } from './AICore'
+import { HudText } from './HudText'
 
 const RING_FLOOR_Y = -1.32
 
@@ -99,6 +100,9 @@ export function TrackerStation() {
 
       {/* AI answer beat: glowing wireframe icosahedron above the figure */}
       <AICore />
+
+      {/* holographic HUD: stat readout + AI answer line */}
+      <HudText />
     </group>
   )
 }
