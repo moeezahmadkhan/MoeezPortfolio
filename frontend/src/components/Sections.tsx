@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion'
+import { useRef, useState } from 'react'
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import { Reveal, IgniteHeading, MaskReveal } from './Reveal'
 import { Tilt } from './Tilt'
 import { projects, spellbook, chronicles } from '../data'
@@ -47,27 +48,53 @@ export function About() {
 }
 
 export function Spells() {
+  const ref = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start start', 'end end'],
+  })
+  const [step, setStep] = useState(0)
+  const last = spellbook.length - 1
+  useMotionValueEvent(scrollYProgress, 'change', (p) => {
+    const idx = Math.floor(p * spellbook.length)
+    setStep(Math.max(0, Math.min(last, idx)))
+  })
+
   return (
-    <section id="spells" className="section section--spells">
-      <div className="section__wrap">
+    <section id="spells" ref={ref} className="section section--spells spells--pinned">
+      <div className="spells__stage">
         <MaskReveal>
           <span className="eyebrow">Chapter III — The Arsenal</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="Spells & Incantations" />
-        <div className="spells__grid">
-          {spellbook.map((group, i) => (
-            <Reveal key={group.title} delay={0.08 * i} className="spell-group">
-              <h3 className="spell-group__title">{group.title}</h3>
-              <ul className="spell-group__list">
-                {group.spells.map((s) => (
-                  <li key={s} className="spell-chip">
-                    <span className="spell-chip__rune">✦</span>
-                    {s}
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
-          ))}
+
+        <div className="spells__steps">
+          <div className="spells__index" aria-hidden>
+            {String(step + 1).padStart(2, '0')}
+            <span className="spells__index-total">/ {String(spellbook.length).padStart(2, '0')}</span>
+          </div>
+
+          <div className="spells__panel">
+            {spellbook.map((group, i) => (
+              <motion.div
+                key={group.title}
+                className="spell-group spell-group--step"
+                animate={{ opacity: i === step ? 1 : 0, y: i === step ? 0 : 24 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                style={{ pointerEvents: i === step ? 'auto' : 'none' }}
+              >
+                <h3 className="spell-group__title">{group.title}</h3>
+                <ul className="spell-group__list">
+                  {group.spells.map((s) => (
+                    <li key={s} className="spell-chip">
+                      <span className="spell-chip__rune">✦</span>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
