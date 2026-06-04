@@ -7,6 +7,7 @@ import { Cursor } from './components/Cursor'
 import { Candles } from './components/Candles'
 import { ScrollRail } from './components/ScrollRail'
 import { About, Spells, Grimoire, Chronicles, OwlPost } from './components/Sections'
+import { useSmoothScroll } from './smoothScroll'
 import { useScrollTracker } from './scroll'
 import './App.css'
 
@@ -16,6 +17,7 @@ export default function App() {
   const [reveal, setReveal] = useState(0)
   const raf = useRef<number>()
 
+  useSmoothScroll()
   useScrollTracker()
 
   // Once assets finish, hold a beat then drive the conjuring reveal 0 → 1.
