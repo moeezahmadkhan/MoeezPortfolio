@@ -29,12 +29,7 @@ type Props = {
 export function WizardModel({ reveal = 1 }: Props) {
   const group = useRef<THREE.Group>(null)
   const wandLight = useRef<THREE.PointLight>(null)
-  const lockRef = useRef(0)
-  const lastRawRef = useRef(0)
-  const targetYRef = useRef(0)
-  const baseRef = useRef(0)
-  const driftRef = useRef(0)
-  const prevTRef = useRef(0)
+  const spinRef = useRef(0)
   const { scene } = useGLTF('/models/wizard_improved.glb')
 
   // Clone so HMR / multiple mounts never share mutated material state.
@@ -86,20 +81,17 @@ export function WizardModel({ reveal = 1 }: Props) {
 
     group.current.position.y = THREE.MathUtils.lerp(0, Math.sin(t * 0.8) * 0.05, 0.02)
 
-    const intro = THREE.MathUtils.clamp(scrollState.progress / 0.15, 0, 1)
-    const targetBase = intro * Math.PI * 2
-    prevTRef.current = THREE.MathUtils.clamp(t, 0, dt > 0 ? t : prevTRef.current + 0.016)
-    const dTarget = targetYRef.current - baseRef.current
-    const capped = Math.sign(dTarget) * Math.min(Math.abs(dTarget), 0.22)
-    if (Math.abs(capped) > 0.001) {
-      baseRef.current = targetYRef.current - capped
-      driftRef.current = THREE.MathUtils.lerp(driftRef.current, capped, 0.08)
-    } else {
-      driftRef.current = THREE.MathUtils.lerp(driftRef.current, 0, 0.03)
-    }
-    baseRef.current = THREE.MathUtils.lerp(baseRef.current, targetBase, 0.03 + Math.abs(intro - 0.5) * 0.12)
-    targetYRef.current = baseRef.current + driftRef.current
-    group.current.rotation.y = targetYRef.current
+    // Scroll-locked full 360° across the pinned hero runway: the spin tracks
+    // scroll closely so a complete turn lands by ~0.09, just before the camera
+    // begins its descent (CameraRig holds the hero pose to ~0.10). Once the turn
+    // completes, a gentle sine sway (eased in by `intro`) keeps it alive without
+    // re-spinning.
+    const intro = THREE.MathUtils.clamp(scrollState.progress / 0.09, 0, 1)
+    const sway = intro * Math.sin(t * 0.25) * 0.18
+    const targetY = intro * Math.PI * 2 + sway
+    const spinSmooth = 1 - Math.pow(0.12, dt)
+    spinRef.current = THREE.MathUtils.lerp(spinRef.current, targetY, spinSmooth)
+    group.current.rotation.y = spinRef.current
 
     if (wandLight.current) {
       wandLight.current.intensity = 0.9 + Math.sin(t * 3.1) * 0.45

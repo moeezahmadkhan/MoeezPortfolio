@@ -2,13 +2,18 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { scrollState, responsiveState } from '../scroll'
 
+// `at` = scroll fraction → camera pos/look. Fractions are derived from the real
+// section offsets (the hero is a tall pinned runway, so #wizard now starts ~0.20).
+// The duplicated hero pose (0.0 + 0.10) HOLDS the camera still through the hero
+// runway so the figurine can finish its full 360° spin before the descent begins.
 const KEYS: { at: number; pos: [number, number, number]; look: [number, number, number] }[] = [
   { at: 0.0, pos: [0, 1.15, 5.5], look: [0, 0.16, 0] },   // hero
-  { at: 0.11, pos: [4.5, 1.8, 3.8], look: [0, 0.3, 0] },  // about (#wizard)
-  { at: 0.24, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] }, // spells — entry
-  { at: 0.55, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] }, // spells — held across 01–04
-  { at: 0.77, pos: [4.5, 0.4, 4.6], look: [0, 0.0, 0] },  // grimoire
-  { at: 0.90, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] }, // chronicles
+  { at: 0.10, pos: [0, 1.15, 5.5], look: [0, 0.16, 0] },  // hero — hold while figurine spins 360°
+  { at: 0.197, pos: [4.5, 1.8, 3.8], look: [0, 0.3, 0] }, // about (#wizard)
+  { at: 0.31, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] }, // spells — entry
+  { at: 0.60, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] }, // spells — held across 01–04
+  { at: 0.793, pos: [4.5, 0.4, 4.6], look: [0, 0.0, 0] }, // grimoire
+  { at: 0.914, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },// chronicles
   { at: 1.0, pos: [0, 1.0, 10.5], look: [0, 0.2, 0] },    // owlpost
 ]
 
