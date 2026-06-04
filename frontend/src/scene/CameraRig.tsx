@@ -13,8 +13,8 @@ const KEYS: { at: number; pos: [number, number, number]; look: [number, number, 
   { at: 0.232, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.232)
   { at: 0.500, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across 01–04
   { at: 0.612, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },    // grimoire (measured 0.612)
-  { at: 0.705, pos: [12, 1.2, 5.2],   look: [12, 0.4, 0] },   // tracker — entry (measured 0.705)
-  { at: 0.857, pos: [12.6, 1.0, 5.0], look: [12, 0.5, 0] },   // tracker — held (measured 0.857)
+  { at: 0.705, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.705)
+  { at: 0.857, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held (measured 0.857)
   { at: 0.933, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.933)
   { at: 1.0,   pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost
 ]
