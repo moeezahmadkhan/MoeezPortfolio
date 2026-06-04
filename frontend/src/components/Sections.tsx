@@ -140,12 +140,31 @@ export function Grimoire() {
   )
 }
 
+export function Tracker() {
+  return (
+    <section id="tracker" className="section section--tracker tracker--pinned">
+      <div className="tracker__stage">
+        <MaskReveal>
+          <span className="eyebrow">Chapter V — The Tracker</span>
+        </MaskReveal>
+        <IgniteHeading className="section__title" text="It reads the pulse" />
+        <Reveal delay={0.1}>
+          <p className="tracker__lede">
+            A wrist. A heartbeat climbing under effort. The signal is caught,
+            saved, and read — an intelligence that answers for the body in motion.
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  )
+}
+
 export function Chronicles() {
   return (
     <section id="chronicles" className="section section--chronicles">
       <div className="section__wrap">
         <MaskReveal>
-          <span className="eyebrow">Chapter V — Chronicles</span>
+          <span className="eyebrow">Chapter VI — Chronicles</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="The path so far" />
         <div className="timeline">
@@ -181,7 +200,7 @@ export function OwlPost() {
     <section id="owlpost" className="section section--owl">
       <div className="section__wrap owl">
         <MaskReveal>
-          <span className="eyebrow">Chapter VI — Owl Post</span>
+          <span className="eyebrow">Chapter VII — Owl Post</span>
         </MaskReveal>
         <IgniteHeading className="section__title section__title--center" text="Send an owl" />
         <Reveal delay={0.1}>

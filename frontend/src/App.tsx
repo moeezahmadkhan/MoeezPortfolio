@@ -6,7 +6,7 @@ import { Hero } from './components/Hero'
 import { Cursor } from './components/Cursor'
 import { Candles } from './components/Candles'
 import { ScrollRail } from './components/ScrollRail'
-import { About, Spells, Grimoire, Chronicles, OwlPost } from './components/Sections'
+import { About, Spells, Grimoire, Tracker, Chronicles, OwlPost } from './components/Sections'
 import { useSmoothScroll } from './smoothScroll'
 import { useScrollTracker } from './scroll'
 import './App.css'
@@ -71,6 +71,7 @@ export default function App() {
         <About />
         <Spells />
         <Grimoire />
+        <Tracker />
         <Chronicles />
         <OwlPost />
       </main>

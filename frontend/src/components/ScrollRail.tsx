@@ -10,8 +10,9 @@ const chapters = [
   { id: 'wizard', label: 'II', at: 0.197 },
   { id: 'spells', label: 'III', at: 0.301 },
   { id: 'grimoire', label: 'IV', at: 0.793 },
-  { id: 'chronicles', label: 'V', at: 0.914 },
-  { id: 'owlpost', label: 'VI', at: 1.0 },
+  { id: 'tracker', label: 'V', at: 0.854 },
+  { id: 'chronicles', label: 'VI', at: 0.914 },
+  { id: 'owlpost', label: 'VII', at: 1.0 },
 ]
 
 /** A vertical "wand" on the page edge whose glowing core fills with scroll progress. */
