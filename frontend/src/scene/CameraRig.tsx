@@ -3,12 +3,13 @@ import * as THREE from 'three'
 import { scrollState, responsiveState } from '../scroll'
 
 const KEYS: { at: number; pos: [number, number, number]; look: [number, number, number] }[] = [
-  { at: 0.0, pos: [0, 1.15, 5.5], look: [0, 0.16, 0] },
-  { at: 0.2, pos: [4.5, 1.8, 3.8], look: [0, 0.3, 0] },
-  { at: 0.4, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },
-  { at: 0.6, pos: [4.5, 0.4, 4.6], look: [0, 0.0, 0] },
-  { at: 0.8, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },
-  { at: 1.0, pos: [0, 1.0, 10.5], look: [0, 0.2, 0] },
+  { at: 0.0, pos: [0, 1.15, 5.5], look: [0, 0.16, 0] },   // hero
+  { at: 0.11, pos: [4.5, 1.8, 3.8], look: [0, 0.3, 0] },  // about (#wizard)
+  { at: 0.24, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] }, // spells — entry
+  { at: 0.55, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] }, // spells — held across 01–04
+  { at: 0.77, pos: [4.5, 0.4, 4.6], look: [0, 0.0, 0] },  // grimoire
+  { at: 0.90, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] }, // chronicles
+  { at: 1.0, pos: [0, 1.0, 10.5], look: [0, 0.2, 0] },    // owlpost
 ]
 
 const current = new THREE.Vector3()
@@ -42,7 +43,7 @@ export function CameraRig() {
     sampleKeyframes(progress, 'look', targetLook)
 
     // Steady on first page, light parallax after intro completes.
-    const intro = THREE.MathUtils.smoothstep(scrollState.progress / 0.25, 0, 1)
+    const intro = THREE.MathUtils.smoothstep(scrollState.progress / 0.10, 0, 1)
     const parallax = THREE.MathUtils.lerp(0.08, 0.6, intro)
     target.x += scrollState.pointerX * parallax
     target.y += -scrollState.pointerY * parallax * 0.5

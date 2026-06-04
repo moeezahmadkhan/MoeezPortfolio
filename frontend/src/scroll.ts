@@ -1,4 +1,6 @@
 import { useEffect } from 'react'
+import type Lenis from 'lenis'
+import { getLenis } from './smoothScroll'
 
 /**
  * A module-level scroll singleton read inside R3F's useFrame loop.
@@ -18,7 +20,7 @@ export const responsiveState = {
 
 export function useScrollTracker() {
   useEffect(() => {
-    const onScroll = () => {
+    const nativeScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight
       scrollState.raw = window.scrollY
       scrollState.progress = max > 0 ? Math.min(window.scrollY / max, 1) : 0
@@ -31,15 +33,37 @@ export function useScrollTracker() {
       const vw = window.innerWidth
       responsiveState.zoom = vw < 640 ? 0.92 : vw < 1024 ? 0.96 : 1
     }
-    onScroll()
+
+    // When Lenis is active, read its smoothed scroll; otherwise fall back to
+    // native window scroll (e.g. under prefers-reduced-motion).
+    // getLenis() is populated by useSmoothScroll(), which must run before this
+    // hook in App.tsx; otherwise we silently fall back to native scroll.
+    const lenis = getLenis()
+    let detach = () => {}
+    if (lenis) {
+      const onLenis = (instance: Lenis) => {
+        scrollState.raw = instance.scroll
+        scrollState.progress = instance.limit > 0
+          ? Math.min(instance.scroll / instance.limit, 1)
+          : 0
+      }
+      lenis.on('scroll', onLenis)
+      detach = () => lenis.off('scroll', onLenis)
+    } else {
+      nativeScroll()
+      window.addEventListener('scroll', nativeScroll, { passive: true })
+      window.addEventListener('resize', nativeScroll)
+      detach = () => {
+        window.removeEventListener('scroll', nativeScroll)
+        window.removeEventListener('resize', nativeScroll)
+      }
+    }
+
     onResize()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
     window.addEventListener('resize', onResize)
     window.addEventListener('pointermove', onPointer, { passive: true })
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
+      detach()
       window.removeEventListener('resize', onResize)
       window.removeEventListener('pointermove', onPointer)
     }

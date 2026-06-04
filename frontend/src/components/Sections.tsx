@@ -1,16 +1,18 @@
-import { motion } from 'framer-motion'
-import { Reveal, IgniteHeading } from './Reveal'
+import { useRef, useState } from 'react'
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
+import { Reveal, IgniteHeading, MaskReveal } from './Reveal'
 import { Tilt } from './Tilt'
 import { projects, spellbook, chronicles } from '../data'
+import { useParallax } from './useParallax'
 import './sections.css'
 
 export function About() {
   return (
     <section id="wizard" className="section section--about">
       <div className="section__wrap about">
-        <Reveal className="about__eyebrow">
-          <p className="eyebrow">Chapter II — The Wizard</p>
-        </Reveal>
+        <MaskReveal className="about__eyebrow">
+          <span className="eyebrow">Chapter II — The Wizard</span>
+        </MaskReveal>
         <IgniteHeading className="section__title" text="The mind behind the wand" />
         <Reveal delay={0.1}>
           <p className="about__lede">
@@ -46,30 +48,77 @@ export function About() {
 }
 
 export function Spells() {
+  const ref = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start start', 'end end'],
+  })
+  const [step, setStep] = useState(0)
+  const last = spellbook.length - 1
+  useMotionValueEvent(scrollYProgress, 'change', (p) => {
+    const idx = Math.floor(p * spellbook.length)
+    setStep(Math.max(0, Math.min(last, idx)))
+  })
+
   return (
-    <section id="spells" className="section section--spells">
-      <div className="section__wrap">
-        <Reveal>
-          <p className="eyebrow">Chapter III — The Arsenal</p>
-        </Reveal>
+    <section id="spells" ref={ref} className="section section--spells spells--pinned">
+      <div className="spells__stage">
+        <MaskReveal>
+          <span className="eyebrow">Chapter III — The Arsenal</span>
+        </MaskReveal>
         <IgniteHeading className="section__title" text="Spells & Incantations" />
-        <div className="spells__grid">
-          {spellbook.map((group, i) => (
-            <Reveal key={group.title} delay={0.08 * i} className="spell-group">
-              <h3 className="spell-group__title">{group.title}</h3>
-              <ul className="spell-group__list">
-                {group.spells.map((s) => (
-                  <li key={s} className="spell-chip">
-                    <span className="spell-chip__rune">✦</span>
-                    {s}
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
-          ))}
+
+        <div className="spells__steps">
+          <div className="spells__index" aria-hidden>
+            {String(step + 1).padStart(2, '0')}
+            <span className="spells__index-total">/ {String(spellbook.length).padStart(2, '0')}</span>
+          </div>
+
+          <div className="spells__panel">
+            {spellbook.map((group, i) => (
+              <motion.div
+                key={group.title}
+                className="spell-group spell-group--step"
+                animate={{ opacity: i === step ? 1 : 0, y: i === step ? 0 : 24 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                style={{ pointerEvents: i === step ? 'auto' : 'none' }}
+              >
+                <h3 className="spell-group__title">{group.title}</h3>
+                <ul className="spell-group__list">
+                  {group.spells.map((s) => (
+                    <li key={s} className="spell-chip">
+                      <span className="spell-chip__rune">✦</span>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
+  )
+}
+
+function GrimoireCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
+  const [ref, y] = useParallax(40 + (i % 3) * 18)
+  return (
+    <motion.div ref={ref as React.RefObject<HTMLDivElement>} style={{ y }}>
+      <Reveal delay={0.06 * i}>
+        <Tilt className="spell-card">
+          <div className="spell-card__glyph">{p.glyph}</div>
+          <p className="spell-card__incant">“{p.incantation}”</p>
+          <h3 className="spell-card__name">{p.name}</h3>
+          <p className="spell-card__blurb">{p.blurb}</p>
+          <ul className="spell-card__tags">
+            {p.tags.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        </Tilt>
+      </Reveal>
+    </motion.div>
   )
 }
 
@@ -77,25 +126,13 @@ export function Grimoire() {
   return (
     <section id="grimoire" className="section section--grimoire">
       <div className="section__wrap">
-        <Reveal>
-          <p className="eyebrow">Chapter IV — The Grimoire</p>
-        </Reveal>
+        <MaskReveal>
+          <span className="eyebrow">Chapter IV — The Grimoire</span>
+        </MaskReveal>
         <IgniteHeading className="section__title" text="Works of conjuring" />
         <div className="grimoire__grid">
           {projects.map((p, i) => (
-            <Reveal key={p.name} delay={0.06 * i}>
-              <Tilt className="spell-card">
-                <div className="spell-card__glyph">{p.glyph}</div>
-                <p className="spell-card__incant">“{p.incantation}”</p>
-                <h3 className="spell-card__name">{p.name}</h3>
-                <p className="spell-card__blurb">{p.blurb}</p>
-                <ul className="spell-card__tags">
-                  {p.tags.map((t) => (
-                    <li key={t}>{t}</li>
-                  ))}
-                </ul>
-              </Tilt>
-            </Reveal>
+            <GrimoireCard key={p.name} p={p} i={i} />
           ))}
         </div>
       </div>
@@ -107,9 +144,9 @@ export function Chronicles() {
   return (
     <section id="chronicles" className="section section--chronicles">
       <div className="section__wrap">
-        <Reveal>
-          <p className="eyebrow">Chapter V — Chronicles</p>
-        </Reveal>
+        <MaskReveal>
+          <span className="eyebrow">Chapter V — Chronicles</span>
+        </MaskReveal>
         <IgniteHeading className="section__title" text="The path so far" />
         <div className="timeline">
           <motion.span
@@ -143,9 +180,9 @@ export function OwlPost() {
   return (
     <section id="owlpost" className="section section--owl">
       <div className="section__wrap owl">
-        <Reveal>
-          <p className="eyebrow">Chapter VI — Owl Post</p>
-        </Reveal>
+        <MaskReveal>
+          <span className="eyebrow">Chapter VI — Owl Post</span>
+        </MaskReveal>
         <IgniteHeading className="section__title section__title--center" text="Send an owl" />
         <Reveal delay={0.1}>
           <p className="owl__lede">

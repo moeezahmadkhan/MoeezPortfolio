@@ -64,11 +64,6 @@
 .stat__v { font-size: 0.95rem; letter-spacing: 0.04em; color: var(--parchment-dim); max-width: 14rem; }
 
 /* ── Spells ── */
-.spells__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.4rem;
-}
 .spell-group {
   border: 1px solid rgba(231, 194, 125, 0.14);
   border-radius: 6px;
@@ -248,4 +243,58 @@
 
 @media (max-width: 720px) {
   .about__stats { gap: 1.6rem; }
+}
+
+/* Pinned Spells: tall section (one viewport per step + one) with a sticky stage. */
+.spells--pinned {
+  height: 500vh;            /* 4 steps + 1; tune for pacing */
+  padding: 0;
+}
+.spells__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.2rem;
+  padding: clamp(2rem, 6vw, 6rem);
+  box-sizing: border-box;
+}
+.spells__steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+  align-items: center;
+  gap: clamp(1rem, 5vw, 4rem);
+  min-height: 42vh;
+}
+.spells__index {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(4rem, 14vw, 12rem);
+  line-height: 0.9;
+  color: var(--gold);
+  opacity: 0.85;
+}
+.spells__index-total {
+  display: block;
+  font-size: 0.18em;
+  letter-spacing: 0.3em;
+  opacity: 0.6;
+}
+.spells__panel {
+  position: relative;
+  min-height: 38vh;
+}
+.spell-group--step {
+  position: absolute;
+  inset: 0;
+}
+
+/* Reduced motion: drop the pin, restore a normal stacked grid. */
+@media (prefers-reduced-motion: reduce) {
+  .spells--pinned { height: auto; }
+  .spells__stage { position: static; height: auto; }
+  .spell-group--step { position: static; opacity: 1 !important; transform: none !important; }
+  .spells__panel { min-height: 0; }
 }

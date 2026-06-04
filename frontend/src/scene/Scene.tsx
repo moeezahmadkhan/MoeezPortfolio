@@ -16,6 +16,7 @@ import { WizardModel } from './WizardModel'
 import { RuneCircle } from './RuneCircle'
 import { Candlelight } from './Candlelight'
 import { CameraRig } from './CameraRig'
+import { ScrollDriver } from './ScrollDriver'
 
 export function Scene({ reveal }: { reveal: number }) {
   const [dpr, setDpr] = useState(1.5)
@@ -35,6 +36,7 @@ export function Scene({ reveal }: { reveal: number }) {
         onIncline={() => setDpr(Math.min(window.devicePixelRatio, 2))}
       />
       <AdaptiveDpr pixelated />
+      <ScrollDriver />
       <CameraRig />
 
       {/* ── Lighting: low moody hall to hide model artifacts ── */}
