@@ -20,7 +20,7 @@ export function ScanRings() {
       const s = 0.4 + phase * 2.2
       m.scale.set(s, s, s)
       const mat = m.material as THREE.MeshBasicMaterial
-      mat.opacity = gate * (1 - phase) * 0.6
+      mat.opacity = gate * Math.sin(Math.PI * phase) * 0.6
     })
   })
 
