@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { getLenis, prefersReducedMotion } from './smoothScroll'
+import type Lenis from 'lenis'
+import { getLenis } from './smoothScroll'
 
 /**
  * A module-level scroll singleton read inside R3F's useFrame loop.
@@ -35,12 +36,16 @@ export function useScrollTracker() {
 
     // When Lenis is active, read its smoothed scroll; otherwise fall back to
     // native window scroll (e.g. under prefers-reduced-motion).
+    // getLenis() is populated by useSmoothScroll(), which must run before this
+    // hook in App.tsx; otherwise we silently fall back to native scroll.
     const lenis = getLenis()
     let detach = () => {}
-    if (lenis && !prefersReducedMotion()) {
-      const onLenis = (e: { scroll: number; limit: number }) => {
-        scrollState.raw = e.scroll
-        scrollState.progress = e.limit > 0 ? Math.min(e.scroll / e.limit, 1) : 0
+    if (lenis) {
+      const onLenis = (instance: Lenis) => {
+        scrollState.raw = instance.scroll
+        scrollState.progress = instance.limit > 0
+          ? Math.min(instance.scroll / instance.limit, 1)
+          : 0
       }
       lenis.on('scroll', onLenis)
       detach = () => lenis.off('scroll', onLenis)
