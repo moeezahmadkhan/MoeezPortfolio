@@ -39,7 +39,7 @@ export function DataStream() {
 
   return (
     <group>
-      <instancedMesh ref={mesh} args={[undefined, undefined, COUNT]}>
+      <instancedMesh ref={mesh} args={[undefined, undefined, COUNT]} frustumCulled={false}>
         <sphereGeometry args={[1, 8, 8]} />
         <meshBasicMaterial color="#7cffb0" transparent opacity={0.9} blending={THREE.AdditiveBlending} depthWrite={false} />
       </instancedMesh>
