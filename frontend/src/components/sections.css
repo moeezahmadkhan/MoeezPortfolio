@@ -64,11 +64,6 @@
 .stat__v { font-size: 0.95rem; letter-spacing: 0.04em; color: var(--parchment-dim); max-width: 14rem; }
 
 /* ── Spells ── */
-.spells__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.4rem;
-}
 .spell-group {
   border: 1px solid rgba(231, 194, 125, 0.14);
   border-radius: 6px;

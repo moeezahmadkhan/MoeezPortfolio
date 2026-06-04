@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useProgress } from '@react-three/drei'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, MotionConfig, motion } from 'framer-motion'
 import { Scene } from './scene/Scene'
 import { Hero } from './components/Hero'
 import { Cursor } from './components/Cursor'
@@ -42,7 +42,7 @@ export default function App() {
   }, [loaded])
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <div className="canvas-layer">
         <Scene reveal={reveal} />
       </div>
@@ -74,6 +74,6 @@ export default function App() {
         <Chronicles />
         <OwlPost />
       </main>
-    </>
+    </MotionConfig>
   )
 }
