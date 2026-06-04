@@ -6,6 +6,7 @@ import { scrollState } from '../../scroll'
 import { STATION, localProgress } from './phases'
 import { ScanRings } from './ScanRings'
 import { Heartbeat } from './Heartbeat'
+import { DataStream } from './DataStream'
 
 const RING_FLOOR_Y = -1.32
 
@@ -91,6 +92,9 @@ export function TrackerStation() {
 
       {/* hero ECG trace + climbing BPM at the wrist */}
       <Heartbeat />
+
+      {/* particles streaming wrist→datastore + glowing store cube */}
+      <DataStream />
     </group>
   )
 }
