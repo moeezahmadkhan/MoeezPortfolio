@@ -7,6 +7,7 @@ import { STATION, localProgress } from './phases'
 import { ScanRings } from './ScanRings'
 import { Heartbeat } from './Heartbeat'
 import { DataStream } from './DataStream'
+import { AICore } from './AICore'
 
 const RING_FLOOR_Y = -1.32
 
@@ -95,6 +96,9 @@ export function TrackerStation() {
 
       {/* particles streaming wrist→datastore + glowing store cube */}
       <DataStream />
+
+      {/* AI answer beat: glowing wireframe icosahedron above the figure */}
+      <AICore />
     </group>
   )
 }
