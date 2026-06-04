@@ -3,18 +3,20 @@ import * as THREE from 'three'
 import { scrollState, responsiveState } from '../scroll'
 
 // `at` = scroll fraction → camera pos/look. Fractions are derived from the real
-// section offsets (the hero is a tall pinned runway, so #wizard now starts ~0.20).
+// section offsets measured via puppeteer (1440×900 viewport, 2026-06-04).
 // The duplicated hero pose (0.0 + 0.10) HOLDS the camera still through the hero
 // runway so the figurine can finish its full 360° spin before the descent begins.
 const KEYS: { at: number; pos: [number, number, number]; look: [number, number, number] }[] = [
-  { at: 0.0, pos: [0, 1.15, 5.5], look: [0, 0.16, 0] },   // hero
-  { at: 0.10, pos: [0, 1.15, 5.5], look: [0, 0.16, 0] },  // hero — hold while figurine spins 360°
-  { at: 0.197, pos: [4.5, 1.8, 3.8], look: [0, 0.3, 0] }, // about (#wizard)
-  { at: 0.31, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] }, // spells — entry
-  { at: 0.60, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] }, // spells — held across 01–04
-  { at: 0.793, pos: [4.5, 0.4, 4.6], look: [0, 0.0, 0] }, // grimoire
-  { at: 0.914, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },// chronicles
-  { at: 1.0, pos: [0, 1.0, 10.5], look: [0, 0.2, 0] },    // owlpost
+  { at: 0.0,   pos: [0, 1.15, 5.5],   look: [0, 0.16, 0] },   // hero
+  { at: 0.10,  pos: [0, 1.15, 5.5],   look: [0, 0.16, 0] },   // hero — hold while figurine spins 360°
+  { at: 0.152, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.152
+  { at: 0.232, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.232)
+  { at: 0.500, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across 01–04
+  { at: 0.612, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },    // grimoire (measured 0.612)
+  { at: 0.705, pos: [12, 1.2, 5.2],   look: [12, 0.4, 0] },   // tracker — entry (measured 0.705)
+  { at: 0.857, pos: [12.6, 1.0, 5.0], look: [12, 0.5, 0] },   // tracker — held (measured 0.857)
+  { at: 0.933, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.933)
+  { at: 1.0,   pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost
 ]
 
 const current = new THREE.Vector3()
