@@ -4,6 +4,7 @@ import { useGLTF, Center } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from '../../scroll'
 import { STATION, localProgress } from './phases'
+import { ScanRings } from './ScanRings'
 
 const RING_FLOOR_Y = -1.32
 
@@ -83,6 +84,9 @@ export function TrackerStation() {
           <primitive object={model} scale={3} />
         </Center>
       </group>
+
+      {/* pulsing scan rings around the figure */}
+      <ScanRings />
     </group>
   )
 }
