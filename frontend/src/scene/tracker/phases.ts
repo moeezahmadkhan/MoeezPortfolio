@@ -7,7 +7,7 @@ import * as THREE from 'three'
 export const STATION: [number, number, number] = [12, 0, 0]
 
 /** Local-space anchors (relative to the station group). */
-export const WRIST_ANCHOR: [number, number, number] = [0.5, 0.3, 0.4]
+export const WRIST_ANCHOR: [number, number, number] = [-0.25, -0.18, 0.5]
 export const DATASTORE_POS: [number, number, number] = [2.0, 0.9, 0]
 export const AICORE_POS: [number, number, number] = [0, 2.4, 0]
 
