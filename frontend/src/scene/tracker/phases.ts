@@ -15,8 +15,8 @@ export const AICORE_POS: [number, number, number] = [0, 2.4, 0]
  * Scroll fractions spanning the pinned #tracker section. CALIBRATE in Step 2
  * from measured DOM offsets; keep in sync with the #tracker CameraRig KEYS.
  */
-export const SECTION_START = 0.705
-export const SECTION_END = 0.857
+export const SECTION_START = 0.731
+export const SECTION_END = 0.900
 
 /** Maps global scroll progress (0→1 across the page) to 0→1 local progress within the tracker section. */
 export function localProgress(progress: number) {

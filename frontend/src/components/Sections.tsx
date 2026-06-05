@@ -4,6 +4,7 @@ import { Reveal, IgniteHeading, MaskReveal } from './Reveal'
 import { OwlPostForm } from './OwlPostForm'
 import { Tilt } from './Tilt'
 import { projects, spellbook, chronicles } from '../data'
+import { spellState, NODES } from '../scene/spell/spell'
 import { useParallax } from './useParallax'
 import './sections.css'
 
@@ -141,12 +142,55 @@ export function Grimoire() {
   )
 }
 
+export function Conjuring() {
+  const [cast, setCast] = useState(false)
+
+  const onCast = () => {
+    spellState.requested = true
+    setCast(true) // local flag only drives the button label; canvas reads the singleton
+  }
+
+  return (
+    <section id="conjuring" className="section section--conjuring conjuring--pinned">
+      <div className="conjuring__stage">
+        <MaskReveal>
+          <span className="eyebrow">Chapter V — The Conjuring of Apps</span>
+        </MaskReveal>
+        <IgniteHeading className="section__title" text="One spell, end to end" />
+        <Reveal delay={0.1}>
+          <p className="conjuring__lede">
+            From a brief to a living product — retrieval-augmented intelligence, a
+            FastAPI spine, containerized and summoned onto AWS or GCP. Cast the spell and
+            watch a full-stack AI app assemble itself, A&nbsp;→&nbsp;Z.
+          </p>
+        </Reveal>
+        <Reveal delay={0.18}>
+          <button type="button" className="cast-btn" onClick={onCast}>
+            <span className="cast-btn__rune">✦</span>
+            {cast ? 'Recast the spell' : 'Cast the spell'}
+          </button>
+        </Reveal>
+        <Reveal delay={0.24}>
+          <ol className="conjuring__legend">
+            {NODES.map((n) => (
+              <li key={n.name} className="conjuring__legend-item">
+                <span className="conjuring__legend-name">{n.name}</span>
+                <span className="conjuring__legend-tags">{n.tags.join(' · ')}</span>
+              </li>
+            ))}
+          </ol>
+        </Reveal>
+      </div>
+    </section>
+  )
+}
+
 export function Tracker() {
   return (
     <section id="tracker" className="section section--tracker tracker--pinned">
       <div className="tracker__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter V — The Tracker</span>
+          <span className="eyebrow">Chapter VI — The Tracker</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="It reads the pulse" />
         <Reveal delay={0.1}>
@@ -165,7 +209,7 @@ export function Chronicles() {
     <section id="chronicles" className="section section--chronicles">
       <div className="section__wrap">
         <MaskReveal>
-          <span className="eyebrow">Chapter VI — Chronicles</span>
+          <span className="eyebrow">Chapter VII — Chronicles</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="The path so far" />
         <div className="timeline">
@@ -201,7 +245,7 @@ export function OwlPost() {
     <section id="owlpost" className="section section--owl">
       <div className="section__wrap owl">
         <MaskReveal>
-          <span className="eyebrow">Chapter VII — Owl Post</span>
+          <span className="eyebrow">Chapter VIII — Owl Post</span>
         </MaskReveal>
         <IgniteHeading className="section__title section__title--center" text="Send an owl" />
         <Reveal delay={0.1}>
@@ -217,8 +261,8 @@ export function OwlPost() {
           <a className="owl__link" href="mailto:kmoeez2018@gmail.com">
             <span className="owl__rune">✉</span> kmoeez2018@gmail.com
           </a>
-          <a className="owl__link" href="tel:+923035772640">
-            <span className="owl__rune">☎</span> 0303 577 2640
+          <a className="owl__link" href="https://github.com/moeezahmadkhan" target="_blank" rel="noreferrer">
+            <span className="owl__rune">⌥</span> github.com/moeezahmadkhan
           </a>
           <span className="owl__link owl__link--static">
             <span className="owl__rune">⌖</span> Lahore, Pakistan

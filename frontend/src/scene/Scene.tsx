@@ -18,6 +18,7 @@ import { Candlelight } from './Candlelight'
 import { CameraRig } from './CameraRig'
 import { ScrollDriver } from './ScrollDriver'
 import { TrackerStation } from './tracker/TrackerStation'
+import { SpellStation } from './spell/SpellStation'
 
 export function Scene({ reveal }: { reveal: number }) {
   const [dpr, setDpr] = useState(1.5)
@@ -77,6 +78,7 @@ export function Scene({ reveal }: { reveal: number }) {
 
         <RuneCircle />
         <TrackerStation />
+        <SpellStation />
 
         {/* Floating golden dust + finer white motes */}
         <Sparkles count={70} scale={[8, 6, 8]} size={5} speed={0.25} color="#f3d99b" opacity={0.7} />
