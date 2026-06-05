@@ -1,0 +1,74 @@
+.scroll-cues {
+  position: fixed;
+  left: 50%;
+  bottom: 2.2rem;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--parchment-dim);
+  pointer-events: none; /* overlay never blocks scroll/clicks… */
+  transition: opacity 0.5s ease;
+}
+
+/* …except the explicit back-to-top button. */
+.scroll-cues__top {
+  pointer-events: auto;
+  cursor: pointer;
+  background: none;
+  border: 1px solid rgba(231, 194, 125, 0.35);
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--gold);
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+.scroll-cues__top:hover {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+}
+
+.scroll-cues__label {
+  color: var(--gold-deep);
+}
+.scroll-cues__arrow {
+  color: var(--gold);
+  animation: cue-bob 1.8s ease-in-out infinite;
+}
+.scroll-cues__text {
+  color: var(--parchment);
+}
+
+/* Mode switching: next vs end. */
+.scroll-cues[data-mode='next'] .scroll-cues__top {
+  display: none;
+}
+.scroll-cues[data-mode='end'] .scroll-cues__label,
+.scroll-cues[data-mode='end'] .scroll-cues__arrow {
+  display: none;
+}
+
+@keyframes cue-bob {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(3px); opacity: 1; }
+}
+
+/* Reduced motion: keep the cues (they're informational) but kill movement. */
+.scroll-cues--static {
+  transition: none;
+}
+.scroll-cues--static .scroll-cues__arrow {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cues__arrow { animation: none; }
+  .scroll-cues { transition: none; }
+}

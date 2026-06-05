@@ -6,6 +6,7 @@ import { Hero } from './components/Hero'
 import { Cursor } from './components/Cursor'
 import { Candles } from './components/Candles'
 import { ScrollRail } from './components/ScrollRail'
+import { ScrollCues } from './components/ScrollCues'
 import { About, Spells, Grimoire, Tracker, Chronicles, OwlPost } from './components/Sections'
 import { useSmoothScroll } from './smoothScroll'
 import { useScrollTracker } from './scroll'
@@ -52,6 +53,7 @@ export default function App() {
       <Candles />
       <Cursor />
       <ScrollRail />
+      <ScrollCues visible={loaded} />
 
       <AnimatePresence>
         {!loaded && (
