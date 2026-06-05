@@ -39,7 +39,7 @@ export function useScrollSettle() {
       if (idle) clearTimeout(idle)
       idle = setTimeout(() => {
         const target = settleTarget(
-          instance.scroll,
+          lenis.scroll,
           sectionTops(),
           window.innerHeight * MAGNET_FRACTION,
         )
@@ -63,12 +63,17 @@ export function useScrollSettle() {
     }
 
     lenis.on('scroll', onScroll)
+    // Any user-initiated scroll cancels an in-flight assist so it can re-arm.
     window.addEventListener('wheel', cancel, { passive: true })
     window.addEventListener('touchstart', cancel, { passive: true })
+    window.addEventListener('keydown', cancel)
+    window.addEventListener('pointerdown', cancel)
     return () => {
       lenis.off('scroll', onScroll)
       window.removeEventListener('wheel', cancel)
       window.removeEventListener('touchstart', cancel)
+      window.removeEventListener('keydown', cancel)
+      window.removeEventListener('pointerdown', cancel)
       if (idle) clearTimeout(idle)
     }
   }, [])
