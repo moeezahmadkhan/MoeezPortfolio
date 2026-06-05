@@ -8,18 +8,18 @@ import { WRIST_ANCHOR, localProgress, ramp, metricsAt, type Metrics } from './ph
 interface Tile {
   key: string
   color: string
-  angle: number // base angle around the wrist (radians)
+  offset: [number, number] // fixed [x,y] fan position relative to the wrist
   format: (m: Metrics) => string
 }
 
+// BPM is owned by the big Heartbeat readout, so the tiles carry the rest —
+// fanned into a tidy, evenly-spaced column to the right of the wrist (no orbit).
 const TILES: Tile[] = [
-  { key: 'bpm', color: '#ff4d5e', angle: Math.PI * 0.5, format: (m) => `♥ ${m.bpm}` },
-  { key: 'cal', color: '#8fe9ff', angle: Math.PI * 0.85, format: (m) => `${m.cal} cal` },
-  { key: 'steps', color: '#7cffb0', angle: Math.PI * 1.2, format: (m) => `${(m.steps / 1000).toFixed(1)}k` },
-  { key: 'spo2', color: '#8fe9ff', angle: Math.PI * 1.55, format: (m) => `SpO2 ${m.spo2}%` },
+  { key: 'cal', color: '#8fe9ff', offset: [1.5, 0.4], format: (m) => `${m.cal} cal` },
+  { key: 'steps', color: '#7cffb0', offset: [1.62, 0.0], format: (m) => `${(m.steps / 1000).toFixed(1)}k` },
+  { key: 'spo2', color: '#8fe9ff', offset: [1.5, -0.4], format: (m) => `SpO2 ${m.spo2}%` },
 ]
 
-const RADIUS = 0.6
 const ANCHOR = new THREE.Vector3(...WRIST_ANCHOR)
 const M0 = metricsAt(0)
 
@@ -31,8 +31,8 @@ export function WristTiles() {
 
   useFrame((state) => {
     const lp = localProgress(scrollState.progress)
-    // visible across the live + save beats, gone by the AI answer beat
-    const vis = ramp(lp, 0.18, 0.4) * (1 - ramp(lp, 0.62, 0.78))
+    // own the live beat, then clear out so the saved-stats summary reads alone
+    const vis = ramp(lp, 0.18, 0.4) * (1 - ramp(lp, 0.48, 0.58))
     if (root.current) {
       root.current.visible = vis > 0.02
       root.current.scale.setScalar(0.7 + vis * 0.3)
@@ -44,10 +44,10 @@ export function WristTiles() {
     TILES.forEach((tile, i) => {
       const g = tiles.current[i]
       if (g) {
-        const a = tile.angle + t * 0.15 // slow orbit
+        const bob = Math.sin(t * 0.8 + i * 1.3) * 0.015 // gentle life, no orbit
         g.position.set(
-          ANCHOR.x + Math.cos(a) * RADIUS,
-          ANCHOR.y + Math.sin(a) * RADIUS * 0.6 + 0.15,
+          ANCHOR.x + tile.offset[0],
+          ANCHOR.y + tile.offset[1] + bob,
           ANCHOR.z,
         )
       }
@@ -74,11 +74,11 @@ export function WristTiles() {
         >
           <Billboard>
             <mesh>
-              <planeGeometry args={[0.42, 0.16]} />
+              <planeGeometry args={[0.56, 0.2]} />
               <meshBasicMaterial color="#06222b" transparent opacity={0.55} depthWrite={false} />
             </mesh>
             <mesh position={[0, 0, -0.001]}>
-              <planeGeometry args={[0.46, 0.2]} />
+              <planeGeometry args={[0.6, 0.24]} />
               <meshBasicMaterial
                 color={tile.color}
                 transparent
@@ -92,7 +92,7 @@ export function WristTiles() {
                 texts.current[i] = el
               }}
               position={[0, 0, 0.01]}
-              fontSize={0.09}
+              fontSize={0.088}
               color={tile.color}
               anchorX="center"
               anchorY="middle"

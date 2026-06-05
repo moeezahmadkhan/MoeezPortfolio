@@ -12,12 +12,14 @@ export function HudText() {
 
   useFrame(() => {
     const lp = localProgress(scrollState.progress)
-    const save = ramp(lp, 0.5, 0.7)
+    // fades in once the live vitals have cleared, then out as the AI cards arrive
+    const save = ramp(lp, 0.56, 0.64) * (1 - ramp(lp, 0.72, 0.78))
     if (stats.current) {
-      stats.current.visible = save > 0.05
+      stats.current.visible = save > 0.02
       stats.current.scale.setScalar(0.85 + save * 0.15)
     }
     if (statText.current) {
+      statText.current.fillOpacity = save
       const m = metricsAt(lp)
       const str =
         `♥ ${m.bpm}  ·  ${(m.steps / 1000).toFixed(1)}k steps\n` +

@@ -5,7 +5,7 @@ import * as THREE from 'three'
 import { scrollState } from '../../scroll'
 import { AICORE_POS, localProgress, pulse, metricsAt, type Metrics } from './phases'
 
-const ANS_START = 0.7
+const ANS_START = 0.78
 const ANS_END = 1.0
 
 interface Card {
@@ -36,7 +36,7 @@ export function InsightCards() {
       if (g) {
         g.visible = o > 0.02
         g.scale.setScalar(0.9 + o * 0.1)
-        g.position.y = AICORE_POS[1] - 0.9 + o * 0.12
+        g.position.y = AICORE_POS[1] - 0.85 + o * 0.12
       }
       const txt = texts.current[i]
       if (txt) {
@@ -58,23 +58,23 @@ export function InsightCards() {
           ref={(el) => {
             groups.current[i] = el
           }}
-          position={[AICORE_POS[0], AICORE_POS[1] - 0.9, AICORE_POS[2]]}
+          position={[AICORE_POS[0] + 1.7, AICORE_POS[1] - 0.85, AICORE_POS[2]]}
           visible={false}
         >
           <Billboard>
             <mesh position={[0, 0, -0.01]}>
-              <planeGeometry args={[2.0, 0.4]} />
+              <planeGeometry args={[2.3, 0.5]} />
               <meshBasicMaterial color="#06251c" transparent opacity={0.5} depthWrite={false} />
             </mesh>
             <Text
               ref={(el) => {
                 texts.current[i] = el
               }}
-              fontSize={0.16}
+              fontSize={0.135}
               color="#bfffe0"
               anchorX="center"
               anchorY="middle"
-              maxWidth={3.2}
+              maxWidth={2.1}
               textAlign="center"
             >
               {card.text(M0)}

@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { useGLTF, Center } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from '../../scroll'
-import { STATION, localProgress } from './phases'
+import { STATION, WRIST_ANCHOR, localProgress } from './phases'
 import { ScanRings } from './ScanRings'
 import { Heartbeat } from './Heartbeat'
 import { WristTiles } from './WristTiles'
@@ -73,6 +73,15 @@ export function TrackerStation() {
       <pointLight position={[2, 3, 3]} intensity={6} color="#35e0ff" distance={14} decay={2} />
       <pointLight position={[-2.5, 1.5, 2]} intensity={3} color="#1f8fb0" distance={12} decay={2} />
       <spotLight position={[0, 5, 4]} angle={0.6} penumbra={1} intensity={10} color="#bfefff" target-position={[STATION[0], 0.5, 0]} />
+
+      {/* gentle wrist fill so the watch lifts out of shadow — kept dim to stay under Bloom */}
+      <pointLight
+        position={[WRIST_ANCHOR[0], WRIST_ANCHOR[1], WRIST_ANCHOR[2] + 0.2]}
+        intensity={1.1}
+        color="#dff6ff"
+        distance={0.9}
+        decay={2}
+      />
 
       {/* scan platform rings on the floor */}
       <group position={[0, RING_FLOOR_Y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
