@@ -9,6 +9,7 @@ import { ScrollRail } from './components/ScrollRail'
 import { About, Spells, Grimoire, Tracker, Chronicles, OwlPost } from './components/Sections'
 import { useSmoothScroll } from './smoothScroll'
 import { useScrollTracker } from './scroll'
+import { useScrollSettle } from './useScrollSettle'
 import './App.css'
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
 
   useSmoothScroll()
   useScrollTracker()
+  useScrollSettle()
 
   // Once assets finish, hold a beat then drive the conjuring reveal 0 → 1.
   useEffect(() => {
