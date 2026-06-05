@@ -327,3 +327,83 @@
   .tracker--pinned { height: auto; }
   .tracker__stage { position: static; min-height: 0; }
 }
+
+/* ── Chapter V — The Conjuring of Apps (pinned runway) ── */
+.conjuring--pinned {
+  height: 250vh;
+  padding: 0;
+}
+.conjuring__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  max-width: 42rem;
+  padding: clamp(2rem, 6vw, 6rem);
+  box-sizing: border-box;
+}
+.conjuring__lede {
+  max-width: 34ch;
+  color: var(--parchment-dim);
+  font-family: var(--font-body);
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  line-height: 1.5;
+}
+.cast-btn {
+  align-self: flex-start;
+  margin-top: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 0 24px rgba(231, 194, 125, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cast-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 38px rgba(231, 194, 125, 0.85);
+}
+.cast-btn__rune { color: var(--rune); }
+.conjuring__legend {
+  margin: 1.4rem 0 0;
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+  max-width: 30rem;
+}
+.conjuring__legend-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid rgba(231, 194, 125, 0.18);
+  padding-top: 0.45rem;
+}
+.conjuring__legend-name {
+  font-family: var(--font-display);
+  color: var(--gold);
+  font-size: 0.9rem;
+}
+.conjuring__legend-tags {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--rune);
+  text-align: right;
+  align-self: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conjuring--pinned { height: auto; }
+  .conjuring__stage { position: static; min-height: 0; }
+}
