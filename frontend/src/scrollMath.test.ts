@@ -4,12 +4,13 @@ import { activeIndex, settleTarget, nextCue } from './scrollMath'
 const TOPS = [0, 1000, 2000, 5000] // ascending section tops (px)
 
 describe('activeIndex', () => {
-  it('returns the last section whose top is at or above the anchor', () => {
+  it('returns the last section whose top is at or below the anchor', () => {
     expect(activeIndex(0, TOPS)).toBe(0)
     expect(activeIndex(999, TOPS)).toBe(0)
     expect(activeIndex(1000, TOPS)).toBe(1)
     expect(activeIndex(2500, TOPS)).toBe(2)
     expect(activeIndex(9999, TOPS)).toBe(3)
+    expect(activeIndex(0, [])).toBe(0)
   })
 })
 
@@ -33,5 +34,7 @@ describe('nextCue', () => {
   })
   it('reports no next section past the final boundary', () => {
     expect(nextCue(5000, TOPS, 150)).toEqual({ active: false, nextIndex: null })
+    // within epsilon of last boundary
+    expect(nextCue(4997, TOPS, 150)).toEqual({ active: false, nextIndex: null })
   })
 })

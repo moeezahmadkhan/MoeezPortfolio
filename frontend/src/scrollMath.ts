@@ -6,6 +6,7 @@
 
 /** Index of the section occupying `anchorY` (e.g. viewport-center in doc px). */
 export function activeIndex(anchorY: number, tops: number[]): number {
+  if (tops.length === 0) return 0
   let idx = 0
   for (let i = 0; i < tops.length; i++) {
     if (anchorY >= tops[i]) idx = i
@@ -29,6 +30,7 @@ export function settleTarget(
   let bestDist = Infinity
   for (const top of tops) {
     const d = Math.abs(top - scrollY)
+    // strict < keeps tie-breaks at the lower boundary (ascending tops assumed)
     if (d < bestDist) {
       bestDist = d
       best = top
