@@ -13,6 +13,8 @@ import { HudText } from './HudText'
 import { InsightCards } from './InsightCards'
 
 const RING_FLOOR_Y = -1.32
+/** Base yaw of the cricketer — turned to face the camera/viewer. */
+const FACING_Y = -1.5
 
 useGLTF.preload('/models/cricket_improved.glb')
 
@@ -62,7 +64,7 @@ export function TrackerStation() {
     if (!figure.current) return
     const t = state.clock.elapsedTime
     figure.current.position.y = Math.sin(t * 0.8) * 0.04
-    figure.current.rotation.y = -0.4 + Math.sin(t * 0.18) * 0.12
+    figure.current.rotation.y = FACING_Y + Math.sin(t * 0.18) * 0.12
   })
 
   return (
