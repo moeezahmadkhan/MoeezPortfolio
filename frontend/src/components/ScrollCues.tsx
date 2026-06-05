@@ -27,20 +27,24 @@ export function ScrollCues({ visible }: { visible: boolean }) {
 
       const scrollY = window.scrollY
       const vh = window.innerHeight
-      const tops = chapters.map((c) => {
-        const el = document.getElementById(c.id)
-        return el ? el.getBoundingClientRect().top + scrollY : Number.POSITIVE_INFINITY
-      })
-      const valid = tops.filter((t) => Number.isFinite(t)) as number[]
-      if (valid.length < 2) {
+      // Pair each present section's top with its chapter index so the labels stay
+      // correct even if a section id is missing from the DOM.
+      const entries = chapters
+        .map((c, ci) => {
+          const el = document.getElementById(c.id)
+          return el ? { top: el.getBoundingClientRect().top + scrollY, ci } : null
+        })
+        .filter((e): e is { top: number; ci: number } => e !== null)
+      if (entries.length < 2) {
         root.style.opacity = '0'
         return
       }
+      const tops = entries.map((e) => e.top)
 
-      const idx = activeIndex(scrollY + vh * 0.5, valid)
+      const idx = activeIndex(scrollY + vh * 0.5, tops)
 
       // Final section → end cue (back to top).
-      if (idx >= valid.length - 1) {
+      if (idx >= tops.length - 1) {
         root.dataset.mode = 'end'
         text.textContent = "you've reached the end"
         root.style.opacity = '1'
@@ -55,11 +59,11 @@ export function ScrollCues({ visible }: { visible: boolean }) {
       }
 
       // Next-section cue: threshold = 16% of the CURRENT section's height.
-      const threshold = (valid[idx + 1] - valid[idx]) * CUE_FRACTION
-      const { active, nextIndex } = nextCue(scrollY, valid, threshold)
+      const threshold = (tops[idx + 1] - tops[idx]) * CUE_FRACTION
+      const { active, nextIndex } = nextCue(scrollY, tops, threshold)
       root.dataset.mode = 'next'
       if (active && nextIndex !== null) {
-        const c = chapters[nextIndex]
+        const c = chapters[entries[nextIndex].ci]
         text.textContent = `${c.theme} · ${c.plain}`
         root.style.opacity = '1'
       } else {
