@@ -190,7 +190,7 @@ export function Tracker() {
     <section id="tracker" className="section section--tracker tracker--pinned">
       <div className="tracker__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter V — The Tracker</span>
+          <span className="eyebrow">Chapter VI — The Tracker</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="It reads the pulse" />
         <Reveal delay={0.1}>
@@ -209,7 +209,7 @@ export function Chronicles() {
     <section id="chronicles" className="section section--chronicles">
       <div className="section__wrap">
         <MaskReveal>
-          <span className="eyebrow">Chapter VI — Chronicles</span>
+          <span className="eyebrow">Chapter VII — Chronicles</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="The path so far" />
         <div className="timeline">
@@ -245,7 +245,7 @@ export function OwlPost() {
     <section id="owlpost" className="section section--owl">
       <div className="section__wrap owl">
         <MaskReveal>
-          <span className="eyebrow">Chapter VII — Owl Post</span>
+          <span className="eyebrow">Chapter VIII — Owl Post</span>
         </MaskReveal>
         <IgniteHeading className="section__title section__title--center" text="Send an owl" />
         <Reveal delay={0.1}>
@@ -260,6 +260,9 @@ export function OwlPost() {
         <Reveal delay={0.2} className="owl__links">
           <a className="owl__link" href="mailto:kmoeez2018@gmail.com">
             <span className="owl__rune">✉</span> kmoeez2018@gmail.com
+          </a>
+          <a className="owl__link" href="https://github.com/moeezahmadkhan" target="_blank" rel="noreferrer">
+            <span className="owl__rune">⌥</span> github.com/moeezahmadkhan
           </a>
           <span className="owl__link owl__link--static">
             <span className="owl__rune">⌖</span> Lahore, Pakistan

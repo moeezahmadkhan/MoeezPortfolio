@@ -345,6 +345,21 @@
   padding: clamp(2rem, 6vw, 6rem);
   box-sizing: border-box;
 }
+/* legibility scrim so the pitch copy reads over the 3D chamber behind it */
+.conjuring__stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(7, 7, 13, 0.82) 0%,
+    rgba(7, 7, 13, 0.55) 45%,
+    rgba(7, 7, 13, 0) 82%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+.conjuring__stage > * { position: relative; }
 .conjuring__lede {
   max-width: 34ch;
   color: var(--parchment-dim);

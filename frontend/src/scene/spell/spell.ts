@@ -48,11 +48,13 @@ export function streamGlow(progress: number, segIndex: number, count: number): n
 export const STATION: [number, number, number] = [-13, 0, 0]
 
 /**
- * Scroll fractions spanning the pinned #conjuring section. PLACEHOLDER values —
- * Task 9 re-measures real DOM offsets and overwrites these two numbers.
+ * Scroll window over which the chamber is visible. Measured conjuring top is 0.575
+ * and tracker top 0.731; we pad the start a little earlier so the chamber is already
+ * lit when the scroll-settle magnet rests on the section top (where localProgress
+ * would otherwise be 0 and the visibility gate would hide it).
  */
-export const SECTION_START = 0.62
-export const SECTION_END = 0.72
+export const SECTION_START = 0.54
+export const SECTION_END = 0.75
 
 /** Global scroll progress → 0→1 local progress within the conjuring section. */
 export function localProgress(progress: number): number {
