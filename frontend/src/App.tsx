@@ -6,9 +6,11 @@ import { Hero } from './components/Hero'
 import { Cursor } from './components/Cursor'
 import { Candles } from './components/Candles'
 import { ScrollRail } from './components/ScrollRail'
+import { ScrollCues } from './components/ScrollCues'
 import { About, Spells, Grimoire, Tracker, Chronicles, OwlPost } from './components/Sections'
 import { useSmoothScroll } from './smoothScroll'
 import { useScrollTracker } from './scroll'
+import { useScrollSettle } from './useScrollSettle'
 import './App.css'
 
 export default function App() {
@@ -19,6 +21,7 @@ export default function App() {
 
   useSmoothScroll()
   useScrollTracker()
+  useScrollSettle()
 
   // Once assets finish, hold a beat then drive the conjuring reveal 0 → 1.
   useEffect(() => {
@@ -50,6 +53,7 @@ export default function App() {
       <Candles />
       <Cursor />
       <ScrollRail />
+      <ScrollCues visible={loaded} />
 
       <AnimatePresence>
         {!loaded && (

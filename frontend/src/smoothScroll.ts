@@ -22,8 +22,9 @@ export function useSmoothScroll() {
   useEffect(() => {
     if (prefersReducedMotion()) return
     lenis = new Lenis({
-      lerp: 0.1,
+      lerp: 0.08, // a touch more glide than the previous 0.1 → weighted, premium feel
       wheelMultiplier: 1,
+      touchMultiplier: 1.2, // slightly livelier on touch without feeling twitchy
       smoothWheel: true,
       autoRaf: false,
     })
