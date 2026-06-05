@@ -3,3 +3,7 @@ dist
 *.log
 .DS_Store
 .shots/
+
+# local env (Web3Forms key, etc.)
+.env
+.env.local

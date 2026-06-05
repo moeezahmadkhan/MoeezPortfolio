@@ -1,0 +1,131 @@
+/* ── Owl Post contact form ── */
+.owlform {
+  max-width: 32rem;
+  margin: 2.6rem auto 0;
+  text-align: left;
+}
+
+.owlform__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.owlform__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.owlform__label {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.85;
+}
+
+/* Candlelit "parchment" fields: faint ink panel, gold ink, rune-teal focus glow. */
+.owlform__input {
+  width: 100%;
+  background: rgba(12, 12, 22, 0.6);
+  border: 1px solid rgba(231, 194, 125, 0.18);
+  border-radius: 4px;
+  padding: 0.7rem 0.85rem;
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  line-height: 1.4;
+  transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.owlform__input::placeholder {
+  color: var(--parchment-dim);
+  opacity: 0.5;
+}
+
+.owlform__input:focus {
+  outline: none;
+  border-color: var(--rune);
+  background: rgba(12, 12, 22, 0.85);
+  box-shadow: 0 0 0 1px rgba(127, 208, 196, 0.35), 0 0 18px rgba(127, 208, 196, 0.18);
+}
+
+textarea.owlform__input {
+  resize: vertical;
+  min-height: 6.5rem;
+}
+
+.owlform__input--invalid {
+  border-color: rgba(214, 122, 110, 0.6);
+}
+.owlform__input--invalid:focus {
+  box-shadow: 0 0 0 1px rgba(214, 122, 110, 0.5), 0 0 18px rgba(214, 122, 110, 0.15);
+}
+
+.owlform__field-error {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: #d67a6e;
+}
+
+.owlform__submit {
+  align-self: flex-start;
+  margin-top: 0.4rem;
+  cursor: pointer;
+}
+.owlform__submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.owlform__error {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #d67a6e;
+}
+.owlform__error a {
+  color: var(--gold);
+  text-decoration: underline;
+}
+
+/* Honeypot — kept out of the layout and away from assistive tech / tab order. */
+.owlform__botcheck {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* Success confirmation */
+.owlform__sent {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+.owlform__sent-rune {
+  font-size: 2.4rem;
+  display: block;
+  margin-bottom: 0.8rem;
+  filter: drop-shadow(0 0 14px rgba(231, 194, 125, 0.45));
+}
+.owlform__sent-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--gold-bright);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.4rem;
+}
+.owlform__sent-sub {
+  font-size: 1.1rem;
+  color: var(--parchment-dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .owlform__input {
+    transition: none;
+  }
+}
