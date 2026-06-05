@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from '../../scroll'
-import { WRIST_ANCHOR, localProgress, ramp } from './phases'
+import { WRIST_ANCHOR, localProgress, ramp, metricsAt } from './phases'
 
 const N = 80          // ECG samples
 const WIDTH = 1.4     // world width of the trace
@@ -42,7 +42,7 @@ export function Heartbeat() {
   useFrame((state) => {
     const lp = localProgress(scrollState.progress)
     const intensity = ramp(lp, 0.15, 0.4)            // heartbeat ramps in
-    const bpm = Math.round(72 + intensity * (158 - 72))
+    const bpm = metricsAt(lp).bpm
     const t = state.clock.elapsedTime
     const speed = 0.6 + intensity * 1.2              // trace scrolls faster as HR rises
 
