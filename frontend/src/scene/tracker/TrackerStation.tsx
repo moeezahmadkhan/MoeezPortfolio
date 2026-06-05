@@ -10,6 +10,7 @@ import { WristTiles } from './WristTiles'
 import { DataStream } from './DataStream'
 import { AICore } from './AICore'
 import { HudText } from './HudText'
+import { InsightCards } from './InsightCards'
 
 const RING_FLOOR_Y = -1.32
 
@@ -105,8 +106,11 @@ export function TrackerStation() {
       {/* AI answer beat: glowing wireframe icosahedron above the figure */}
       <AICore />
 
-      {/* holographic HUD: stat readout + AI answer line */}
+      {/* holographic HUD: saved stat readout */}
       <HudText />
+
+      {/* scroll-cycled AI insight cards near the core */}
+      <InsightCards />
     </group>
   )
 }
