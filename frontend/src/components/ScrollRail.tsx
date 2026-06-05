@@ -1,19 +1,7 @@
 import { useScroll, useSpring, motion } from 'framer-motion'
 import { getLenis } from '../smoothScroll'
+import { chapters } from '../chapters'
 import './ScrollRail.css'
-
-// `at` = each chapter's real scroll fraction (matches CameraRig KEYS / measured
-// section offsets), so a dot lights exactly as you arrive at its section rather
-// than at an even visual interval. Keep in sync if section heights change.
-const chapters = [
-  { id: 'top', label: 'I', at: 0.0 },
-  { id: 'wizard', label: 'II', at: 0.197 },
-  { id: 'spells', label: 'III', at: 0.301 },
-  { id: 'grimoire', label: 'IV', at: 0.793 },
-  { id: 'tracker', label: 'V', at: 0.854 },
-  { id: 'chronicles', label: 'VI', at: 0.914 },
-  { id: 'owlpost', label: 'VII', at: 1.0 },
-]
 
 /** A vertical "wand" on the page edge whose glowing core fills with scroll progress. */
 export function ScrollRail() {
@@ -35,9 +23,9 @@ export function ScrollRail() {
       <ul className="rail__marks">
         {chapters.map((c) => (
           <li key={c.id} className="rail__mark-item" style={{ '--at': `${c.at * 100}%` } as React.CSSProperties}>
-            <a href={`#${c.id}`} className="rail__mark" aria-label={`Chapter ${c.label}`} onClick={(e) => onJump(e, c.id)}>
+            <a href={`#${c.id}`} className="rail__mark" aria-label={`Chapter ${c.numeral}`} onClick={(e) => onJump(e, c.id)}>
               <span className="rail__dot" />
-              <span className="rail__num">{c.label}</span>
+              <span className="rail__num">{c.numeral}</span>
             </a>
           </li>
         ))}
