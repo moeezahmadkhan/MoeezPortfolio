@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import { Reveal, IgniteHeading, MaskReveal } from './Reveal'
+import { OwlPostForm } from './OwlPostForm'
 import { Tilt } from './Tilt'
 import { projects, spellbook, chronicles } from '../data'
 import { useParallax } from './useParallax'
@@ -208,6 +209,9 @@ export function OwlPost() {
             Building something that needs intelligence woven into it? Let’s talk shop —
             agents, vision pipelines, or model deployment.
           </p>
+        </Reveal>
+        <Reveal delay={0.15}>
+          <OwlPostForm />
         </Reveal>
         <Reveal delay={0.2} className="owl__links">
           <a className="owl__link" href="mailto:kmoeez2018@gmail.com">
