@@ -7,6 +7,7 @@ import { Cursor } from './components/Cursor'
 import { Candles } from './components/Candles'
 import { ScrollRail } from './components/ScrollRail'
 import { ScrollCues } from './components/ScrollCues'
+import { GrimoireChat } from './components/GrimoireChat'
 import { About, Spells, Grimoire, Conjuring, Tracker, Chronicles, OwlPost } from './components/Sections'
 import { useSmoothScroll } from './smoothScroll'
 import { useScrollTracker } from './scroll'
@@ -54,6 +55,7 @@ export default function App() {
       <Cursor />
       <ScrollRail />
       <ScrollCues visible={loaded} />
+      <GrimoireChat />
 
       <AnimatePresence>
         {!loaded && (
