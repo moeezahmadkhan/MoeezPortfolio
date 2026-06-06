@@ -5,10 +5,12 @@
 // Models tried in order — first that responds wins. All free; the cascade keeps the
 // Familiar answering even when the primary's free endpoint is rate-limited upstream.
 export const MODELS = [
-  'moonshotai/kimi-k2.6:free',
+  'moonshotai/kimi-k2.6:free', // primary (your pick); often rate-limited upstream
+  'z-ai/glm-4.5-air:free',
+  'openai/gpt-oss-120b:free',
+  'nvidia/nemotron-3-super-120b-a12b:free',
   'meta-llama/llama-3.3-70b-instruct:free',
   'qwen/qwen3-next-80b-a3b-instruct:free',
-  'z-ai/glm-4.5-air:free',
 ]
 export const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 

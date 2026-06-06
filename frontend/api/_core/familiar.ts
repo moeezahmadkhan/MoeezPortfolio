@@ -94,7 +94,7 @@ export async function handleFamiliarRequest(args: HandleArgs): Promise<FamiliarR
         headers: {
           Authorization: `Bearer ${args.apiKey}`,
           'Content-Type': 'application/json',
-          'X-Title': 'Moeez Portfolio — Familiar',
+          'X-Title': 'Moeez Portfolio - Familiar',
         },
         body: JSON.stringify(buildRequestBody(capped, model)),
       })
