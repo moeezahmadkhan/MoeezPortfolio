@@ -165,3 +165,35 @@ Browser renders the Familiar's reply in the panel
 - Durable rate limiting (Vercel KV / Edge Config) shared across instances.
 - RAG showcase (FAISS/embeddings) if the knowledge base outgrows a system prompt.
 - Conversation analytics / lead logging.
+
+## Model Strategy — as built (updated during implementation)
+
+The account is OpenRouter **free-tier with no credits**, and the planned single slug
+`moonshotai/kimi-k2:free` does not exist. The correct free K2.6 slug is
+`moonshotai/kimi-k2.6:free`, but its upstream provider is frequently rate-limited (429).
+To keep the Familiar answering for visitors without spending money, the implementation
+uses a **cascade of free models** (`api/_core/persona.ts` → `MODELS`), trying each in order
+and returning the first real answer:
+
+1. `moonshotai/kimi-k2.6:free` (primary — your pick)
+2. `z-ai/glm-4.5-air:free`
+3. `openai/gpt-oss-120b:free`
+4. `nvidia/nemotron-3-super-120b-a12b:free`
+5. `meta-llama/llama-3.3-70b-instruct:free`
+6. `qwen/qwen3-next-80b-a3b-instruct:free`
+
+Only if **all** fail does it return the static fallback. To go fully reliable later, add
+OpenRouter credits and put a paid model at the top of `MODELS`.
+
+> Implementation note: OpenRouter (and all HTTP) header values must be Latin-1. The
+> `X-Title` header must stay ASCII — an em-dash there throws in Node's `fetch` before the
+> request is sent. A regression test guards this.
+
+## Deploy notes (Vercel)
+
+- Set the Vercel project **Root Directory** to `frontend/`.
+- Add env var `OPENROUTER_API_KEY` in Vercel → Settings → Environment Variables
+  (Production + Preview). Do NOT prefix with `VITE_`.
+- `frontend/api/familiar.ts` is auto-detected as a serverless function at `/api/familiar`.
+- After first deploy, **rotate** the OpenRouter key (the brainstorming-shared key is
+  exposed) and keep a low/zero paid credit balance as a backstop.
