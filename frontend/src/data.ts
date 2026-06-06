@@ -8,11 +8,11 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    name: 'Project Horus',
+    name: 'Real-Time Vision · Attendance',
     incantation: 'Oculus Reparo',
     blurb:
-      'A computer-vision pipeline that triggers automated frame capture as students move — YOLO / SCRFD for detection and ArcFace for identity assignment via a FAISS vector index.',
-    tags: ['YOLO', 'SCRFD', 'ArcFace', 'FAISS', 'Real-time CV'],
+      'An edge computer-vision pipeline: motion-triggered capture, on-device person detection and re-identification on a palm-sized NPU — real-time, fully local, no footage leaving the device.',
+    tags: ['Edge NPU', 'Detection', 'Re-ID', 'FAISS', 'Real-time CV'],
     glyph: '👁',
   },
   {
