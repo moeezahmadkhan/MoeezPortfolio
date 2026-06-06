@@ -2,7 +2,7 @@ import {
   FALLBACK_REPLY,
   MAX_MESSAGE_CHARS,
   MAX_TURNS,
-  MODEL,
+  MODELS,
   OPENROUTER_ENDPOINT,
   RATE_PER_HOUR,
   RATE_PER_MIN,
@@ -27,10 +27,10 @@ export type OpenRouterBody = {
   messages: { role: 'system' | ChatRole; content: string }[]
 }
 
-// Builds the OpenRouter payload. Caller is responsible for capping first (see capMessages).
-export function buildRequestBody(messages: ChatMessage[]): OpenRouterBody {
+// Builds the OpenRouter payload for one model. Caller caps messages first (see capMessages).
+export function buildRequestBody(messages: ChatMessage[], model: string): OpenRouterBody {
   return {
-    model: MODEL,
+    model,
     messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
   }
 }
@@ -87,26 +87,25 @@ export async function handleFamiliarRequest(args: HandleArgs): Promise<FamiliarR
     return { status: 400, body: { reply: FALLBACK_REPLY } }
   }
 
-  try {
-    const res = await doFetch(OPENROUTER_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${args.apiKey}`,
-        'Content-Type': 'application/json',
-        'X-Title': 'Moeez Portfolio — Familiar',
-      },
-      body: JSON.stringify(buildRequestBody(capped)),
-    })
-    if (!res.ok) {
-      return { status: 502, body: { reply: FALLBACK_REPLY } }
+  for (const model of MODELS) {
+    try {
+      const res = await doFetch(OPENROUTER_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${args.apiKey}`,
+          'Content-Type': 'application/json',
+          'X-Title': 'Moeez Portfolio — Familiar',
+        },
+        body: JSON.stringify(buildRequestBody(capped, model)),
+      })
+      if (!res.ok) continue
+      const data = (await res.json()) as { choices?: { message?: { content?: string } }[] }
+      const reply = data.choices?.[0]?.message?.content?.trim()
+      if (!reply) continue
+      return { status: 200, body: { reply } }
+    } catch {
+      continue
     }
-    const data = (await res.json()) as { choices?: { message?: { content?: string } }[] }
-    const reply = data.choices?.[0]?.message?.content?.trim()
-    if (!reply) {
-      return { status: 502, body: { reply: FALLBACK_REPLY } }
-    }
-    return { status: 200, body: { reply } }
-  } catch {
-    return { status: 502, body: { reply: FALLBACK_REPLY } }
   }
+  return { status: 502, body: { reply: FALLBACK_REPLY } }
 }

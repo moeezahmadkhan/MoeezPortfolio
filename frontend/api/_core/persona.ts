@@ -1,8 +1,15 @@
 // The Familiar's identity + all tunable knobs for the chat proxy.
 // Facts are compiled from src/data.ts and Moeez's CV. Edit copy here.
 
-// --- Model & endpoint (swap MODEL to a paid backup like 'anthropic/claude-haiku-4.5' anytime) ---
-export const MODEL = 'moonshotai/kimi-k2:free'
+// --- Models & endpoint ---
+// Models tried in order — first that responds wins. All free; the cascade keeps the
+// Familiar answering even when the primary's free endpoint is rate-limited upstream.
+export const MODELS = [
+  'moonshotai/kimi-k2.6:free',
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'qwen/qwen3-next-80b-a3b-instruct:free',
+  'z-ai/glm-4.5-air:free',
+]
 export const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 
 // --- Caps (bound token spend) ---

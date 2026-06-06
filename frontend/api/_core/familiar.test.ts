@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { capMessages, buildRequestBody, createRateLimiter, handleFamiliarRequest, type ChatMessage } from './familiar'
-import { FALLBACK_REPLY, MAX_MESSAGE_CHARS, MAX_TURNS, MODEL, RATE_PER_HOUR, RATE_PER_MIN, SYSTEM_PROMPT } from './persona'
+import { FALLBACK_REPLY, MAX_MESSAGE_CHARS, MAX_TURNS, MODELS, RATE_PER_HOUR, RATE_PER_MIN, SYSTEM_PROMPT } from './persona'
 
 const u = (content: string): ChatMessage => ({ role: 'user', content })
 const a = (content: string): ChatMessage => ({ role: 'assistant', content })
@@ -29,9 +29,9 @@ describe('capMessages', () => {
 })
 
 describe('buildRequestBody', () => {
-  it('prepends the system prompt and forwards the model + capped messages', () => {
-    const body = buildRequestBody([u('Is he good with LLMs?')])
-    expect(body.model).toBe(MODEL)
+  it('prepends the system prompt and forwards the given model + messages', () => {
+    const body = buildRequestBody([u('Is he good with LLMs?')], MODELS[0])
+    expect(body.model).toBe(MODELS[0])
     expect(body.messages[0]).toEqual({ role: 'system', content: SYSTEM_PROMPT })
     expect(body.messages[1]).toEqual({ role: 'user', content: 'Is he good with LLMs?' })
   })
@@ -87,6 +87,26 @@ describe('handleFamiliarRequest', () => {
     })
     expect(res.status).toBe(200)
     expect(res.body.reply).toBe('Well met!')
+  })
+
+  it('falls back to the next model when the first is rate-limited', async () => {
+    let call = 0
+    const flakyFetch = vi.fn(async () => {
+      call++
+      return call === 1
+        ? new Response('limited', { status: 429 })
+        : new Response(
+            JSON.stringify({ choices: [{ message: { content: 'Second model speaks!' } }] }),
+            { status: 200 },
+          )
+    }) as unknown as typeof fetch
+    const res = await handleFamiliarRequest({
+      messages: [{ role: 'user', content: 'hi' }],
+      ip: 'x', apiKey: 'key', now: 10, rateLimiter: createRateLimiter(), fetchImpl: flakyFetch,
+    })
+    expect(res.status).toBe(200)
+    expect(res.body.reply).toBe('Second model speaks!')
+    expect(call).toBe(2)
   })
 
   it('falls back gracefully when the upstream errors', async () => {
