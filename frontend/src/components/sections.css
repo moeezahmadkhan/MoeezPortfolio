@@ -17,6 +17,26 @@
 }
 .section__title--center { text-align: center; margin-left: auto; margin-right: auto; }
 
+/* Category marker — tells the visitor whether a block is a shipped PROJECT or an
+   offered SERVICE. Plain language + colour-coded so the two never read alike:
+   warm gold for projects, rune-teal for services. */
+.section__cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  margin: 0.9rem 0 0.2rem;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+.section__cat--project { color: var(--gold-deep); }
+.section__cat--service { color: var(--rune); }
+
 /* Backgrounds: dark scrims that let the candlelight & sparkles bleed through edges */
 .section--about {
   background: linear-gradient(180deg, transparent, rgba(8, 8, 16, 0.86) 18%, rgba(8, 8, 16, 0.86));

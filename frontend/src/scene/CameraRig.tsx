@@ -12,9 +12,9 @@ const KEYS: { at: number; pos: [number, number, number]; look: [number, number, 
   { at: 0.130, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.124
   { at: 0.195, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.189)
   { at: 0.440, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across 01–04
-  { at: 0.500, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },    // grimoire (measured 0.500)
-  { at: 0.575, pos: [-13, 1.25, 10.5], look: [-13, 0.55, 0] }, // conjuring — entry (settles here; pulled back to fit the full arc)
-  { at: 0.665, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held
+  { at: 0.500, pos: [-13, 1.25, 10.5], look: [-13, 0.55, 0] }, // conjuring (service) — entry, spell chamber far-left (measured 0.498)
+  { at: 0.630, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held across the pinned span
+  { at: 0.690, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },     // grimoire (projects) — center framing (measured held 0.695)
   { at: 0.735, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.731)
   { at: 0.860, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
   { at: 0.917, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.917)

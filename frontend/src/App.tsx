@@ -74,8 +74,8 @@ export default function App() {
         <Hero />
         <About />
         <Spells />
-        <Grimoire />
         <Conjuring />
+        <Grimoire />
         <Tracker />
         <Chronicles />
         <OwlPost />

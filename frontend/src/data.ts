@@ -24,14 +24,6 @@ export const projects: Project[] = [
     glyph: '💎',
   },
   {
-    name: 'Whoop AI Chat',
-    incantation: 'Vitae Sense',
-    blurb:
-      'Low-latency, lightweight AI chat for wearables. Processes live biometric data into real-time health insights with adaptive feedback loops under tight hardware constraints.',
-    tags: ['Edge AI', 'Wearables', 'LLM Serving', 'Biometrics'],
-    glyph: '⌚',
-  },
-  {
     name: 'Airbnb Replica',
     incantation: 'Domus Revelio',
     blurb:

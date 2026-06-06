@@ -129,9 +129,10 @@ export function Grimoire() {
     <section id="grimoire" className="section section--grimoire">
       <div className="section__wrap">
         <MaskReveal>
-          <span className="eyebrow">Chapter IV — The Grimoire</span>
+          <span className="eyebrow">Chapter V — The Grimoire</span>
         </MaskReveal>
-        <IgniteHeading className="section__title" text="Works of conjuring" />
+        <span className="section__cat section__cat--project">✦ Projects · shipped work</span>
+        <IgniteHeading className="section__title" text="Built & shipped" />
         <div className="grimoire__grid">
           {projects.map((p, i) => (
             <GrimoireCard key={p.name} p={p} i={i} />
@@ -154,8 +155,9 @@ export function Conjuring() {
     <section id="conjuring" className="section section--conjuring conjuring--pinned">
       <div className="conjuring__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter V — The Conjuring of Apps</span>
+          <span className="eyebrow">Chapter IV — The Conjuring of Apps</span>
         </MaskReveal>
+        <span className="section__cat section__cat--service">✦ Service · full-stack AI, brief to deploy</span>
         <IgniteHeading className="section__title" text="One spell, end to end" />
         <Reveal delay={0.1}>
           <p className="conjuring__lede">
@@ -192,6 +194,7 @@ export function Tracker() {
         <MaskReveal>
           <span className="eyebrow">Chapter VI — The Tracker</span>
         </MaskReveal>
+        <span className="section__cat section__cat--project">✦ Project · live demo</span>
         <IgniteHeading className="section__title" text="It reads the pulse" />
         <Reveal delay={0.1}>
           <p className="tracker__lede">
