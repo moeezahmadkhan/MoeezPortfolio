@@ -20,6 +20,7 @@ import { ScrollDriver } from './ScrollDriver'
 import { TrackerStation } from './tracker/TrackerStation'
 import { SpellStation } from './spell/SpellStation'
 import { MapStation } from './map/MapStation'
+import { PactStation } from './pact/PactStation'
 
 export function Scene({ reveal }: { reveal: number }) {
   const [dpr, setDpr] = useState(1.5)
@@ -81,6 +82,7 @@ export function Scene({ reveal }: { reveal: number }) {
         <TrackerStation />
         <SpellStation />
         <MapStation />
+        <PactStation />
 
         {/* Floating golden dust + finer white motes */}
         <Sparkles count={70} scale={[8, 6, 8]} size={5} speed={0.25} color="#f3d99b" opacity={0.7} />

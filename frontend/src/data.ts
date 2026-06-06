@@ -112,3 +112,16 @@ export const familiar = {
     'Is he available for hire?',
   ],
 }
+
+export type PactStep = {
+  name: string // themed pipeline step
+  tags: string[] // real stack chips
+}
+
+/** The four pipeline steps shown in the Pact chapter legend. */
+export const pactSteps: PactStep[] = [
+  { name: 'Ingest', tags: ['Deck upload', 'Parsing'] },
+  { name: 'Legilimency', tags: ['LLM deck analysis'] },
+  { name: 'The Match', tags: ['Embeddings + matching'] },
+  { name: 'The Pact', tags: ['FastAPI', 'React', 'Kanban'] },
+]

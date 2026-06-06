@@ -3,7 +3,7 @@ import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import { Reveal, IgniteHeading, MaskReveal } from './Reveal'
 import { OwlPostForm } from './OwlPostForm'
 import { Tilt } from './Tilt'
-import { projects, spellbook, chronicles } from '../data'
+import { projects, spellbook, chronicles, pactSteps } from '../data'
 import { spellState, NODES } from '../scene/spell/spell'
 import { revealState, PIPELINE_BEATS, EDGE_STACK } from '../scene/map/map'
 import { useParallax } from './useParallax'
@@ -180,6 +180,38 @@ export function Conjuring() {
               <li key={n.name} className="conjuring__legend-item">
                 <span className="conjuring__legend-name">{n.name}</span>
                 <span className="conjuring__legend-tags">{n.tags.join(' · ')}</span>
+              </li>
+            ))}
+          </ol>
+        </Reveal>
+      </div>
+    </section>
+  )
+}
+
+export function Pact() {
+  return (
+    <section id="pact" className="section section--pact pact--pinned">
+      <div className="pact__stage">
+        <MaskReveal>
+          <span className="eyebrow">Chapter VI — The Pact</span>
+        </MaskReveal>
+        <span className="section__cat section__cat--project">
+          ✦ Project · AI founder–investor matchmaking
+        </span>
+        <IgniteHeading className="section__title" text="The deck, read. The deal, bound." />
+        <Reveal delay={0.1}>
+          <p className="pact__lede">
+            A founder uploads a pitch deck. An LLM reads it, scores it, and surfaces it to the
+            investors who actually fit — then binds the two together to carry the deal forward.
+          </p>
+        </Reveal>
+        <Reveal delay={0.18}>
+          <ol className="pact__legend">
+            {pactSteps.map((s) => (
+              <li key={s.name} className="pact__legend-item">
+                <span className="pact__legend-name">{s.name}</span>
+                <span className="pact__legend-tags">{s.tags.join(' · ')}</span>
               </li>
             ))}
           </ol>

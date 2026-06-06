@@ -8,14 +8,15 @@ export const STATION: [number, number, number] = [22, 0, 0]
 export const TABLE_Y = -1.2
 
 /**
- * Scroll fractions spanning the pinned #map section. Calibrated from measured DOM
- * offsets (map section: 0.772 → 0.928 at 1440×900). START is padded slightly before
- * the section top so the station is already lit when the scroll-settle magnet rests
- * there (where localProgress would otherwise be 0 and the visibility gate hides it).
+ * Scroll fractions spanning the pinned #map section. Recalibrated 2026-06-06 after the
+ * Pact chapter was inserted (scripts/measure.mjs): map section ≈ 0.799 → 0.937 at
+ * 1440×900. START is padded slightly before the section top (as in the original) so
+ * the station is already lit at the entry; the brief overlap with the tracker band is
+ * harmless since the two chambers sit far apart (tracker +12, map +22).
  * Keep in sync with the #map CameraRig KEYS.
  */
-export const SECTION_START = 0.76
-export const SECTION_END = 0.93
+export const SECTION_START = 0.787
+export const SECTION_END = 0.937
 
 /** Global scroll progress (0→1) → 0→1 local progress within the map section. */
 export function localProgress(progress: number): number {

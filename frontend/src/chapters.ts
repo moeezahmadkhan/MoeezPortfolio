@@ -13,12 +13,13 @@ export interface Chapter {
  */
 export const chapters: Chapter[] = [
   { id: 'top',        numeral: 'I',    theme: 'The Conjuring',         plain: 'intro',         at: 0.0 },
-  { id: 'wizard',     numeral: 'II',   theme: 'The Mind',              plain: 'about me',      at: 0.104 },
-  { id: 'spells',     numeral: 'III',  theme: 'Spells',                plain: 'skills',        at: 0.159 },
-  { id: 'conjuring',  numeral: 'IV',   theme: 'The Conjuring of Apps', plain: 'service · full-stack AI', at: 0.419 },
-  { id: 'grimoire',   numeral: 'V',    theme: 'The Grimoire',          plain: 'projects',               at: 0.549 },
-  { id: 'tracker',    numeral: 'VI',   theme: 'The Pulse',             plain: 'live AI demo',  at: 0.616 },
-  { id: 'map',        numeral: 'VII',  theme: "The Marauder's Map",    plain: 'edge AI · on-device',    at: 0.772 },
-  { id: 'chronicles', numeral: 'VIII', theme: 'The Path',              plain: 'experience',    at: 0.928 },
-  { id: 'owlpost',    numeral: 'IX',   theme: 'Owl Post',              plain: 'contact',       at: 0.982 },
+  { id: 'wizard',     numeral: 'II',   theme: 'The Mind',              plain: 'about me',      at: 0.092 },
+  { id: 'spells',     numeral: 'III',  theme: 'Spells',                plain: 'skills',        at: 0.140 },
+  { id: 'conjuring',  numeral: 'IV',   theme: 'The Conjuring of Apps', plain: 'service · full-stack AI', at: 0.370 },
+  { id: 'grimoire',   numeral: 'V',    theme: 'The Grimoire',          plain: 'projects',               at: 0.486 },
+  { id: 'pact',       numeral: 'VI',   theme: 'The Pact',              plain: 'AI matchmaking',         at: 0.546 },
+  { id: 'tracker',    numeral: 'VII',  theme: 'The Pulse',             plain: 'live AI demo',           at: 0.661 },
+  { id: 'map',        numeral: 'VIII', theme: "The Marauder's Map",    plain: 'edge AI · on-device',    at: 0.799 },
+  { id: 'chronicles', numeral: 'IX',   theme: 'The Path',              plain: 'experience',             at: 0.937 },
+  { id: 'owlpost',    numeral: 'X',    theme: 'Owl Post',              plain: 'contact',                at: 0.984 },
 ]

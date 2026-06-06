@@ -7,19 +7,24 @@ import { scrollState, responsiveState } from '../scroll'
 // The duplicated hero pose (0.0 + 0.10) HOLDS the camera still through the hero
 // runway so the figurine can finish its full 360° spin before the descent begins.
 const KEYS: { at: number; pos: [number, number, number]; look: [number, number, number] }[] = [
+  // Recalibrated 2026-06-06 via scripts/measure.mjs for the page carrying BOTH the
+  // Pact and Marauder's Map chapters. Entry keys sit on measured section tops; "held"
+  // keys sit ~65–70% into each pinned span so the camera holds before transitioning.
   { at: 0.0,   pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — closer + framed higher for a more commanding figurine
-  { at: 0.10,  pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — hold while figurine spins 360°
-  { at: 0.110, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.104
-  { at: 0.165, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.159)
-  { at: 0.360, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across the pinned span (ends 0.419)
-  { at: 0.430, pos: [-13, 1.25, 10.5], look: [-13, 0.55, 0] }, // conjuring (service) — entry, spell chamber far-left (measured 0.419)
-  { at: 0.530, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held across the pinned span
-  { at: 0.575, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },     // grimoire (projects) — center framing (measured 0.549)
-  { at: 0.625, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.616)
-  { at: 0.730, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
-  { at: 0.800, pos: [22, 1.0, 6.4],   look: [22, 0.5, 0] },   // map (Marauder's Map) — entry (measured 0.772)
-  { at: 0.900, pos: [22.6, 1.6, 7.8], look: [22, 0.9, 0] },   // map — held
-  { at: 0.950, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.928)
+  { at: 0.06,  pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — hold while figurine spins 360°
+  { at: 0.092, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.092
+  { at: 0.140, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.140)
+  { at: 0.301, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across the pinned span
+  { at: 0.370, pos: [-13, 1.25, 10.5], look: [-13, 0.55, 0] }, // conjuring (service) — entry, spell chamber far-left (measured 0.370)
+  { at: 0.445, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held across the pinned span
+  { at: 0.486, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },     // grimoire (projects) — center framing (measured 0.486)
+  { at: 0.546, pos: [-7, 1.1, 5.0],   look: [-7, 0.5, -1] },   // pact — entry, framing the left-offset chamber (measured 0.546)
+  { at: 0.621, pos: [-7, 1.35, 4.0],  look: [-7, 0.45, -1] },  // pact — held across the pinned span
+  { at: 0.661, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.661)
+  { at: 0.751, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
+  { at: 0.799, pos: [22, 1.0, 6.4],   look: [22, 0.5, 0] },   // map (Marauder's Map) — entry (measured 0.799)
+  { at: 0.889, pos: [22.6, 1.6, 7.8], look: [22, 0.9, 0] },   // map — held
+  { at: 0.937, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.937)
   { at: 1.0,   pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost
 ]
 
