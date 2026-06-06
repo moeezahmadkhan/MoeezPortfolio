@@ -94,7 +94,7 @@ export function WizardModel({ reveal = 1 }: Props) {
     group.current.rotation.y = spinRef.current
 
     if (wandLight.current) {
-      wandLight.current.intensity = 0.9 + Math.sin(t * 3.1) * 0.45
+      wandLight.current.intensity = 1.3 + Math.sin(t * 3.1) * 0.55
     }
   })
 
@@ -111,21 +111,21 @@ export function WizardModel({ reveal = 1 }: Props) {
       <group position={WAND_TIP}>
         {/* Outer wand glow orb */}
         <mesh>
-          <sphereGeometry args={[0.045, 20, 20]} />
-          <meshBasicMaterial color="#fff4d6" transparent opacity={0.55} depthWrite={false} blending={THREE.AdditiveBlending} />
+          <sphereGeometry args={[0.055, 20, 20]} />
+          <meshBasicMaterial color="#fff4d6" transparent opacity={0.7} depthWrite={false} blending={THREE.AdditiveBlending} />
         </mesh>
         <pointLight
           ref={wandLight}
           color="#ffe2b0"
-          intensity={1.35}
-          distance={2.8}
+          intensity={1.6}
+          distance={3.4}
           decay={2}
         />
         <Sparkles
-          count={18}
-          scale={0.7}
-          size={2.8}
-          speed={0.55}
+          count={30}
+          scale={0.95}
+          size={3.4}
+          speed={0.6}
           noise={0.55}
           color="#ffcf8f"
         />

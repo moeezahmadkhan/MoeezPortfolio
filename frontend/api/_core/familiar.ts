@@ -7,7 +7,7 @@ import {
   RATE_PER_HOUR,
   RATE_PER_MIN,
   SYSTEM_PROMPT,
-} from './persona'
+} from './persona.js'
 
 export type ChatRole = 'user' | 'assistant'
 export type ChatMessage = { role: ChatRole; content: string }
