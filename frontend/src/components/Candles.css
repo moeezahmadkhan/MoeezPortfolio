@@ -1,7 +1,7 @@
 .candles {
   position: fixed;
   inset: 0;
-  z-index: 3; /* above the canvas (1), below content (this layer is decorative) */
+  z-index: 2; /* above the canvas (1), below content (this layer is decorative) */
   pointer-events: none;
   overflow: hidden;
 }

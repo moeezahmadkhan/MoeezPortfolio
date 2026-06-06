@@ -563,3 +563,72 @@
   .section--pact.pact--pinned { height: auto; }
   .pact__stage { position: static; min-height: 0; }
 }
+
+@media (max-width: 1024px) {
+  /* Increase vertical spacing to give the 3D scene more visibility */
+  .section {
+    padding: clamp(6rem, 16vh, 12rem) 1.5rem !important;
+  }
+
+  /* Disable pinning / sticky layouts for all components on mobile/tablets */
+  .spells--pinned,
+  .conjuring--pinned,
+  .pact--pinned,
+  .tracker--pinned,
+  .section--map.map--pinned {
+    height: auto !important;
+  }
+
+  .spells__stage,
+  .conjuring__stage,
+  .pact__stage,
+  .tracker__stage,
+  .map__stage {
+    position: static !important;
+    height: auto !important;
+    min-height: auto !important;
+    padding: clamp(5rem, 15vh, 10rem) clamp(1rem, 5vw, 3rem) !important;
+  }
+
+  /* Spells layout stacking */
+  .spells__steps {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+    min-height: auto !important;
+  }
+
+  .spells__index {
+    font-size: 3.5rem !important;
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 0.4rem !important;
+  }
+
+  .spells__index-total {
+    display: inline !important;
+    font-size: 1.1rem !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  .spells__panel {
+    min-height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+
+  .spell-group--step {
+    position: static !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
+
+  /* Lighter scrims on mobile so the 3D scene pops through clearly */
+  .conjuring__stage::before,
+  .pact__stage::before,
+  .map__stage::before {
+    background: rgba(7, 7, 13, 0.72) !important;
+  }
+}
+

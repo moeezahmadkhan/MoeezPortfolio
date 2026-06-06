@@ -35,6 +35,7 @@ export function useScrollSettle() {
     let settling = false
 
     const onScroll = (instance: Lenis) => {
+      if (typeof window !== 'undefined' && window.innerWidth < 1024) return
       if (settling) return // ignore our own programmatic scroll
       if (idle) clearTimeout(idle)
       idle = setTimeout(() => {

@@ -31,7 +31,7 @@ export function useScrollTracker() {
     }
     const onResize = () => {
       const vw = window.innerWidth
-      responsiveState.zoom = vw < 640 ? 0.92 : vw < 1024 ? 0.96 : 1
+      responsiveState.zoom = vw < 640 ? 0.78 : vw < 1024 ? 0.90 : 1
     }
 
     // When Lenis is active, read its smoothed scroll; otherwise fall back to

@@ -215,6 +215,25 @@
   }
 }
 
+@media (max-width: 720px) {
+  .grim-launcher__tip {
+    display: none;
+  }
+  .grim-launcher {
+    right: 16px;
+    bottom: 16px;
+    padding: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    justify-content: center;
+  }
+  .grim-launcher__book {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .grim-launcher__book { animation: none; }
 }
