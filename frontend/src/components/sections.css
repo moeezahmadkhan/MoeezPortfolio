@@ -442,3 +442,48 @@
   .conjuring--pinned { height: auto; }
   .conjuring__stage { position: static; min-height: 0; }
 }
+
+/* ── Chapter VII — The Marauder's Map (pinned runway) ── */
+.section--map.map--pinned {
+  height: 300vh;
+  padding: 0;
+}
+.map__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  max-width: 42rem;
+  padding: clamp(2rem, 6vw, 6rem);
+  box-sizing: border-box;
+}
+/* legibility scrim so copy reads over the 3D map behind it */
+.map__stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(7, 7, 13, 0.82) 0%,
+    rgba(7, 7, 13, 0.55) 45%,
+    rgba(7, 7, 13, 0) 82%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+.map__stage > * { position: relative; }
+.map__lede {
+  max-width: 34ch;
+  color: var(--parchment-dim);
+  font-family: var(--font-body);
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section--map.map--pinned { height: auto; }
+  .map__stage { position: static; min-height: 0; }
+}

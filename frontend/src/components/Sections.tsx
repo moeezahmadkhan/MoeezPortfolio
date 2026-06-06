@@ -5,6 +5,7 @@ import { OwlPostForm } from './OwlPostForm'
 import { Tilt } from './Tilt'
 import { projects, spellbook, chronicles } from '../data'
 import { spellState, NODES } from '../scene/spell/spell'
+import { revealState, PIPELINE_BEATS, EDGE_STACK } from '../scene/map/map'
 import { useParallax } from './useParallax'
 import './sections.css'
 
@@ -202,6 +203,56 @@ export function Tracker() {
             A wrist. A heartbeat climbing under effort. The signal is caught,
             saved, and read — an intelligence that answers for the body in motion.
           </p>
+        </Reveal>
+      </div>
+    </section>
+  )
+}
+
+export function Marauders() {
+  const [sworn, setSworn] = useState(false)
+
+  const onSwear = () => {
+    if (sworn) {
+      revealState.active = false // "Mischief managed" — MapStation eases it back down
+      setSworn(false)
+    } else {
+      revealState.requested = true // canvas reads the singleton
+      setSworn(true)
+    }
+  }
+
+  return (
+    <section id="map" className="section section--map map--pinned">
+      <div className="map__stage">
+        <MaskReveal>
+          <span className="eyebrow">Chapter VII — The Marauder's Map</span>
+        </MaskReveal>
+        <span className="section__cat section__cat--project">✦ Project · live demo · on-device</span>
+        <IgniteHeading className="section__title" text="It sees who passes" />
+        <Reveal delay={0.1}>
+          <p className="map__lede">
+            A camera at the threshold. Motion stirs and a palm-sized edge device — an NPU
+            with no cloud behind it — wakes, captures the figure, follows the footsteps,
+            and names who just passed. Detection, tracking, and re-identification all run
+            on the device itself; no footage ever leaves the room.
+          </p>
+        </Reveal>
+        <Reveal delay={0.18}>
+          <button type="button" className="cast-btn" onClick={onSwear}>
+            <span className="cast-btn__rune">✦</span>
+            {sworn ? 'Mischief managed' : 'I solemnly swear that I am up to no good'}
+          </button>
+        </Reveal>
+        <Reveal delay={0.24}>
+          <ol className="conjuring__legend">
+            {PIPELINE_BEATS.map((beat, i) => (
+              <li key={beat} className="conjuring__legend-item">
+                <span className="conjuring__legend-name">{beat}</span>
+                <span className="conjuring__legend-tags">{EDGE_STACK[i] ?? ''}</span>
+              </li>
+            ))}
+          </ol>
         </Reveal>
       </div>
     </section>
