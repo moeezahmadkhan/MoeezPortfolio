@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { familiar } from '../data'
 import { sendToFamiliar, type ChatMessage } from './familiarClient'
+import { Markdown } from './Markdown'
 import './GrimoireChat.css'
 
 const GREETING: ChatMessage = { role: 'assistant', content: familiar.greeting }
@@ -72,7 +73,7 @@ export function GrimoireChat() {
             <div className="grim-body" ref={bodyRef}>
               {messages.map((m, i) => (
                 <div key={i} className={'grim-msg grim-msg--' + m.role}>
-                  {m.content}
+                  {m.role === 'assistant' ? <Markdown text={m.content} /> : m.content}
                 </div>
               ))}
 
