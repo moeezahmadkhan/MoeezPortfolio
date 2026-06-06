@@ -1,4 +1,13 @@
-import { MAX_MESSAGE_CHARS, MAX_TURNS, MODEL, SYSTEM_PROMPT } from './persona'
+import {
+  FALLBACK_REPLY,
+  MAX_MESSAGE_CHARS,
+  MAX_TURNS,
+  MODEL,
+  OPENROUTER_ENDPOINT,
+  RATE_PER_HOUR,
+  RATE_PER_MIN,
+  SYSTEM_PROMPT,
+} from './persona'
 
 export type ChatRole = 'user' | 'assistant'
 export type ChatMessage = { role: ChatRole; content: string }
@@ -18,18 +27,17 @@ export type OpenRouterBody = {
   messages: { role: 'system' | ChatRole; content: string }[]
 }
 
+// Builds the OpenRouter payload. Caller is responsible for capping first (see capMessages).
 export function buildRequestBody(messages: ChatMessage[]): OpenRouterBody {
   return {
     model: MODEL,
-    messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...capMessages(messages)],
+    messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
   }
 }
 
-import { FALLBACK_REPLY, OPENROUTER_ENDPOINT, RATE_PER_HOUR, RATE_PER_MIN } from './persona'
-
 export type RateLimiter = { check: (ip: string, now: number) => { allowed: boolean } }
 
-// In-memory, best-effort (resets on cold start; not shared across instances).
+// In-memory, best-effort (resets on cold start; not shared across instances). IP keys are never pruned — safe only on short-lived serverless instances.
 export function createRateLimiter(): RateLimiter {
   const hits = new Map<string, number[]>()
   return {

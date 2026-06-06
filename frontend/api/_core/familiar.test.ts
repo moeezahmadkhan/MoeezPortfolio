@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
-import { capMessages, buildRequestBody, type ChatMessage } from './familiar'
-import { MAX_MESSAGE_CHARS, MAX_TURNS, MODEL, SYSTEM_PROMPT } from './persona'
+import { capMessages, buildRequestBody, createRateLimiter, handleFamiliarRequest, type ChatMessage } from './familiar'
+import { FALLBACK_REPLY, MAX_MESSAGE_CHARS, MAX_TURNS, MODEL, RATE_PER_HOUR, RATE_PER_MIN, SYSTEM_PROMPT } from './persona'
 
 const u = (content: string): ChatMessage => ({ role: 'user', content })
 const a = (content: string): ChatMessage => ({ role: 'assistant', content })
@@ -37,9 +37,6 @@ describe('buildRequestBody', () => {
   })
 })
 
-import { createRateLimiter, handleFamiliarRequest } from './familiar'
-import { FALLBACK_REPLY, RATE_PER_MIN } from './persona'
-
 describe('createRateLimiter', () => {
   it('allows up to RATE_PER_MIN requests in a minute then blocks', () => {
     const rl = createRateLimiter()
@@ -64,6 +61,16 @@ describe('createRateLimiter', () => {
     for (let i = 0; i < RATE_PER_MIN; i++) rl.check('a', t)
     expect(rl.check('a', t).allowed).toBe(false)
     expect(rl.check('a', t + 61_000).allowed).toBe(true)
+  })
+
+  it('frees the per-hour window after 3600s', () => {
+    const rl = createRateLimiter()
+    const t = 4_000_000
+    // spread across minutes so the per-minute cap doesn't trigger first
+    for (let i = 0; i < RATE_PER_HOUR; i++) rl.check('a', t + i * 5_000)
+    const tLast = t + (RATE_PER_HOUR - 1) * 5_000
+    expect(rl.check('a', tLast).allowed).toBe(false)
+    expect(rl.check('a', tLast + 3_601_000).allowed).toBe(true)
   })
 })
 
