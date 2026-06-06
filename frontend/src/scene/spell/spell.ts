@@ -73,21 +73,30 @@ export interface PipelineNode {
   color: string      // orb hue (three.js literal)
 }
 
-/** The six A→Z build stages (client-grab framing). Single source of truth. */
+/**
+ * The A→Z build stages, AI as the spine (client-grab framing). Single source of
+ * truth. Every tag maps to real stack from the spellbook/chronicles — five of the
+ * eight orbs are explicitly AI, so the journey reads as AI engineering end to end.
+ */
 export const NODES: PipelineNode[] = [
-  { name: 'The Brief',     sub: 'Your idea, scoped',     tags: ['Discovery', 'Scope'],       color: '#e7c27d' },
-  { name: 'The Mind',      sub: 'Retrieval + reasoning', tags: ['RAG', 'LangChain', 'LLMs'], color: '#7fd0c4' },
-  { name: 'The Conduit',   sub: 'Backend API',           tags: ['FastAPI', 'REST'],          color: '#7fb6d8' },
-  { name: 'The Vessel',    sub: 'Containerized',         tags: ['Docker'],                   color: '#9b8cff' },
-  { name: 'The Summoning', sub: 'Deployed to the cloud', tags: ['AWS', 'GCP', 'CI/CD'],      color: '#ffa64d' },
-  { name: 'Live App',      sub: 'Delivered, end to end', tags: ['Full-stack AI'],            color: '#ffe2b0' },
+  { name: 'The Brief',     sub: 'Your idea, scoped',       tags: ['Discovery', 'Scope'],                  color: '#e7c27d' },
+  { name: 'The Corpus',    sub: 'Data → embeddings',       tags: ['Parsing', 'FAISS', 'Vectors'],         color: '#9ad6b4' },
+  { name: 'The Mind',      sub: 'Retrieval + LLM reasoning', tags: ['RAG', 'LangChain', 'LLMs'],          color: '#7fd0c4' },
+  { name: 'The Familiars', sub: 'Agents & tools',          tags: ['Multi-agent', 'Orchestration'],        color: '#7fb6d8' },
+  { name: 'The Forge',     sub: 'Fine-tune & quantize',    tags: ['QLoRA', 'Quantization'],               color: '#9b8cff' },
+  { name: 'The Conduit',   sub: 'Inference API',           tags: ['FastAPI', 'LLM Serving'],              color: '#c69bf2' },
+  { name: 'The Summoning', sub: 'Containerized & deployed', tags: ['Docker', 'AWS Bedrock', 'GCP', 'CI/CD'], color: '#ffa64d' },
+  { name: 'Live App',      sub: 'Live AI product, end to end', tags: ['Full-stack AI'],                   color: '#ffe2b0' },
 ]
 
 /** Local-space position of node `i` along a gentle left→right, slightly rising arc. */
 export function nodePosition(i: number): [number, number, number] {
   const n = NODES.length - 1
   const t = n === 0 ? 0 : i / n // 0→1
-  const x = THREE.MathUtils.lerp(-3.2, 3.2, t)
+  // Widen the arc with the node count so labels keep their breathing room
+  // (~0.64 units of half-span per orb; matches the old ±3.2 feel at 6 nodes).
+  const halfSpan = Math.max(3.2, n * 0.6)
+  const x = THREE.MathUtils.lerp(-halfSpan, halfSpan, t)
   const y = 0.2 + Math.sin(t * Math.PI) * 0.9 // arch upward in the middle
   const z = -Math.cos(t * Math.PI) * 0.6      // gentle bow toward camera at the ends
   return [x, y, z]

@@ -157,13 +157,14 @@ export function Conjuring() {
         <MaskReveal>
           <span className="eyebrow">Chapter IV — The Conjuring of Apps</span>
         </MaskReveal>
-        <span className="section__cat section__cat--service">✦ Service · full-stack AI, brief to deploy</span>
+        <span className="section__cat section__cat--service">✦ Service · AI systems, brief to deploy</span>
         <IgniteHeading className="section__title" text="One spell, end to end" />
         <Reveal delay={0.1}>
           <p className="conjuring__lede">
-            From a brief to a living product — retrieval-augmented intelligence, a
-            FastAPI spine, containerized and summoned onto AWS or GCP. Cast the spell and
-            watch a full-stack AI app assemble itself, A&nbsp;→&nbsp;Z.
+            From a brief to a deployed AI system — embeddings &amp; retrieval, agentic
+            reasoning, fine-tuned models served behind a FastAPI spine, containerized and
+            summoned onto AWS&nbsp;Bedrock or GCP. Cast the spell and watch a full-stack
+            AI app assemble itself, A&nbsp;→&nbsp;Z.
           </p>
         </Reveal>
         <Reveal delay={0.18}>

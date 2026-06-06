@@ -57,11 +57,11 @@ describe('localProgress', () => {
 })
 
 describe('NODES / nodePosition', () => {
-  it('defines six pipeline nodes ending in the live app', () => {
-    expect(NODES).toHaveLength(6)
-    expect(NODES[5].name).toMatch(/Live App/i)
+  it('defines the AI build pipeline ending in the live app', () => {
+    expect(NODES).toHaveLength(8)
+    expect(NODES[NODES.length - 1].name).toMatch(/Live App/i)
   })
   it('spreads nodes left→right along the arc (x increases with index)', () => {
-    expect(nodePosition(0)[0]).toBeLessThan(nodePosition(5)[0])
+    expect(nodePosition(0)[0]).toBeLessThan(nodePosition(NODES.length - 1)[0])
   })
 })
