@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from '../../scroll'
-import { STATION, localProgress, revealState, revealProgress, REVEAL_DURATION } from './map'
+import { STATION, MAP_TILT, localProgress, revealState, revealProgress, REVEAL_DURATION } from './map'
 import { MapTable } from './MapTable'
 import { Walker } from './Walker'
 import { NameTag } from './NameTag'
@@ -49,7 +49,7 @@ export function MapStation() {
   })
 
   return (
-    <group ref={group} position={STATION} dispose={null}>
+    <group ref={group} position={STATION} rotation={[MAP_TILT, 0, 0]} dispose={null}>
       {/* light rig: warm parchment key + cool detection rim */}
       <pointLight position={[0, 3, 3]} intensity={5} color="#ffe2b0" distance={16} decay={2} />
       <pointLight position={[-3, 1.5, 2]} intensity={3} color="#35e0ff" distance={12} decay={2} />

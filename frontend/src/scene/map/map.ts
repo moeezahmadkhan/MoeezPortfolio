@@ -7,6 +7,12 @@ export const STATION: [number, number, number] = [22, 0, 0]
 /** Map-table surface height in station-local space (cf. Tracker's RING_FLOOR_Y). */
 export const TABLE_Y = -1.2
 
+/** Tilt (radians) of the whole map station toward the camera, so the parchment
+ * reads as an unfurled map on an easel rather than a flat floor. The entire
+ * station tilts as one unit, keeping footprints, reticle and name-tags coplanar
+ * with the table surface (billboards still face the camera). */
+export const MAP_TILT = 0.34
+
 /**
  * Scroll fractions spanning the pinned #map section. Calibrated from measured DOM
  * offsets (map section: 0.772 → 0.928 at 1440×900). START is padded slightly before

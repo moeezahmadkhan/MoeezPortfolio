@@ -17,8 +17,8 @@ const KEYS: { at: number; pos: [number, number, number]; look: [number, number, 
   { at: 0.575, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },     // grimoire (projects) — center framing (measured 0.549)
   { at: 0.625, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.616)
   { at: 0.730, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
-  { at: 0.800, pos: [22, 1.0, 6.4],   look: [22, 0.5, 0] },   // map (Marauder's Map) — entry (measured 0.772)
-  { at: 0.900, pos: [22.6, 1.6, 7.8], look: [22, 0.9, 0] },   // map — held
+  { at: 0.800, pos: [22, 1.25, 5.2],  look: [22, -0.45, 0] }, // map (Marauder's Map) — entry: closer + tilted down to fill frame with parchment (measured 0.772)
+  { at: 0.900, pos: [22, 1.7, 6.1],   look: [22, -0.2, 0] },  // map — held: ease back/up, table stays large and legible
   { at: 0.950, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.928)
   { at: 1.0,   pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost
 ]
