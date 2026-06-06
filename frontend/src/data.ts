@@ -101,3 +101,14 @@ export const chronicles: Chronicle[] = [
     ],
   },
 ]
+
+export const familiar = {
+  greeting:
+    'Well met, traveller. I am the Familiar of these halls — I keep my master Moeez’s secrets. Ask, and I shall reveal his craft.',
+  starters: [
+    'What are his best projects?',
+    'Is he a fit for my role?',
+    'What’s his tech stack?',
+    'Is he available for hire?',
+  ],
+}
