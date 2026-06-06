@@ -22,8 +22,8 @@ const KEYS: { at: number; pos: [number, number, number]; look: [number, number, 
   { at: 0.621, pos: [-7, 1.35, 4.0],  look: [-7, 0.45, -1] },  // pact — held across the pinned span
   { at: 0.661, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.661)
   { at: 0.751, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
-  { at: 0.799, pos: [22, 1.0, 6.4],   look: [22, 0.5, 0] },   // map (Marauder's Map) — entry (measured 0.799)
-  { at: 0.889, pos: [22.6, 1.6, 7.8], look: [22, 0.9, 0] },   // map — held
+  { at: 0.799, pos: [22, 1.25, 5.2],  look: [22, -0.45, 0] }, // map (Marauder's Map) — entry: closer + tilted down to fill frame (measured 0.799)
+  { at: 0.889, pos: [22, 1.7, 6.1],   look: [22, -0.2, 0] },  // map — held: ease back/up, table stays large and legible
   { at: 0.937, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.937)
   { at: 1.0,   pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost
 ]
