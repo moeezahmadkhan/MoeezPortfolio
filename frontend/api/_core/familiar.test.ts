@@ -36,3 +36,87 @@ describe('buildRequestBody', () => {
     expect(body.messages[1]).toEqual({ role: 'user', content: 'Is he good with LLMs?' })
   })
 })
+
+import { createRateLimiter, handleFamiliarRequest } from './familiar'
+import { FALLBACK_REPLY, RATE_PER_MIN } from './persona'
+
+describe('createRateLimiter', () => {
+  it('allows up to RATE_PER_MIN requests in a minute then blocks', () => {
+    const rl = createRateLimiter()
+    const t = 1_000_000
+    for (let i = 0; i < RATE_PER_MIN; i++) {
+      expect(rl.check('1.1.1.1', t).allowed).toBe(true)
+    }
+    expect(rl.check('1.1.1.1', t).allowed).toBe(false)
+  })
+
+  it('tracks IPs independently', () => {
+    const rl = createRateLimiter()
+    const t = 2_000_000
+    for (let i = 0; i < RATE_PER_MIN; i++) rl.check('a', t)
+    expect(rl.check('a', t).allowed).toBe(false)
+    expect(rl.check('b', t).allowed).toBe(true)
+  })
+
+  it('frees the per-minute window after 60s', () => {
+    const rl = createRateLimiter()
+    const t = 3_000_000
+    for (let i = 0; i < RATE_PER_MIN; i++) rl.check('a', t)
+    expect(rl.check('a', t).allowed).toBe(false)
+    expect(rl.check('a', t + 61_000).allowed).toBe(true)
+  })
+})
+
+describe('handleFamiliarRequest', () => {
+  const okFetch = (reply: string) =>
+    vi.fn(async () =>
+      new Response(JSON.stringify({ choices: [{ message: { content: reply } }] }), { status: 200 }),
+    ) as unknown as typeof fetch
+
+  it('returns the model reply on success', async () => {
+    const res = await handleFamiliarRequest({
+      messages: [{ role: 'user', content: 'hi' }],
+      ip: 'x', apiKey: 'key', now: 10, rateLimiter: createRateLimiter(), fetchImpl: okFetch('Well met!'),
+    })
+    expect(res.status).toBe(200)
+    expect(res.body.reply).toBe('Well met!')
+  })
+
+  it('falls back gracefully when the upstream errors', async () => {
+    const badFetch = vi.fn(async () => new Response('nope', { status: 500 })) as unknown as typeof fetch
+    const res = await handleFamiliarRequest({
+      messages: [{ role: 'user', content: 'hi' }],
+      ip: 'x', apiKey: 'key', now: 10, rateLimiter: createRateLimiter(), fetchImpl: badFetch,
+    })
+    expect(res.status).toBe(502)
+    expect(res.body.reply).toBe(FALLBACK_REPLY)
+  })
+
+  it('returns the resting fallback (429) when rate-limited', async () => {
+    const rl = createRateLimiter()
+    for (let i = 0; i < RATE_PER_MIN; i++) rl.check('x', 10)
+    const res = await handleFamiliarRequest({
+      messages: [{ role: 'user', content: 'hi' }],
+      ip: 'x', apiKey: 'key', now: 10, rateLimiter: rl, fetchImpl: okFetch('nope'),
+    })
+    expect(res.status).toBe(429)
+    expect(res.body.reply).toBe(FALLBACK_REPLY)
+  })
+
+  it('returns the fallback when the API key is missing', async () => {
+    const res = await handleFamiliarRequest({
+      messages: [{ role: 'user', content: 'hi' }],
+      ip: 'x', apiKey: undefined, now: 10, rateLimiter: createRateLimiter(), fetchImpl: okFetch('x'),
+    })
+    expect(res.status).toBe(500)
+    expect(res.body.reply).toBe(FALLBACK_REPLY)
+  })
+
+  it('rejects an empty conversation with 400', async () => {
+    const res = await handleFamiliarRequest({
+      messages: [], ip: 'x', apiKey: 'key', now: 10, rateLimiter: createRateLimiter(), fetchImpl: okFetch('x'),
+    })
+    expect(res.status).toBe(400)
+    expect(res.body.reply).toBe(FALLBACK_REPLY)
+  })
+})
