@@ -8,12 +8,14 @@ export const STATION: [number, number, number] = [22, 0, 0]
 export const TABLE_Y = -1.2
 
 /**
- * Scroll fractions spanning the pinned #map section. PLACEHOLDER values — a later
- * calibration task recalibrates these from measured DOM offsets and keeps them in
- * sync with the #map CameraRig KEYS.
+ * Scroll fractions spanning the pinned #map section. Calibrated from measured DOM
+ * offsets (map section: 0.772 → 0.928 at 1440×900). START is padded slightly before
+ * the section top so the station is already lit when the scroll-settle magnet rests
+ * there (where localProgress would otherwise be 0 and the visibility gate hides it).
+ * Keep in sync with the #map CameraRig KEYS.
  */
-export const SECTION_START = 0.86
-export const SECTION_END = 0.95
+export const SECTION_START = 0.76
+export const SECTION_END = 0.93
 
 /** Global scroll progress (0→1) → 0→1 local progress within the map section. */
 export function localProgress(progress: number): number {

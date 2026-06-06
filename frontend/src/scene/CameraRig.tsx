@@ -9,15 +9,17 @@ import { scrollState, responsiveState } from '../scroll'
 const KEYS: { at: number; pos: [number, number, number]; look: [number, number, number] }[] = [
   { at: 0.0,   pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — closer + framed higher for a more commanding figurine
   { at: 0.10,  pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — hold while figurine spins 360°
-  { at: 0.130, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.124
-  { at: 0.195, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.189)
-  { at: 0.440, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across 01–04
-  { at: 0.500, pos: [-13, 1.25, 10.5], look: [-13, 0.55, 0] }, // conjuring (service) — entry, spell chamber far-left (measured 0.498)
-  { at: 0.630, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held across the pinned span
-  { at: 0.690, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },     // grimoire (projects) — center framing (measured held 0.695)
-  { at: 0.735, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.731)
-  { at: 0.860, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
-  { at: 0.917, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.917)
+  { at: 0.110, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.104
+  { at: 0.165, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.159)
+  { at: 0.360, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across the pinned span (ends 0.419)
+  { at: 0.430, pos: [-13, 1.25, 10.5], look: [-13, 0.55, 0] }, // conjuring (service) — entry, spell chamber far-left (measured 0.419)
+  { at: 0.530, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held across the pinned span
+  { at: 0.575, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },     // grimoire (projects) — center framing (measured 0.549)
+  { at: 0.625, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.616)
+  { at: 0.730, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
+  { at: 0.800, pos: [22, 1.0, 6.4],   look: [22, 0.5, 0] },   // map (Marauder's Map) — entry (measured 0.772)
+  { at: 0.900, pos: [22.6, 1.6, 7.8], look: [22, 0.9, 0] },   // map — held
+  { at: 0.950, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.928)
   { at: 1.0,   pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost
 ]
 

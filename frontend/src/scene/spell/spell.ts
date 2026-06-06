@@ -54,8 +54,8 @@ export const STATION: [number, number, number] = [-13, 0, 0]
  * chamber is already lit when the scroll-settle magnet rests on the section top
  * (where localProgress would otherwise be 0 and the visibility gate would hide it).
  */
-export const SECTION_START = 0.47
-export const SECTION_END = 0.66
+export const SECTION_START = 0.39
+export const SECTION_END = 0.55
 
 /** Global scroll progress → 0→1 local progress within the conjuring section. */
 export function localProgress(progress: number): number {
