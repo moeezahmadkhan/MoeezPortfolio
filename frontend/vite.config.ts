@@ -16,6 +16,10 @@ function familiarDevApi(apiKey: string | undefined): Plugin {
           return
         }
         let raw = ''
+        req.on('error', () => {
+          res.statusCode = 400
+          res.end()
+        })
         req.on('data', (chunk) => (raw += chunk))
         req.on('end', async () => {
           let messages

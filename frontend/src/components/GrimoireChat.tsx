@@ -5,7 +5,7 @@ import { sendToFamiliar, type ChatMessage } from './familiarClient'
 import './GrimoireChat.css'
 
 const GREETING: ChatMessage = { role: 'assistant', content: familiar.greeting }
-const MAX_INPUT = 1000
+const MAX_INPUT = 1000 // keep in sync with MAX_MESSAGE_CHARS in api/_core/persona.ts
 
 export function GrimoireChat() {
   const [open, setOpen] = useState(false)
@@ -55,6 +55,7 @@ export function GrimoireChat() {
           <motion.div
             className="grim-panel"
             role="dialog"
+            aria-modal="true"
             aria-label="The Talking Grimoire"
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
