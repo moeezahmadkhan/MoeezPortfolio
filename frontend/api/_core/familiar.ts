@@ -1,6 +1,7 @@
 import {
   FALLBACK_REPLY,
   MAX_MESSAGE_CHARS,
+  MAX_OUTPUT_TOKENS,
   MAX_TURNS,
   MODELS,
   OPENROUTER_ENDPOINT,
@@ -25,6 +26,7 @@ export function capMessages(messages: ChatMessage[]): ChatMessage[] {
 export type OpenRouterBody = {
   model: string
   messages: { role: 'system' | ChatRole; content: string }[]
+  max_tokens: number
 }
 
 // Builds the OpenRouter payload for one model. Caller caps messages first (see capMessages).
@@ -32,6 +34,7 @@ export function buildRequestBody(messages: ChatMessage[], model: string): OpenRo
   return {
     model,
     messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+    max_tokens: MAX_OUTPUT_TOKENS,
   }
 }
 
