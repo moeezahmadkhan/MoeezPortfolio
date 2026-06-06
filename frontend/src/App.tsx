@@ -8,7 +8,7 @@ import { Candles } from './components/Candles'
 import { ScrollRail } from './components/ScrollRail'
 import { ScrollCues } from './components/ScrollCues'
 import { GrimoireChat } from './components/GrimoireChat'
-import { About, Spells, Grimoire, Conjuring, Tracker, Chronicles, OwlPost } from './components/Sections'
+import { About, Spells, Grimoire, Conjuring, Tracker, Marauders, Chronicles, OwlPost } from './components/Sections'
 import { useSmoothScroll } from './smoothScroll'
 import { useScrollTracker } from './scroll'
 import { useScrollSettle } from './useScrollSettle'
@@ -79,6 +79,7 @@ export default function App() {
         <Conjuring />
         <Grimoire />
         <Tracker />
+        <Marauders />
         <Chronicles />
         <OwlPost />
       </main>
