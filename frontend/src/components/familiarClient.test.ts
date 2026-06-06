@@ -10,10 +10,10 @@ describe('sendToFamiliar', () => {
   })
 
   it('POSTs the messages to /api/familiar', async () => {
-    const f = vi.fn(async () => new Response(JSON.stringify({ reply: 'x' }), { status: 200 }))
+    const f = vi.fn(async (_url: string, _init: RequestInit) => new Response(JSON.stringify({ reply: 'x' }), { status: 200 }))
     await sendToFamiliar(msgs, f as unknown as typeof fetch)
     expect(f).toHaveBeenCalledWith('/api/familiar', expect.objectContaining({ method: 'POST' }))
-    const sent = JSON.parse((f.mock.calls[0][1] as RequestInit).body as string)
+    const sent = JSON.parse(f.mock.calls[0][1].body as string)
     expect(sent.messages).toEqual(msgs)
   })
 
