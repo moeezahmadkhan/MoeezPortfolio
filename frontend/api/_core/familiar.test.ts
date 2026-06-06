@@ -109,6 +109,23 @@ describe('handleFamiliarRequest', () => {
     expect(call).toBe(2)
   })
 
+  it('sends only Latin-1-safe request headers (regression: em-dash in X-Title threw before fetch)', async () => {
+    const strictFetch = vi.fn(async (_url: unknown, init: { headers?: Record<string, string> }) => {
+      for (const value of Object.values(init.headers ?? {})) {
+        for (const ch of value) {
+          if (ch.charCodeAt(0) > 255) throw new TypeError('header value is not a valid ByteString')
+        }
+      }
+      return new Response(JSON.stringify({ choices: [{ message: { content: 'ok' } }] }), { status: 200 })
+    }) as unknown as typeof fetch
+    const res = await handleFamiliarRequest({
+      messages: [{ role: 'user', content: 'hi' }],
+      ip: 'x', apiKey: 'key', now: 10, rateLimiter: createRateLimiter(), fetchImpl: strictFetch,
+    })
+    expect(res.status).toBe(200)
+    expect(res.body.reply).toBe('ok')
+  })
+
   it('falls back gracefully when the upstream errors', async () => {
     const badFetch = vi.fn(async () => new Response('nope', { status: 500 })) as unknown as typeof fetch
     const res = await handleFamiliarRequest({
