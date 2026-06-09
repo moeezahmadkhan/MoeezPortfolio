@@ -22,12 +22,19 @@ import { SpellStation } from './spell/SpellStation'
 import { MapStation } from './map/MapStation'
 import { PactStation } from './pact/PactStation'
 
+// Coarse-pointer phones / small viewports get a lighter render tier: no real-time
+// shadow maps, capped DPR, cheaper post chain and fewer particles. Resolved once
+// at mount (matching the matchMedia approach used in Cursor.tsx).
+const isMobile =
+  typeof window !== 'undefined' &&
+  (window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 720)
+
 export function Scene({ reveal }: { reveal: number }) {
-  const [dpr, setDpr] = useState(1.5)
+  const [dpr, setDpr] = useState(isMobile ? 1 : 1.5)
 
   return (
     <Canvas
-      shadows
+      shadows={!isMobile}
       dpr={dpr}
       gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 0.85 }}
       camera={{ position: [0, 0.4, 6.4], fov: 38 }}
@@ -37,7 +44,7 @@ export function Scene({ reveal }: { reveal: number }) {
 
       <PerformanceMonitor
         onDecline={() => setDpr(1)}
-        onIncline={() => setDpr(Math.min(window.devicePixelRatio, 2))}
+        onIncline={() => setDpr(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2))}
       />
       <AdaptiveDpr pixelated />
       <ScrollDriver />
@@ -84,9 +91,9 @@ export function Scene({ reveal }: { reveal: number }) {
         <MapStation />
         <PactStation />
 
-        {/* Floating golden dust + finer white motes */}
-        <Sparkles count={70} scale={[8, 6, 8]} size={5} speed={0.25} color="#f3d99b" opacity={0.7} />
-        <Sparkles count={120} scale={[10, 7, 10]} size={1.6} speed={0.15} color="#ffffff" opacity={0.35} />
+        {/* Floating golden dust + finer white motes (thinned on mobile to ease fill-rate) */}
+        <Sparkles count={isMobile ? 32 : 70} scale={[8, 6, 8]} size={5} speed={0.25} color="#f3d99b" opacity={0.7} />
+        <Sparkles count={isMobile ? 48 : 120} scale={[10, 7, 10]} size={1.6} speed={0.15} color="#ffffff" opacity={0.35} />
 
         <ContactShadows
           position={[0, -1.34, 0]}
@@ -98,24 +105,40 @@ export function Scene({ reveal }: { reveal: number }) {
         />
 
         {/* Inline environment (no network fetch) for soft PBR reflections */}
-        <Environment resolution={256}>
+        <Environment resolution={isMobile ? 128 : 256}>
           <Lightformer intensity={0.9} color="#ffcaa0" position={[0, 4, 2]} scale={[8, 3, 1]} />
           <Lightformer intensity={0.4} color="#7fb6d8" position={[-4, 1, -3]} scale={[4, 6, 1]} />
           <Lightformer intensity={0.3} color="#e7c27d" position={[4, 0, 2]} scale={[4, 4, 1]} />
         </Environment>
       </Suspense>
 
-      <EffectComposer multisampling={0}>
-        <Bloom
-          intensity={0.9}
-          luminanceThreshold={0.5}
-          luminanceSmoothing={0.35}
-          kernelSize={KernelSize.LARGE}
-          mipmapBlur
-        />
-        <Vignette eskil={false} offset={0.25} darkness={0.92} />
-        <SMAA />
-      </EffectComposer>
+      {/* Bloom is the signature gold glow, kept on both tiers. On mobile we shrink
+          the blur kernel and drop the extra SMAA pass to cut fill-rate (the
+          per-frame depth-stencil blit went away with the Canvas shadow maps). */}
+      {isMobile ? (
+        <EffectComposer multisampling={0}>
+          <Bloom
+            intensity={0.9}
+            luminanceThreshold={0.5}
+            luminanceSmoothing={0.35}
+            kernelSize={KernelSize.SMALL}
+            mipmapBlur
+          />
+          <Vignette eskil={false} offset={0.25} darkness={0.92} />
+        </EffectComposer>
+      ) : (
+        <EffectComposer multisampling={0}>
+          <Bloom
+            intensity={0.9}
+            luminanceThreshold={0.5}
+            luminanceSmoothing={0.35}
+            kernelSize={KernelSize.LARGE}
+            mipmapBlur
+          />
+          <Vignette eskil={false} offset={0.25} darkness={0.92} />
+          <SMAA />
+        </EffectComposer>
+      )}
     </Canvas>
   )
 }

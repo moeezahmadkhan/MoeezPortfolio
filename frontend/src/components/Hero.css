@@ -141,19 +141,38 @@
 }
 
 @media (max-width: 720px) {
-  .hero__stage { align-items: flex-end; padding-bottom: 16vh; }
+  /* Top-anchor the copy: a flex-end block taller than the viewport clips its
+     TOP line (you can't scroll a sticky stage), which was eating "Moeez".
+     Anchoring to the top guarantees the full name is always in view and frees
+     the lower frame for the figurine. */
+  .hero__stage { align-items: flex-start; padding-top: 7vh; }
   .hero__inner {
-    padding-right: 1.5rem;
-    /* legibility scrim so the figurine doesn't fight the text */
-    background: linear-gradient(0deg, rgba(7, 7, 13, 0.82) 30%, rgba(7, 7, 13, 0.2) 75%, transparent);
-    padding-top: 3rem;
-    padding-bottom: 1rem;
+    padding-left: 1.4rem;
+    padding-right: 1.4rem;
+    padding-top: 1.6rem;
+    padding-bottom: 1.8rem;
+    max-width: 100%;
+    /* Top-down legibility scrim: dark behind the text, fading out so the
+       figurine reads through the lower half of the hero. */
+    background: linear-gradient(180deg, rgba(7, 7, 13, 0.86) 45%, rgba(7, 7, 13, 0.35) 78%, transparent);
     border-radius: 12px;
     backdrop-filter: blur(2px);
   }
+  .hero__name {
+    font-size: clamp(2.7rem, 13vw, 4.4rem);
+    margin-bottom: 1.1rem;
+  }
+  .hero__title {
+    font-size: 1rem;
+    line-height: 1.4;
+    max-width: 24rem;
+    margin-bottom: 1.2rem;
+  }
+  /* Decorative incantation line — drop it on phones to keep the figurine visible. */
+  .hero__spell { display: none; }
   .hero__actions {
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 0.7rem;
   }
   .hero__actions .btn {
     width: 100%;
