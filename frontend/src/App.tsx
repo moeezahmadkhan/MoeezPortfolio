@@ -11,7 +11,7 @@ import { GrimoireChat } from './components/GrimoireChat'
 import { CinematicIntro } from './components/CinematicIntro'
 import { shouldPlayIntro, markIntroSeen } from './components/introGate'
 import { About, Spells, Grimoire, Conjuring, Pact, Tracker, Marauders, Chronicles, OwlPost } from './components/Sections'
-import { useSmoothScroll } from './smoothScroll'
+import { useSmoothScroll, getLenis } from './smoothScroll'
 import { useScrollTracker } from './scroll'
 import { useScrollSettle } from './useScrollSettle'
 import './App.css'
@@ -53,6 +53,22 @@ export default function App() {
     }
     raf.current = requestAnimationFrame(tick)
     return () => { if (raf.current) cancelAnimationFrame(raf.current) }
+  }, [phase])
+
+  // Hold the page still until the hero is live so the loader/intro can't be
+  // scrolled past (which would silently drift the camera rig). Locks Lenis
+  // (smooth scroll) and, for the reduced-motion path where Lenis is absent,
+  // the document overflow as well.
+  useEffect(() => {
+    const root = document.documentElement
+    if (phase === 'live') {
+      root.style.overflow = ''
+      getLenis()?.start()
+    } else {
+      root.style.overflow = 'hidden'
+      getLenis()?.stop()
+    }
+    return () => { root.style.overflow = '' }
   }, [phase])
 
   const handleIntroDone = () => {
