@@ -8,6 +8,7 @@ import { Candles } from './components/Candles'
 import { ScrollRail } from './components/ScrollRail'
 import { ScrollCues } from './components/ScrollCues'
 import { GrimoireChat } from './components/GrimoireChat'
+import { SiteNav } from './components/SiteNav'
 import { CinematicIntro } from './components/CinematicIntro'
 import { About, Spells, Grimoire, Conjuring, Pact, Tracker, Marauders, Chronicles, OwlPost } from './components/Sections'
 import { useSmoothScroll, getLenis } from './smoothScroll'
@@ -80,6 +81,7 @@ export default function App() {
 
       <Candles />
       <Cursor />
+      <SiteNav />
       <ScrollRail />
       <ScrollCues visible={phase === 'live'} />
       <GrimoireChat />

@@ -1,0 +1,109 @@
+/* ── Sticky wizard nav ────────────────────────────────────────────────────
+   Borrowed from solais.ai: a thin monospace bar with logo, chapter links and
+   a pill CTA. Wizard-flavoured (gold-on-ink glass, ✦ runes). Hidden over the
+   hero, slides down once you start descending. */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.85rem clamp(1rem, 4vw, 2.6rem);
+  background: linear-gradient(to bottom, rgba(7, 7, 13, 0.82), rgba(7, 7, 13, 0.55));
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  border-bottom: 1px solid rgba(231, 194, 125, 0.16);
+  transform: translateY(-110%);
+  opacity: 0;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  pointer-events: none;
+}
+.nav--visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Brand */
+.nav__brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.nav__brand-text {
+  font-size: 0.95rem;
+  letter-spacing: 0.22em;
+  color: var(--gold-bright);
+  font-weight: 600;
+}
+.nav__brand-sub {
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  color: rgba(231, 194, 125, 0.45);
+}
+.nav__rune { color: var(--gold); }
+
+/* Links */
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.nav__link {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(231, 194, 125, 0.7);
+  text-decoration: none;
+  padding: 0.4rem 0.85rem;
+  transition: color 0.2s;
+}
+.nav__link:not(:last-child)::after {
+  content: '/';
+  position: absolute;
+  right: -2px;
+  color: rgba(231, 194, 125, 0.22);
+}
+.nav__link:hover { color: var(--gold-bright); }
+
+/* CTA pill */
+.nav__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold-deep));
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  padding: 0.55rem 1.15rem;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 0 0 rgba(231, 194, 125, 0);
+  transition: box-shadow 0.25s, transform 0.15s;
+}
+.nav__cta:hover {
+  box-shadow: 0 0 22px rgba(231, 194, 125, 0.4);
+  transform: translateY(-1px);
+}
+.nav__cta .nav__rune { color: var(--ink); }
+
+/* Mobile: drop the chapter links, keep brand + CTA */
+@media (max-width: 720px) {
+  .nav__links { display: none; }
+  .nav__brand-sub { display: none; }
+  .nav { padding: 0.7rem 1rem; }
+  .nav__cta { font-size: 0.66rem; padding: 0.5rem 0.95rem; }
+}

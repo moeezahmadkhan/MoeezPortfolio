@@ -17,21 +17,38 @@ export function About() {
           <span className="eyebrow">Chapter II — The Wizard</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="The mind behind the wand" />
-        <Reveal delay={0.1}>
-          <p className="about__lede">
-            I’m <strong>Moeez Ahmad Khan</strong> — an AI/ML engineer who treats models like spells:
-            precise incantations that turn raw data into something that <em>acts</em>. I architect
-            autonomous agents, high-performance computer-vision pipelines, and generative systems,
-            then carry them from research into production-ready software.
-          </p>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <p className="about__sub">
-            Trained at Information Technology University, Lahore (BSCS — specializing in Agentic AI,
-            Computer Vision &amp; Reinforcement Learning), I live in the space between a research
-            paper and a deploy button.
-          </p>
-        </Reveal>
+
+        <div className="about__body">
+          <div className="about__copy">
+            <Reveal delay={0.1}>
+              <p className="about__lede">
+                I’m <strong>Moeez Ahmad Khan</strong> — an AI/ML engineer who treats models like spells:
+                precise incantations that turn raw data into something that <em>acts</em>. I architect
+                autonomous agents, high-performance computer-vision pipelines, and generative systems,
+                then carry them from research into production-ready software.
+              </p>
+            </Reveal>
+            <Reveal delay={0.2}>
+              <p className="about__sub">
+                Trained at Information Technology University, Lahore (BSCS — specializing in Agentic AI,
+                Computer Vision &amp; Reinforcement Learning), I live in the space between a research
+                paper and a deploy button.
+              </p>
+            </Reveal>
+          </div>
+
+          <Reveal delay={0.15} className="about__portrait-wrap">
+            <figure className="about__portrait">
+              <span className="about__portrait-corner about__portrait-corner--tl" aria-hidden />
+              <span className="about__portrait-corner about__portrait-corner--br" aria-hidden />
+              <img src="/moeez.jpeg" alt="Moeez Ahmad Khan" loading="lazy" width={400} height={400} />
+              <figcaption className="about__portrait-cap">
+                <span className="about__portrait-id">SUBJECT Nº MAK·01</span>
+                <span className="about__portrait-name">// engineer of spells</span>
+              </figcaption>
+            </figure>
+          </Reveal>
+        </div>
 
         <div className="about__stats">
           {[
@@ -110,8 +127,13 @@ function GrimoireCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
     <motion.div ref={ref as React.RefObject<HTMLDivElement>} style={{ y }}>
       <Reveal delay={0.06 * i}>
         <Tilt className="spell-card">
-          <div className="spell-card__glyph">{p.glyph}</div>
-          <p className="spell-card__incant">“{p.incantation}”</p>
+          <span className="spell-card__corner spell-card__corner--tr" aria-hidden />
+          <span className="spell-card__corner spell-card__corner--bl" aria-hidden />
+          <div className="spell-card__head">
+            <span className="spell-card__index">Nº{String(i + 1).padStart(2, '0')}</span>
+            <span className="spell-card__glyph">{p.glyph}</span>
+          </div>
+          <p className="spell-card__incant">// {p.incantation}</p>
           <h3 className="spell-card__name">{p.name}</h3>
           <p className="spell-card__blurb">{p.blurb}</p>
           <ul className="spell-card__tags">
@@ -226,7 +248,7 @@ export function Tracker() {
     <section id="tracker" className="section section--tracker tracker--pinned">
       <div className="tracker__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter VI — The Tracker</span>
+          <span className="eyebrow">Chapter VII — The Tracker</span>
         </MaskReveal>
         <span className="section__cat section__cat--project">✦ Project · live demo</span>
         <IgniteHeading className="section__title" text="It reads the pulse" />
@@ -258,7 +280,7 @@ export function Marauders() {
     <section id="map" className="section section--map map--pinned">
       <div className="map__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter VII — The Marauder's Map</span>
+          <span className="eyebrow">Chapter VIII — The Marauder's Map</span>
         </MaskReveal>
         <span className="section__cat section__cat--project">✦ Project · live demo · on-device</span>
         <IgniteHeading className="section__title" text="It sees who passes" />
@@ -296,7 +318,7 @@ export function Chronicles() {
     <section id="chronicles" className="section section--chronicles">
       <div className="section__wrap">
         <MaskReveal>
-          <span className="eyebrow">Chapter VIII — Chronicles</span>
+          <span className="eyebrow">Chapter IX — Chronicles</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="The path so far" />
         <div className="timeline">
@@ -332,7 +354,7 @@ export function OwlPost() {
     <section id="owlpost" className="section section--owl">
       <div className="section__wrap owl">
         <MaskReveal>
-          <span className="eyebrow">Chapter IX — Owl Post</span>
+          <span className="eyebrow">Chapter X — Owl Post</span>
         </MaskReveal>
         <IgniteHeading className="section__title section__title--center" text="Send an owl" />
         <Reveal delay={0.1}>
