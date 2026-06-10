@@ -85,12 +85,44 @@ export function CinematicIntro({ onDone }: { onDone: () => void }) {
       aria-modal="true"
       aria-label="Intro sequence"
     >
+      {/* Shared fractal-noise cloud filters. feTurbulence generates genuine
+          volumetric wisps; feColorMatrix tints them candle-gold and thresholds
+          the alpha into soft cloud edges. */}
+      <svg className="intro__clouddefs" aria-hidden="true">
+        <defs>
+          <filter id="introCloudBack" x="-30%" y="-30%" width="160%" height="160%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.006 0.011" numOctaves="3" seed="11" stitchTiles="stitch" result="n" />
+            <feColorMatrix in="n" type="matrix"
+              values="0 0 0 0 0.46
+                      0 0 0 0 0.34
+                      0 0 0 0 0.18
+                      0 0 0 0.9 -0.34" result="c" />
+            <feGaussianBlur in="c" stdDeviation="5" />
+          </filter>
+          <filter id="introCloudWisp" x="-30%" y="-30%" width="160%" height="160%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.009 0.018" numOctaves="4" seed="4" stitchTiles="stitch" result="n" />
+            <feColorMatrix in="n" type="matrix"
+              values="0 0 0 0 0.64
+                      0 0 0 0 0.49
+                      0 0 0 0 0.28
+                      0 0 0 1.15 -0.34" result="c" />
+            <feGaussianBlur in="c" stdDeviation="3.5" />
+          </filter>
+        </defs>
+      </svg>
+
       <div className="intro__sky" />
       <div className="intro__stars" />
       <div className="intro__moon" />
       <div className="intro__fog intro__fog--1" />
       <div className="intro__fog intro__fog--2" />
       <div className="intro__fog intro__fog--3" />
+
+      {/* The mist bank the title rises out of — always drifting, behind text. */}
+      <svg className="intro__clouds intro__clouds--back" viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
+        <rect x="0" y="0" width="1200" height="800" filter="url(#introCloudBack)" />
+      </svg>
+
       <svg className="intro__castle" viewBox="0 0 400 160" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
         <path d={CASTLE} />
       </svg>
@@ -134,6 +166,15 @@ export function CinematicIntro({ onDone }: { onDone: () => void }) {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Two foreground cloud banks meeting over the title, then parting to
+          reveal it (forwards — runs once on mount). They sit above the text. */}
+      <svg className="intro__clouds intro__wisp intro__wisp--l" viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
+        <rect x="0" y="0" width="1200" height="800" filter="url(#introCloudWisp)" />
+      </svg>
+      <svg className="intro__clouds intro__wisp intro__wisp--r" viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
+        <rect x="0" y="0" width="1200" height="800" filter="url(#introCloudWisp)" />
+      </svg>
 
       <button
         type="button"

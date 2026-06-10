@@ -85,6 +85,69 @@
   to   { transform: translate(10%, -5%) scale(1.18); }
 }
 
+/* Filter-only SVG holding the cloud <defs>; takes no space. */
+.intro__clouddefs { position: absolute; width: 0; height: 0; }
+
+/* SVG fractal-noise cloud layers. `screen` blend lets the gold wisps glow over
+   the dark sky rather than sitting as flat gray patches. */
+.intro__clouds {
+  position: absolute;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+
+/* The drifting mist bank behind the title. Slightly oversized so the slow
+   horizontal drift never exposes an edge. Faded top + bottom so it reads as a
+   band of mist around the title rather than full-screen noise. */
+.intro__clouds--back {
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  opacity: 0.42;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 4%, #000 30%, #000 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 4%, #000 30%, #000 80%, transparent 100%);
+  animation: intro-cloud-drift 42s ease-in-out infinite alternate;
+}
+@keyframes intro-cloud-drift {
+  from { transform: translateX(-4%) scale(1.05); }
+  to   { transform: translateX(6%) scale(1.12); }
+}
+
+/* Foreground banks that cover the title at first, then part outward to reveal
+   it. Masked to feather their inner edge so the parting line is never hard. */
+.intro__wisp {
+  top: 16%;
+  height: 64%;
+  width: 80%;
+  opacity: 0;
+}
+/* Radial (elliptical) masks so each bank feathers softly on every edge — no
+   hard rectangle. Weighted toward the inner edge so they meet over the title. */
+.intro__wisp--l {
+  left: -10%;
+  -webkit-mask-image: radial-gradient(ellipse 58% 64% at 62% 50%, #000 12%, transparent 76%);
+  mask-image: radial-gradient(ellipse 58% 64% at 62% 50%, #000 12%, transparent 76%);
+  animation: intro-part-left 4.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.intro__wisp--r {
+  right: -10%;
+  -webkit-mask-image: radial-gradient(ellipse 58% 64% at 38% 50%, #000 12%, transparent 76%);
+  mask-image: radial-gradient(ellipse 58% 64% at 38% 50%, #000 12%, transparent 76%);
+  animation: intro-part-right 4.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes intro-part-left {
+  0%   { transform: translateX(36%) scale(1.12); opacity: 0.9; }
+  55%  { opacity: 0.62; }
+  100% { transform: translateX(-16%) scale(1); opacity: 0.32; }
+}
+@keyframes intro-part-right {
+  0%   { transform: translateX(-36%) scale(1.12); opacity: 0.9; }
+  55%  { opacity: 0.62; }
+  100% { transform: translateX(16%) scale(1); opacity: 0.32; }
+}
+
 .intro__castle {
   position: absolute;
   bottom: 0;
@@ -221,6 +284,7 @@
 /* Reduced motion: kill ambient motion and the lively atmospheric accents
    (the JS timeline is shortened separately in the component). */
 @media (prefers-reduced-motion: reduce) {
-  .intro__fog, .intro__stars, .intro__mist, .intro__title { animation: none; }
-  .intro__bird, .intro__ember { display: none; }
+  .intro__fog, .intro__stars, .intro__mist, .intro__title,
+  .intro__clouds--back { animation: none; }
+  .intro__bird, .intro__ember, .intro__wisp { display: none; }
 }
