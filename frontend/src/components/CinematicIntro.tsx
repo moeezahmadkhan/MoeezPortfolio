@@ -25,6 +25,8 @@ const CASTLE =
 export function CinematicIntro({ onDone }: { onDone: () => void }) {
   const [step, setStep] = useState(0)
   const done = useRef(false)
+  const onDoneRef = useRef(onDone)
+  onDoneRef.current = onDone
   const [reduced] = useState(
     () => typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -33,7 +35,7 @@ export function CinematicIntro({ onDone }: { onDone: () => void }) {
   const finish = () => {
     if (done.current) return
     done.current = true
-    onDone()
+    onDoneRef.current()
   }
 
   useEffect(() => {
@@ -65,6 +67,7 @@ export function CinematicIntro({ onDone }: { onDone: () => void }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 1, ease: 'easeInOut' }}
       role="dialog"
+      aria-modal="true"
       aria-label="Intro sequence"
     >
       <div className="intro__sky" />
@@ -75,8 +78,8 @@ export function CinematicIntro({ onDone }: { onDone: () => void }) {
       <svg className="intro__castle" viewBox="0 0 400 160" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
         <path d={CASTLE} />
       </svg>
-      <span className="intro__bird" style={{ top: '30%', left: '24%' }}>{'⌃'}</span>
-      <span className="intro__bird intro__bird--2" style={{ top: '38%', left: '60%' }}>{'⌃'}</span>
+      <span className="intro__bird" aria-hidden="true" style={{ top: '30%', left: '24%' }}>{'⌃'}</span>
+      <span className="intro__bird intro__bird--2" aria-hidden="true" style={{ top: '38%', left: '60%' }}>{'⌃'}</span>
 
       <div className="intro__center">
         <AnimatePresence mode="wait">
