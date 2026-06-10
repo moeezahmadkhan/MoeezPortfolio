@@ -43,6 +43,9 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
     plugins: [react(), familiarDevApi(env.OPENROUTER_API_KEY)],
-    server: { host: true },
+    // host:true exposes the dev server on the LAN (reachable at http://<LAN-IP>:5173
+    // from other devices); cors:true sends Access-Control-Allow-Origin so cross-origin
+    // requests aren't blocked.
+    server: { host: true, cors: true },
   }
 })

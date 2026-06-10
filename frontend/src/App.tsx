@@ -8,32 +8,39 @@ import { Candles } from './components/Candles'
 import { ScrollRail } from './components/ScrollRail'
 import { ScrollCues } from './components/ScrollCues'
 import { GrimoireChat } from './components/GrimoireChat'
+import { CinematicIntro } from './components/CinematicIntro'
 import { About, Spells, Grimoire, Conjuring, Pact, Tracker, Marauders, Chronicles, OwlPost } from './components/Sections'
-import { useSmoothScroll } from './smoothScroll'
+import { useSmoothScroll, getLenis } from './smoothScroll'
 import { useScrollTracker } from './scroll'
 import { useScrollSettle } from './useScrollSettle'
 import './App.css'
 
 export default function App() {
   const { progress, active } = useProgress()
-  const [loaded, setLoaded] = useState(false)
+  const [phase, setPhase] = useState<'loading' | 'intro' | 'live'>('loading')
   const [reveal, setReveal] = useState(0)
   const raf = useRef<number>()
+  const ramped = useRef(false)
 
   useSmoothScroll()
   useScrollTracker()
   useScrollSettle()
 
-  // Once assets finish, hold a beat then drive the conjuring reveal 0 → 1.
+  // Once assets finish, hold a beat then play the cinematic intro. It plays on
+  // every load (no once-per-session gate).
   useEffect(() => {
-    if (!active && progress >= 100 && !loaded) {
-      const t = setTimeout(() => setLoaded(true), 500)
+    if (phase !== 'loading') return
+    if (!active && progress >= 100) {
+      const t = setTimeout(() => setPhase('intro'), 500)
       return () => clearTimeout(t)
     }
-  }, [active, progress, loaded])
+  }, [active, progress, phase])
 
+  // Drive the conjuring reveal 0 → 1 once we leave the loader, so the figurine
+  // is alive behind the intro and ready when it dissolves. Runs exactly once.
   useEffect(() => {
-    if (!loaded) return
+    if (phase === 'loading' || ramped.current) return
+    ramped.current = true
     const start = performance.now()
     const DURATION = 1800
     const tick = (now: number) => {
@@ -43,7 +50,27 @@ export default function App() {
     }
     raf.current = requestAnimationFrame(tick)
     return () => { if (raf.current) cancelAnimationFrame(raf.current) }
-  }, [loaded])
+  }, [phase])
+
+  // Hold the page still until the hero is live so the loader/intro can't be
+  // scrolled past (which would silently drift the camera rig). Locks Lenis
+  // (smooth scroll) and, for the reduced-motion path where Lenis is absent,
+  // the document overflow as well.
+  useEffect(() => {
+    const root = document.documentElement
+    if (phase === 'live') {
+      root.style.overflow = ''
+      getLenis()?.start()
+    } else {
+      root.style.overflow = 'hidden'
+      getLenis()?.stop()
+    }
+    return () => { root.style.overflow = '' }
+  }, [phase])
+
+  const handleIntroDone = () => {
+    setPhase('live')
+  }
 
   return (
     <MotionConfig reducedMotion="user">
@@ -54,11 +81,11 @@ export default function App() {
       <Candles />
       <Cursor />
       <ScrollRail />
-      <ScrollCues visible={loaded} />
+      <ScrollCues visible={phase === 'live'} />
       <GrimoireChat />
 
       <AnimatePresence>
-        {!loaded && (
+        {phase === 'loading' && (
           <motion.div
             className="preloader"
             exit={{ opacity: 0 }}
@@ -70,6 +97,10 @@ export default function App() {
             <p className="preloader__hint">summoning the figurine…</p>
           </motion.div>
         )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {phase === 'intro' && <CinematicIntro onDone={handleIntroDone} />}
       </AnimatePresence>
 
       <main>

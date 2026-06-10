@@ -1,0 +1,290 @@
+/* Self-hosted title font. Falls back to Cinzel Decorative until the file is
+   added at /fonts/HarryP.woff2 (see plan Task 2). */
+@font-face {
+  font-family: 'Harry P';
+  src: url('/fonts/HarryP.woff2') format('woff2'),
+       url('/fonts/HarryP.woff') format('woff');
+  font-display: swap;
+}
+
+/* Full-viewport cinematic overlay. z-index sits above page content + the
+   #root::before vignette (z 50) but below the #root::after grain (z 9999,
+   pointer-events:none) which harmlessly textures over it. */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  background: #000;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Cinematic vignette so the scene falls off into darkness at the edges. */
+.intro::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 100% at 50% 38%, transparent 52%, rgba(0, 0, 0, 0.62) 100%);
+}
+
+/* Sky — the approved candle-gold / ink palette. */
+.intro__sky {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 14%,
+    #2c2012 0%, #160d09 42%, #0a0710 78%, var(--ink) 100%);
+}
+
+/* Faint twinkling starfield, concentrated in the upper sky. */
+.intro__stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, rgba(255, 247, 224, 0.9), transparent),
+    radial-gradient(1px 1px at 28% 30%, rgba(255, 247, 224, 0.7), transparent),
+    radial-gradient(1.5px 1.5px at 42% 12%, rgba(255, 247, 224, 0.85), transparent),
+    radial-gradient(1px 1px at 63% 22%, rgba(255, 247, 224, 0.6), transparent),
+    radial-gradient(1.5px 1.5px at 78% 14%, rgba(255, 247, 224, 0.85), transparent),
+    radial-gradient(1px 1px at 88% 28%, rgba(255, 247, 224, 0.6), transparent),
+    radial-gradient(1px 1px at 55% 8%, rgba(255, 247, 224, 0.7), transparent),
+    radial-gradient(1px 1px at 35% 24%, rgba(255, 247, 224, 0.5), transparent);
+  animation: intro-twinkle 6s ease-in-out infinite alternate;
+}
+@keyframes intro-twinkle { from { opacity: 0.32; } to { opacity: 0.7; } }
+
+.intro__moon {
+  position: absolute;
+  top: 11%;
+  left: 50%;
+  width: 130px;
+  height: 130px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6e2 0%, #f6dfa6 38%, var(--gold) 56%, rgba(231, 194, 125, 0) 72%);
+  box-shadow: 0 0 110px 34px rgba(231, 194, 125, 0.34);
+}
+
+/* Drifting cloud banks. */
+.intro__fog {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(56px);
+  opacity: 0.62;
+  background: radial-gradient(circle, #6b5026 0%, rgba(107, 80, 38, 0) 70%);
+  animation: intro-drift 18s ease-in-out infinite alternate;
+}
+.intro__fog--1 { width: 56vw; height: 44vh; left: -10vw; top: 30%; }
+.intro__fog--2 { width: 48vw; height: 40vh; right: -8vw; top: 16%; animation-duration: 24s; animation-direction: alternate-reverse; }
+.intro__fog--3 { width: 60vw; height: 46vh; left: 20vw; bottom: -16vh; animation-duration: 30s; }
+
+@keyframes intro-drift {
+  from { transform: translate(-6%, 0) scale(1); }
+  to   { transform: translate(10%, -5%) scale(1.18); }
+}
+
+/* Filter-only SVG holding the cloud <defs>; takes no space. */
+.intro__clouddefs { position: absolute; width: 0; height: 0; }
+
+/* SVG fractal-noise cloud layers. `screen` blend lets the gold wisps glow over
+   the dark sky rather than sitting as flat gray patches. */
+.intro__clouds {
+  position: absolute;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+
+/* The drifting mist bank behind the title. Slightly oversized so the slow
+   horizontal drift never exposes an edge. Faded top + bottom so it reads as a
+   band of mist around the title rather than full-screen noise. */
+.intro__clouds--back {
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  opacity: 0.42;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 4%, #000 30%, #000 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 4%, #000 30%, #000 80%, transparent 100%);
+  animation: intro-cloud-drift 42s ease-in-out infinite alternate;
+}
+@keyframes intro-cloud-drift {
+  from { transform: translateX(-4%) scale(1.05); }
+  to   { transform: translateX(6%) scale(1.12); }
+}
+
+/* Foreground banks that cover the title at first, then part outward to reveal
+   it. Masked to feather their inner edge so the parting line is never hard. */
+.intro__wisp {
+  top: 16%;
+  height: 64%;
+  width: 80%;
+  opacity: 0;
+}
+/* Radial (elliptical) masks so each bank feathers softly on every edge — no
+   hard rectangle. Weighted toward the inner edge so they meet over the title. */
+.intro__wisp--l {
+  left: -10%;
+  -webkit-mask-image: radial-gradient(ellipse 58% 64% at 62% 50%, #000 12%, transparent 76%);
+  mask-image: radial-gradient(ellipse 58% 64% at 62% 50%, #000 12%, transparent 76%);
+  animation: intro-part-left 4.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.intro__wisp--r {
+  right: -10%;
+  -webkit-mask-image: radial-gradient(ellipse 58% 64% at 38% 50%, #000 12%, transparent 76%);
+  mask-image: radial-gradient(ellipse 58% 64% at 38% 50%, #000 12%, transparent 76%);
+  animation: intro-part-right 4.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes intro-part-left {
+  0%   { transform: translateX(36%) scale(1.12); opacity: 0.9; }
+  55%  { opacity: 0.62; }
+  100% { transform: translateX(-16%) scale(1); opacity: 0.32; }
+}
+@keyframes intro-part-right {
+  0%   { transform: translateX(-36%) scale(1.12); opacity: 0.9; }
+  55%  { opacity: 0.62; }
+  100% { transform: translateX(16%) scale(1); opacity: 0.32; }
+}
+
+.intro__castle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 66%;
+  fill: #080510;
+  opacity: 0.97;
+  /* Soft moon-backlight rim around the silhouette. */
+  filter: drop-shadow(0 -3px 12px rgba(231, 194, 125, 0.22));
+}
+
+/* Low rolling ground mist over the castle base. */
+.intro__mist {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: 0;
+  height: 44%;
+  background: linear-gradient(to top,
+    rgba(18, 12, 8, 0.92) 0%, rgba(44, 31, 17, 0.5) 36%,
+    rgba(107, 80, 38, 0.14) 70%, transparent 100%);
+  filter: blur(10px);
+  animation: intro-mist 26s ease-in-out infinite alternate;
+}
+@keyframes intro-mist {
+  from { transform: translateX(-3%); }
+  to   { transform: translateX(4%); }
+}
+
+/* Distant birds crossing the sky. */
+.intro__bird {
+  position: absolute;
+  fill: none;
+  stroke: rgba(214, 198, 168, 0.5);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  animation: intro-fly 15s linear infinite;
+}
+@keyframes intro-fly {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  10%  { opacity: 0.6; }
+  50%  { transform: translate(7vw, -2vh); }
+  90%  { opacity: 0.6; }
+  100% { transform: translate(15vw, 1vh); opacity: 0; }
+}
+
+/* Drifting candle embers, echoing the rest of the site. */
+.intro__ember {
+  position: absolute;
+  bottom: 22%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--gold-bright), rgba(231, 194, 125, 0));
+  opacity: 0;
+  animation: intro-ember 10s ease-in infinite;
+}
+@keyframes intro-ember {
+  0%   { transform: translateY(20px) scale(0.6); opacity: 0; }
+  15%  { opacity: 0.9; }
+  80%  { opacity: 0.45; }
+  100% { transform: translateY(-130px) scale(1); opacity: 0; }
+}
+
+.intro__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 6vw;
+}
+
+.intro__card { display: flex; flex-direction: column; align-items: center; }
+
+.intro__eyebrow {
+  font-family: var(--font-display);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--gold);
+  margin-bottom: 0.9rem;
+}
+
+.intro__title {
+  font-family: 'Harry P', 'Cinzel Decorative', var(--font-display);
+  font-weight: 900;
+  line-height: 1.04;
+  font-size: clamp(2.4rem, 8vw, 5.5rem);
+  color: #f6ecd6;
+  text-shadow: 0 2px 30px rgba(231, 194, 125, 0.5);
+  animation: intro-title-glow 4.5s ease-in-out infinite alternate;
+}
+@keyframes intro-title-glow {
+  from { text-shadow: 0 2px 24px rgba(231, 194, 125, 0.4); }
+  to   { text-shadow: 0 2px 42px rgba(231, 194, 125, 0.72), 0 0 78px rgba(231, 194, 125, 0.26); }
+}
+
+.intro__skip {
+  position: absolute;
+  right: 26px;
+  bottom: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--gold);
+  background: transparent;
+  border: 1px solid rgba(231, 194, 125, 0.4);
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.intro__skip:hover { background: rgba(231, 194, 125, 0.12); border-color: var(--gold); }
+
+/* Touch / small screens: comfortable tap target + tuned proportions so the
+   scene doesn't feel oversized on a phone. */
+@media (max-width: 640px) {
+  .intro__skip { right: 16px; bottom: 16px; padding: 12px 20px; font-size: 0.78rem; }
+  .intro__eyebrow { font-size: 0.72rem; letter-spacing: 0.26em; }
+  .intro__moon { width: 104px; height: 104px; top: 9%; }
+}
+/* Coarse pointers (phones/tablets): guarantee a 44px-min tap target. */
+@media (hover: none) {
+  .intro__skip { min-height: 44px; min-width: 44px; }
+}
+
+/* Reduced motion: kill ambient motion and the lively atmospheric accents
+   (the JS timeline is shortened separately in the component). */
+@media (prefers-reduced-motion: reduce) {
+  .intro__fog, .intro__stars, .intro__mist, .intro__title,
+  .intro__clouds--back { animation: none; }
+  .intro__bird, .intro__ember, .intro__wisp { display: none; }
+}
