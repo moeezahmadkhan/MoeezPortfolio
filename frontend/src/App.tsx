@@ -9,7 +9,6 @@ import { ScrollRail } from './components/ScrollRail'
 import { ScrollCues } from './components/ScrollCues'
 import { GrimoireChat } from './components/GrimoireChat'
 import { CinematicIntro } from './components/CinematicIntro'
-import { shouldPlayIntro, markIntroSeen } from './components/introGate'
 import { About, Spells, Grimoire, Conjuring, Pact, Tracker, Marauders, Chronicles, OwlPost } from './components/Sections'
 import { useSmoothScroll, getLenis } from './smoothScroll'
 import { useScrollTracker } from './scroll'
@@ -27,14 +26,12 @@ export default function App() {
   useScrollTracker()
   useScrollSettle()
 
-  // Once assets finish, hold a beat then leave the loader. Play the cinematic
-  // intro unless it was already seen this session.
+  // Once assets finish, hold a beat then play the cinematic intro. It plays on
+  // every load (no once-per-session gate).
   useEffect(() => {
     if (phase !== 'loading') return
     if (!active && progress >= 100) {
-      const t = setTimeout(() => {
-        setPhase(shouldPlayIntro(window.sessionStorage) ? 'intro' : 'live')
-      }, 500)
+      const t = setTimeout(() => setPhase('intro'), 500)
       return () => clearTimeout(t)
     }
   }, [active, progress, phase])
@@ -72,7 +69,6 @@ export default function App() {
   }, [phase])
 
   const handleIntroDone = () => {
-    markIntroSeen(window.sessionStorage)
     setPhase('live')
   }
 
