@@ -189,6 +189,9 @@
   position: absolute;
   right: 26px;
   bottom: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-display);
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -202,6 +205,18 @@
   transition: background 0.2s, border-color 0.2s;
 }
 .intro__skip:hover { background: rgba(231, 194, 125, 0.12); border-color: var(--gold); }
+
+/* Touch / small screens: comfortable tap target + tuned proportions so the
+   scene doesn't feel oversized on a phone. */
+@media (max-width: 640px) {
+  .intro__skip { right: 16px; bottom: 16px; padding: 12px 20px; font-size: 0.78rem; }
+  .intro__eyebrow { font-size: 0.72rem; letter-spacing: 0.26em; }
+  .intro__moon { width: 104px; height: 104px; top: 9%; }
+}
+/* Coarse pointers (phones/tablets): guarantee a 44px-min tap target. */
+@media (hover: none) {
+  .intro__skip { min-height: 44px; min-width: 44px; }
+}
 
 /* Reduced motion: kill ambient motion and the lively atmospheric accents
    (the JS timeline is shortened separately in the component). */
