@@ -1,0 +1,136 @@
+/* Self-hosted title font. Falls back to Cinzel Decorative until the file is
+   added at /fonts/HarryP.woff2 (see plan Task 2). */
+@font-face {
+  font-family: 'Harry P';
+  src: url('/fonts/HarryP.woff2') format('woff2'),
+       url('/fonts/HarryP.woff') format('woff');
+  font-display: swap;
+}
+
+/* Full-viewport cinematic overlay. z-index sits above page content + the
+   #root::before vignette (z 50) but below the #root::after grain (z 9999,
+   pointer-events:none) which harmlessly textures over it. */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  background: #000;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Sky — the approved candle-gold / ink palette. */
+.intro__sky {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 16%,
+    #241a10 0%, #140d09 40%, #0a0710 78%, var(--ink) 100%);
+}
+
+.intro__moon {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff3d8 0%, var(--gold) 45%, rgba(231, 194, 125, 0) 72%);
+  box-shadow: 0 0 90px 28px rgba(231, 194, 125, 0.3);
+}
+
+.intro__fog {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(48px);
+  opacity: 0.5;
+  background: radial-gradient(circle, #5a4424 0%, rgba(90, 68, 36, 0) 70%);
+  animation: intro-drift 18s ease-in-out infinite alternate;
+}
+.intro__fog--1 { width: 46vw; height: 38vh; left: -8vw; top: 34%; }
+.intro__fog--2 { width: 40vw; height: 34vh; right: -6vw; top: 18%; animation-duration: 24s; animation-direction: alternate-reverse; }
+.intro__fog--3 { width: 52vw; height: 40vh; left: 22vw; bottom: -14vh; animation-duration: 30s; }
+
+@keyframes intro-drift {
+  from { transform: translate(-6%, 0) scale(1); }
+  to   { transform: translate(10%, -5%) scale(1.16); }
+}
+
+.intro__castle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 58%;
+  fill: #0a0710;
+  opacity: 0.95;
+}
+
+.intro__bird {
+  position: absolute;
+  font-size: 14px;
+  color: #000;
+  opacity: 0.5;
+  animation: intro-fly 11s linear infinite;
+}
+.intro__bird--2 { animation-delay: 3.5s; }
+@keyframes intro-fly {
+  0%   { transform: translate(0, 0); opacity: 0.5; }
+  50%  { transform: translate(46px, -12px); }
+  100% { transform: translate(92px, 6px); opacity: 0; }
+}
+
+.intro__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 6vw;
+}
+
+.intro__card { display: flex; flex-direction: column; align-items: center; }
+
+.intro__eyebrow {
+  font-family: var(--font-display);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--gold);
+  margin-bottom: 0.9rem;
+}
+
+.intro__title {
+  font-family: 'Harry P', 'Cinzel Decorative', var(--font-display);
+  font-weight: 900;
+  line-height: 1.04;
+  font-size: clamp(2.4rem, 8vw, 5.5rem);
+  color: #f6ecd6;
+  text-shadow: 0 2px 30px rgba(231, 194, 125, 0.5);
+}
+
+.intro__skip {
+  position: absolute;
+  right: 26px;
+  bottom: 22px;
+  font-family: var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--gold);
+  background: transparent;
+  border: 1px solid rgba(231, 194, 125, 0.4);
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.intro__skip:hover { background: rgba(231, 194, 125, 0.12); border-color: var(--gold); }
+
+/* Reduced motion: kill the ambient drift (the JS timeline is shortened
+   separately in the component). */
+@media (prefers-reduced-motion: reduce) {
+  .intro__fog, .intro__bird { animation: none; }
+}
