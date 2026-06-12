@@ -13,6 +13,14 @@ const MAP_H = MAP_W * (1024 / 1013)
 
 useTexture.preload(MAP_SRC)
 
+// Phones use the lighter post chain (small bloom kernel) and view the parchment at
+// a steeper down-angle, so the same emissive reads dimmer than on desktop. Push the
+// self-illumination harder there so the AI telemetry panel stays legible.
+const isMobile =
+  typeof window !== 'undefined' &&
+  (window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 720)
+const MAP_EMISSIVE = isMobile ? 1.25 : 0.7
+
 /**
  * Horizontal aged-parchment map laid flat like the floor rings, tilted toward the
  * camera by the station. The illustration is lit by the station rig AND carries a
@@ -35,7 +43,7 @@ export function MapTable() {
           map={map}
           emissive="#ffffff"
           emissiveMap={map}
-          emissiveIntensity={0.7}
+          emissiveIntensity={MAP_EMISSIVE}
           roughness={0.92}
           metalness={0}
           side={THREE.DoubleSide}

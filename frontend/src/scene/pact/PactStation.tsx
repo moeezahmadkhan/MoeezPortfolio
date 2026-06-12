@@ -3,7 +3,8 @@ import { useFrame } from '@react-three/fiber'
 import { Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from '../../scroll'
-import { STATION, localProgress } from './phases'
+import { STATION, SECTION_START, SECTION_END } from './phases'
+import { visibleInSpan } from '../stationVisibility'
 import { DeckIngest } from './DeckIngest'
 import { AnalysisCore } from './AnalysisCore'
 import { ThePact } from './ThePact'
@@ -13,8 +14,8 @@ export function PactStation() {
   const group = useRef<THREE.Group>(null)
 
   useFrame(() => {
-    const lp = localProgress(scrollState.progress)
-    if (group.current) group.current.visible = lp > 0.001 && lp < 0.999
+    if (group.current)
+      group.current.visible = visibleInSpan(scrollState.progress, SECTION_START, SECTION_END)
   })
 
   return (

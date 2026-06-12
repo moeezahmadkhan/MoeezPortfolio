@@ -3,7 +3,8 @@ import { useFrame } from '@react-three/fiber'
 import { Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from '../../scroll'
-import { STATION, localProgress, spellState, castProgress, CAST_DURATION } from './spell'
+import { STATION, SECTION_START, SECTION_END, spellState, castProgress, CAST_DURATION } from './spell'
+import { visibleInSpan } from '../stationVisibility'
 import { PipelineNodes } from './PipelineNodes'
 import { SpellBolt } from './SpellBolt'
 import { SpellCaster } from './SpellCaster'
@@ -17,8 +18,8 @@ export function SpellStation() {
   const group = useRef<THREE.Group>(null)
 
   useFrame((state) => {
-    const lp = localProgress(scrollState.progress)
-    if (group.current) group.current.visible = lp > 0.001 && lp < 0.999
+    if (group.current)
+      group.current.visible = visibleInSpan(scrollState.progress, SECTION_START, SECTION_END)
 
     const now = state.clock.elapsedTime
 

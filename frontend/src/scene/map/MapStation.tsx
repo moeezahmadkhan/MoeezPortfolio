@@ -3,7 +3,8 @@ import { useFrame } from '@react-three/fiber'
 import { Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from '../../scroll'
-import { STATION, MAP_TILT, localProgress, revealState, revealProgress, REVEAL_DURATION } from './map'
+import { STATION, MAP_TILT, SECTION_START, SECTION_END, revealState, revealProgress, REVEAL_DURATION } from './map'
+import { visibleInSpan } from '../stationVisibility'
 import { MapTable } from './MapTable'
 import { Walker } from './Walker'
 import { NameTag } from './NameTag'
@@ -18,8 +19,8 @@ export function MapStation() {
   const group = useRef<THREE.Group>(null)
 
   useFrame((state) => {
-    const lp = localProgress(scrollState.progress)
-    if (group.current) group.current.visible = lp > 0.001 && lp < 0.999
+    if (group.current)
+      group.current.visible = visibleInSpan(scrollState.progress, SECTION_START, SECTION_END)
 
     const now = state.clock.elapsedTime
 

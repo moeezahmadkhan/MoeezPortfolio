@@ -19,7 +19,7 @@ const KEYS: { at: number; pos: [number, number, number]; look: [number, number, 
   { at: 0.445, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held across the pinned span
   { at: 0.486, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },     // grimoire (projects) — center framing (measured 0.486)
   { at: 0.546, pos: [-7, 1.1, 5.0],   look: [-7, 0.5, -1] },   // pact — entry, framing the left-offset chamber (measured 0.546)
-  { at: 0.621, pos: [-7, 1.35, 4.0],  look: [-7, 0.45, -1] },  // pact — held across the pinned span
+  { at: 0.645, pos: [-7, 1.35, 4.0],  look: [-7, 0.45, -1] },  // pact — held late so the camera lingers on the pair, then whips to the tracker (shorter empty gap)
   { at: 0.661, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.661)
   { at: 0.751, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
   { at: 0.799, pos: [22, 1.25, 5.2],  look: [22, -0.45, 0] }, // map (Marauder's Map) — entry: closer + tilted down to fill frame (measured 0.799)
@@ -36,17 +36,29 @@ const KEYS: { at: number; pos: [number, number, number]; look: [number, number, 
 // (tools/measure_mobile.mjs) and frame each model centred + closer so the 3D is
 // the foreground on mobile, not a backdrop. One key per chapter (no entry/held
 // pair) gives smooth continuous motion without the desktop pin holds.
+// Each MODEL chapter gets an entry + hold PAIR at the same pose (fractions measured
+// at 390×844 via tools/measure_mobile.mjs, bracketing that section's reading window)
+// so the camera SETTLES on the figure while you read instead of continuously
+// drifting toward the next far-offset station — which used to slide each model off
+// frame mid-section. The hold→next-entry gaps are short, turning the long lateral
+// moves into quick whip-pans (the station-visibility margin keeps both ends in
+// frame). About/Spells/Grimoire/Chronicles are text/photo chapters (the central
+// wizard is incidental there), so they keep a single key.
 const KEYS_MOBILE: typeof KEYS = [
   { at: 0.0,   pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },     // hero — close, figurine fills the portrait frame
-  { at: 0.05,  pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },     // hero — hold while the figurine spins 360°
-  { at: 0.141, pos: [2.1, 1.1, 3.5],   look: [0, 0.25, 0] },     // about — tight 3/4
-  { at: 0.256, pos: [-2.2, 1.3, 3.7],  look: [0, 0.35, 0] },     // spells — orbit the central wizard
-  { at: 0.375, pos: [-11.0, 0.7, 6.3], look: [-11.0, -0.55, 1.4] }, // conjuring — caster lifted into the cleared top band
-  { at: 0.501, pos: [2.4, 0.35, 3.8],  look: [0, 0.05, 0] },     // grimoire — central wizard, low hero angle
-  { at: 0.619, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — both figures lifted above the copy
-  { at: 0.706, pos: [12, 0.7, 5.8],    look: [12, -0.45, 0] },   // tracker — lifted above the copy
-  { at: 0.799, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — angled down, parchment fills the top band
-  { at: 0.898, pos: [-2.1, 1.3, 3.8],  look: [0, 0.3, 0] },      // chronicles — central wizard
+  { at: 0.07,  pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },     // hero — hold while the figurine spins 360°
+  { at: 0.141, pos: [2.1, 1.1, 3.5],   look: [0, 0.25, 0] },     // about — tight 3/4 (text + photo card)
+  { at: 0.256, pos: [-2.2, 1.3, 3.7],  look: [0, 0.35, 0] },     // spells — orbit the central wizard (skill chips)
+  { at: 0.370, pos: [-11.0, 0.7, 6.3], look: [-11.0, -0.55, 1.4] }, // conjuring — caster lifted into top band (entry)
+  { at: 0.440, pos: [-11.0, 0.7, 6.3], look: [-11.0, -0.55, 1.4] }, // conjuring — hold through the reading window
+  { at: 0.501, pos: [2.4, 0.35, 3.8],  look: [0, 0.05, 0] },     // grimoire — central wizard, low hero angle (cards)
+  { at: 0.620, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — both figures lifted above copy (entry)
+  { at: 0.690, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — hold through the reading window
+  { at: 0.710, pos: [12, 0.7, 5.8],    look: [12, -0.45, 0] },   // tracker — lifted above the copy (entry)
+  { at: 0.770, pos: [12, 0.7, 5.8],    look: [12, -0.45, 0] },   // tracker — hold through the reading window
+  { at: 0.795, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — angled down, parchment fills top band (entry)
+  { at: 0.865, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — hold through the reading window
+  { at: 0.905, pos: [-2.1, 1.3, 3.8],  look: [0, 0.3, 0] },      // chronicles — central wizard (timeline)
   { at: 0.987, pos: [0, 0.9, 8.0],     look: [0, 0.2, 0] },      // owlpost — pull back
 ]
 

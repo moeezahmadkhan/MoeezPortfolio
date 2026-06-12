@@ -79,6 +79,14 @@ export function Scene({ reveal }: { reveal: number }) {
 
       <pointLight position={[0, 0.6, 3.5]} intensity={1.8} color="#fff0d6" distance={10} decay={2} />
 
+      {/* Mobile-only front fill on the central figurine. On phones the close, wide-FOV
+          framing left the hero wizard reading as a dark silhouette; this lifts it (and
+          the About/Grimoire/Chronicles frames, all at x=0) into the foreground. Tight
+          decay/distance keeps it off the far-offset stations (x = −13…22). */}
+      {isMobile && (
+        <pointLight position={[0.4, 1.0, 2.6]} intensity={3.2} color="#ffe7c2" distance={6.5} decay={2} />
+      )}
+
       <Suspense fallback={null}>
         {/* rotationIntensity set to 0 so we can fully control Y rotation in WizardModel for scroll-driven intro */}
         <Float speed={1.4} rotationIntensity={0} floatIntensity={0.5} floatingRange={[-0.05, 0.08]}>
