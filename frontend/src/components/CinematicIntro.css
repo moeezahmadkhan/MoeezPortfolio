@@ -1,11 +1,7 @@
-/* Self-hosted title font. Falls back to Cinzel Decorative until the file is
-   added at /fonts/HarryP.woff2 (see plan Task 2). */
-@font-face {
-  font-family: 'Harry P';
-  src: url('/fonts/HarryP.woff2') format('woff2'),
-       url('/fonts/HarryP.woff') format('woff');
-  font-display: swap;
-}
+/* The intro title is set in Cinzel Decorative (loaded via Google Fonts in
+   index.html). A self-hosted display face was planned at /fonts/HarryP.woff2 but
+   never shipped; the dead @font-face was throwing failed fetches + OTS parse
+   errors on every load, so it's removed and Cinzel Decorative is used directly. */
 
 /* Full-viewport cinematic overlay. z-index sits above page content + the
    #root::before vignette (z 50) but below the #root::after grain (z 9999,
@@ -235,7 +231,7 @@
 }
 
 .intro__title {
-  font-family: 'Harry P', 'Cinzel Decorative', var(--font-display);
+  font-family: 'Cinzel Decorative', var(--font-display);
   font-weight: 900;
   line-height: 1.04;
   font-size: clamp(2.4rem, 8vw, 5.5rem);
