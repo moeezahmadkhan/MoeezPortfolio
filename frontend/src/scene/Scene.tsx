@@ -37,7 +37,7 @@ export function Scene({ reveal }: { reveal: number }) {
       shadows={!isMobile}
       dpr={dpr}
       gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 0.85 }}
-      camera={{ position: [0, 0.4, 6.4], fov: 38 }}
+      camera={{ position: [0, 0.4, 6.4], fov: isMobile ? 52 : 38 }}
     >
       <color attach="background" args={['#07070d']} />
       <fog attach="fog" args={['#07070d', 6, 16]} />

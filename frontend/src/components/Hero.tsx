@@ -30,15 +30,17 @@ export function Hero() {
             ✦ Chapter I — The Conjuring ✦
           </motion.p>
 
+          <motion.div className="hero__flourish" variants={rise} aria-hidden="true" />
+
           <motion.h1 className="hero__name" variants={rise}>
             <span className="hero__name-line">Moeez Ahmad</span>
             <span className="hero__name-line hero__name-line--gold">Khan</span>
           </motion.h1>
 
           <motion.p className="hero__title" variants={rise}>
-            AI&nbsp;/&nbsp;ML&nbsp;Engineer — conjuring autonomous agents,
+            AI&nbsp;/&nbsp;ML&nbsp;Engineer — autonomous agents, computer-vision pipelines
             <br />
-            computer-vision pipelines &amp; generative magic.
+            &amp; generative systems, conjured from brief to deploy.
           </motion.p>
 
           <motion.code className="hero__spell" variants={rise}>

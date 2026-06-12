@@ -28,6 +28,34 @@ const KEYS: { at: number; pos: [number, number, number]; look: [number, number, 
   { at: 1.0,   pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost
 ]
 
+// ── Mobile camera track ────────────────────────────────────────────────────
+// On phones the pinned sections collapse to natural height (see sections.css),
+// so the desktop `at` fractions no longer line up with where each chapter sits —
+// the camera would drift off the models and leave them as background scenery.
+// These keys use fractions MEASURED on a 390×844 portrait viewport
+// (tools/measure_mobile.mjs) and frame each model centred + closer so the 3D is
+// the foreground on mobile, not a backdrop. One key per chapter (no entry/held
+// pair) gives smooth continuous motion without the desktop pin holds.
+const KEYS_MOBILE: typeof KEYS = [
+  { at: 0.0,   pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },     // hero — close, figurine fills the portrait frame
+  { at: 0.05,  pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },     // hero — hold while the figurine spins 360°
+  { at: 0.141, pos: [2.1, 1.1, 3.5],   look: [0, 0.25, 0] },     // about — tight 3/4
+  { at: 0.256, pos: [-2.2, 1.3, 3.7],  look: [0, 0.35, 0] },     // spells — orbit the central wizard
+  { at: 0.375, pos: [-11.0, 0.7, 6.3], look: [-11.0, -0.55, 1.4] }, // conjuring — caster lifted into the cleared top band
+  { at: 0.501, pos: [2.4, 0.35, 3.8],  look: [0, 0.05, 0] },     // grimoire — central wizard, low hero angle
+  { at: 0.619, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — both figures lifted above the copy
+  { at: 0.706, pos: [12, 0.7, 5.8],    look: [12, -0.45, 0] },   // tracker — lifted above the copy
+  { at: 0.799, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — angled down, parchment fills the top band
+  { at: 0.898, pos: [-2.1, 1.3, 3.8],  look: [0, 0.3, 0] },      // chronicles — central wizard
+  { at: 0.987, pos: [0, 0.9, 8.0],     look: [0, 0.2, 0] },      // owlpost — pull back
+]
+
+const isMobile =
+  typeof window !== 'undefined' &&
+  (window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 720)
+
+const ACTIVE_KEYS = isMobile ? KEYS_MOBILE : KEYS
+
 const current = new THREE.Vector3()
 const currentLook = new THREE.Vector3()
 const target = new THREE.Vector3()
@@ -38,16 +66,16 @@ function smoothstep(value: number) {
 }
 
 function sampleKeyframes(progress: number, key: 'pos' | 'look', destination: THREE.Vector3) {
-  for (let index = 0; index < KEYS.length - 1; index++) {
-    const currentKey = KEYS[index]
-    const nextKey = KEYS[index + 1]
+  for (let index = 0; index < ACTIVE_KEYS.length - 1; index++) {
+    const currentKey = ACTIVE_KEYS[index]
+    const nextKey = ACTIVE_KEYS[index + 1]
     if (progress >= currentKey.at && progress <= nextKey.at) {
       const local = smoothstep((progress - currentKey.at) / (nextKey.at - currentKey.at))
       destination.fromArray(currentKey[key]).lerp(new THREE.Vector3().fromArray(nextKey[key]), local)
       return
     }
   }
-  destination.fromArray(KEYS[KEYS.length - 1][key])
+  destination.fromArray(ACTIVE_KEYS[ACTIVE_KEYS.length - 1][key])
 }
 
 export function CameraRig() {

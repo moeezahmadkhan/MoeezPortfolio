@@ -6,6 +6,7 @@ import { scrollState } from '../../scroll'
 import { STATION, localProgress, spellState, castProgress, CAST_DURATION } from './spell'
 import { PipelineNodes } from './PipelineNodes'
 import { SpellBolt } from './SpellBolt'
+import { SpellCaster } from './SpellCaster'
 
 const RING_FLOOR_Y = -1.32
 const reduceMotion =
@@ -14,7 +15,6 @@ const reduceMotion =
 
 export function SpellStation() {
   const group = useRef<THREE.Group>(null)
-  const focus = useRef<THREE.Mesh>(null)
 
   useFrame((state) => {
     const lp = localProgress(scrollState.progress)
@@ -39,9 +39,6 @@ export function SpellStation() {
       spellState.progress = castProgress(now, spellState.startedAt, CAST_DURATION)
       if (spellState.progress >= 1) spellState.startedAt = -1 // finished → idle-lit
     }
-
-    // Idle caster focus spin.
-    if (focus.current) focus.current.rotation.y = now * 0.6
   })
 
   return (
@@ -70,11 +67,8 @@ export function SpellStation() {
         </mesh>
       </group>
 
-      {/* runic caster focus at the path's start (spins idly, source of the bolt) */}
-      <mesh ref={focus} position={[-3.2, 0.2, -0.6]}>
-        <torusGeometry args={[0.22, 0.03, 12, 32]} />
-        <meshStandardMaterial color="#e7c27d" emissive="#e7c27d" emissiveIntensity={1.4} />
-      </mesh>
+      {/* the caster — a wizard mid-incantation, wand thrust down the pipeline */}
+      <SpellCaster />
 
       <PipelineNodes />
       <SpellBolt />

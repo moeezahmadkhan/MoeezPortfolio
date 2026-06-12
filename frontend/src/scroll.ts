@@ -31,7 +31,10 @@ export function useScrollTracker() {
     }
     const onResize = () => {
       const vw = window.innerWidth
-      responsiveState.zoom = vw < 640 ? 0.78 : vw < 1024 ? 0.90 : 1
+      // Phones keep zoom at 1 (was 0.78) so the models read large in the
+      // foreground — the mobile camera track + wider FOV handle framing instead
+      // of shrinking the whole scene. Tablets still ease back slightly.
+      responsiveState.zoom = vw < 640 ? 1 : vw < 1024 ? 0.95 : 1
     }
 
     // When Lenis is active, read its smoothed scroll; otherwise fall back to

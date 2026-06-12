@@ -224,8 +224,8 @@ export function Pact() {
         <IgniteHeading className="section__title" text="The deck, read. The deal, bound." />
         <Reveal delay={0.1}>
           <p className="pact__lede">
-            A founder uploads a pitch deck. An LLM reads it, scores it, and surfaces it to the
-            investors who actually fit — then binds the two together to carry the deal forward.
+            A founder uploads a pitch deck. An LLM reads it, scores it, and surfaces the
+            investors who actually fit — then binds founder to backer to carry the deal forward.
           </p>
         </Reveal>
         <Reveal delay={0.18}>
@@ -283,13 +283,12 @@ export function Marauders() {
           <span className="eyebrow">Chapter VIII — The Marauder's Map</span>
         </MaskReveal>
         <span className="section__cat section__cat--project">✦ Project · live demo · on-device</span>
-        <IgniteHeading className="section__title" text="It sees who passes" />
+        <IgniteHeading className="section__title" text="It knows who passes" />
         <Reveal delay={0.1}>
           <p className="map__lede">
-            A camera at the threshold. Motion stirs and a palm-sized edge device — an NPU
-            with no cloud behind it — wakes, captures the figure, follows the footsteps,
-            and names who just passed. Detection, tracking, and re-identification all run
-            on the device itself; no footage ever leaves the room.
+            A camera watches the threshold. A palm-sized NPU — no cloud behind it — wakes
+            on motion, follows the footsteps, and names who just passed. Detection, tracking,
+            and re-identification run entirely on the device; no footage ever leaves the room.
           </p>
         </Reveal>
         <Reveal delay={0.18}>

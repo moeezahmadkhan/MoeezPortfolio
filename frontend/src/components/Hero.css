@@ -25,8 +25,16 @@
 }
 
 .hero__eyebrow {
-  margin-bottom: 1.6rem;
+  margin-bottom: 0.9rem;
   text-shadow: 0 0 18px rgba(231, 194, 125, 0.4);
+}
+
+.hero__flourish {
+  width: clamp(64px, 12vw, 120px);
+  height: 1px;
+  margin-bottom: 1.7rem;
+  background: linear-gradient(90deg, var(--gold), rgba(231, 194, 125, 0));
+  box-shadow: 0 0 14px rgba(231, 194, 125, 0.5);
 }
 
 .hero__name {
@@ -42,11 +50,11 @@
 .hero__name-line { display: block; }
 
 .hero__name-line--gold {
-  background: linear-gradient(180deg, var(--gold-bright), var(--gold-deep));
+  background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 45%, var(--gold-deep) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 26px rgba(231, 194, 125, 0.35));
+  filter: drop-shadow(0 0 30px rgba(231, 194, 125, 0.45));
 }
 
 .hero__title {
