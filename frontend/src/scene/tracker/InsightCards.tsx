@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text, Billboard } from '@react-three/drei'
 import * as THREE from 'three'
-import { scrollState } from '../../scroll'
+import { scrollState, responsiveState } from '../../scroll'
 import { AICORE_POS, localProgress, pulse, metricsAt, type Metrics } from './phases'
 
 const ANS_START = 0.78
@@ -27,6 +27,11 @@ export function InsightCards() {
   const last = useRef<string[]>([])
 
   useFrame(() => {
+    // Hidden on the stacked mobile layout — these float over the copy there.
+    if (responsiveState.isMobile) {
+      groups.current.forEach((g) => g && (g.visible = false))
+      return
+    }
     const lp = localProgress(scrollState.progress)
     const m = metricsAt(lp)
     CARDS.forEach((card, i) => {

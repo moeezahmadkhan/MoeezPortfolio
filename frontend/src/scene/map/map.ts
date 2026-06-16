@@ -15,14 +15,14 @@ export const MAP_TILT = 0.34
 
 /**
  * Scroll fractions spanning the pinned #map section. Recalibrated 2026-06-06 after the
- * Pact chapter was inserted (scripts/measure.mjs): map section ≈ 0.799 → 0.937 at
- * 1440×900. START is padded slightly before the section top (as in the original) so
- * the station is already lit at the entry; the brief overlap with the tracker band is
- * harmless since the two chambers sit far apart (tracker +12, map +22).
+ * Grimoire chapter moved to just before contact (re-measured 2026-06-16): map section
+ * ≈ 0.753 → 0.894 at 1440×900. START is padded slightly before the section top (as in
+ * the original) so the station is already lit at the entry; the brief overlap with the
+ * tracker band is harmless since the two chambers sit far apart (tracker +12, map +22).
  * Keep in sync with the #map CameraRig KEYS.
  */
-export const SECTION_START = 0.787
-export const SECTION_END = 0.937
+export const SECTION_START = 0.741
+export const SECTION_END = 0.894
 
 /** Global scroll progress (0→1) → 0→1 local progress within the map section. */
 export function localProgress(progress: number): number {

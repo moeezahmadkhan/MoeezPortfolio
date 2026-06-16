@@ -141,6 +141,18 @@ function GrimoireCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
               <li key={t}>{t}</li>
             ))}
           </ul>
+          <a
+            className="spell-card__repo"
+            href={p.repo}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`View ${p.name} on GitHub`}
+          >
+            <span className="spell-card__repo-glyph" aria-hidden>
+              ↗
+            </span>
+            View repository
+          </a>
         </Tilt>
       </Reveal>
     </motion.div>
@@ -152,7 +164,7 @@ export function Grimoire() {
     <section id="grimoire" className="section section--grimoire">
       <div className="section__wrap">
         <MaskReveal>
-          <span className="eyebrow">Chapter V — The Grimoire</span>
+          <span className="eyebrow">Chapter IX — The Grimoire</span>
         </MaskReveal>
         <span className="section__cat section__cat--project">✦ Projects · shipped work</span>
         <IgniteHeading className="section__title" text="Built & shipped" />
@@ -216,7 +228,7 @@ export function Pact() {
     <section id="pact" className="section section--pact pact--pinned">
       <div className="pact__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter VI — The Pact</span>
+          <span className="eyebrow">Chapter V — The Pact</span>
         </MaskReveal>
         <span className="section__cat section__cat--project">
           ✦ Project · AI founder–investor matchmaking
@@ -248,7 +260,7 @@ export function Tracker() {
     <section id="tracker" className="section section--tracker tracker--pinned">
       <div className="tracker__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter VII — The Tracker</span>
+          <span className="eyebrow">Chapter VI — The Tracker</span>
         </MaskReveal>
         <span className="section__cat section__cat--project">✦ Project · live demo</span>
         <IgniteHeading className="section__title" text="It reads the pulse" />
@@ -257,6 +269,25 @@ export function Tracker() {
             A wrist. A heartbeat climbing under effort. The signal is caught,
             saved, and read — an intelligence that answers for the body in motion.
           </p>
+        </Reveal>
+        {/* Mobile-only readout — on desktop the live numbers float in the 3D HUD,
+            but that collides with the copy in a portrait frame, so it carries
+            here instead (see Heartbeat/WristTiles/HudText/InsightCards). */}
+        <Reveal delay={0.18}>
+          <ul className="tracker__vitals" aria-label="Live readout">
+            {[
+              { k: '158', u: 'bpm · peak', hot: true },
+              { k: '2.4k', u: 'steps' },
+              { k: '310', u: 'cal' },
+              { k: '96%', u: 'SpO₂' },
+              { k: '~4 min', u: 'recovery' },
+            ].map((v) => (
+              <li key={v.u} className={`tracker__vital${v.hot ? ' tracker__vital--hot' : ''}`}>
+                <span className="tracker__vital-k">{v.k}</span>
+                <span className="tracker__vital-u">{v.u}</span>
+              </li>
+            ))}
+          </ul>
         </Reveal>
       </div>
     </section>
@@ -280,7 +311,7 @@ export function Marauders() {
     <section id="map" className="section section--map map--pinned">
       <div className="map__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter VIII — The Marauder's Map</span>
+          <span className="eyebrow">Chapter VII — The Marauder's Map</span>
         </MaskReveal>
         <span className="section__cat section__cat--project">✦ Project · live demo · on-device</span>
         <IgniteHeading className="section__title" text="It knows who passes" />
@@ -317,7 +348,7 @@ export function Chronicles() {
     <section id="chronicles" className="section section--chronicles">
       <div className="section__wrap">
         <MaskReveal>
-          <span className="eyebrow">Chapter IX — Chronicles</span>
+          <span className="eyebrow">Chapter VIII — Chronicles</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="The path so far" />
         <div className="timeline">

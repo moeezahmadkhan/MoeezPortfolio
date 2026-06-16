@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text, Billboard } from '@react-three/drei'
 import * as THREE from 'three'
-import { scrollState } from '../../scroll'
+import { scrollState, responsiveState } from '../../scroll'
 import { WRIST_ANCHOR, localProgress, ramp, metricsAt, type Metrics } from './phases'
 
 interface Tile {
@@ -30,6 +30,12 @@ export function WristTiles() {
   const last = useRef<string[]>([])
 
   useFrame((state) => {
+    // Hidden on the stacked mobile layout — the HTML vitals readout carries the
+    // numbers there without colliding with the copy.
+    if (responsiveState.isMobile) {
+      if (root.current) root.current.visible = false
+      return
+    }
     const lp = localProgress(scrollState.progress)
     // own the live beat, then clear out so the saved-stats summary reads alone
     const vis = ramp(lp, 0.18, 0.4) * (1 - ramp(lp, 0.48, 0.58))

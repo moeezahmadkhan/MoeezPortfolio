@@ -4,24 +4,18 @@ export type Project = {
   blurb: string
   tags: string[]
   glyph: string
+  repo: string // GitHub repository URL
 }
 
 export const projects: Project[] = [
   {
-    name: 'Real-Time Vision · Attendance',
-    incantation: 'Oculus Reparo',
+    name: 'Query Sphere',
+    incantation: 'Protego Totalum',
     blurb:
-      'An edge computer-vision pipeline: motion-triggered capture, on-device person detection and re-identification on a palm-sized NPU — real-time, fully local, no footage leaving the device.',
-    tags: ['Edge NPU', 'Detection', 'Re-ID', 'FAISS', 'Real-time CV'],
-    glyph: '👁',
-  },
-  {
-    name: 'Silmaril AI',
-    incantation: 'Legilimens',
-    blurb:
-      'A strategic platform for investors. An AI-driven parsing engine extracts financial metrics from pitch decks and surfaces automated growth recommendations and founder insights.',
-    tags: ['NLP', 'LLMs', 'Document Parsing', 'Analytics'],
-    glyph: '💎',
+      'A Flutter community app with real-time messaging and Firebase integration — cross-platform conjuring with live sync.',
+    tags: ['Flutter', 'Firebase', 'Realtime', 'Mobile'],
+    glyph: '🔮',
+    repo: 'https://github.com/moeezahmadkhan/querysphere',
   },
   {
     name: 'Airbnb Replica',
@@ -30,14 +24,7 @@ export const projects: Project[] = [
       'A full MERN-stack application with property management and secure JWT authentication — research instincts brought into production-grade web engineering.',
     tags: ['MongoDB', 'Express', 'React', 'Node', 'JWT'],
     glyph: '🏰',
-  },
-  {
-    name: 'Query Sphere',
-    incantation: 'Protego Totalum',
-    blurb:
-      'A Flutter community app with real-time messaging and Firebase integration — cross-platform conjuring with live sync.',
-    tags: ['Flutter', 'Firebase', 'Realtime', 'Mobile'],
-    glyph: '🔮',
+    repo: 'https://github.com/moeezahmadkhan/querysphere',
   },
 ]
 

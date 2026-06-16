@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { Billboard, Text } from '@react-three/drei'
 import * as THREE from 'three'
 import { NODES, nodePosition, nodeGlow, spellState } from './spell'
+import { responsiveState } from '../../scroll'
 
 /** One glowing rune-orb whose emissive/scale + labels follow its place in the cast sequence. */
 function Orb({ index }: { index: number }) {
@@ -26,8 +27,13 @@ function Orb({ index }: { index: number }) {
       const s = 0.18 + g * (isFinal ? 0.16 : 0.08)
       mesh.current.scale.setScalar(s + Math.sin(t * 1.6 + index) * 0.004)
     }
-    if (nameMat.current) nameMat.current.opacity = g
-    if (subMat.current) subMat.current.opacity = g * 0.85
+    // On the stacked mobile layout the wide pipeline arc can't fit the portrait
+    // frame, so these floating labels land on top of the HTML legend (which
+    // already lists every stage). Hide them there and let the legend be the
+    // canonical pipeline; the glowing orbs stay as ambience.
+    const labelOpacity = responsiveState.isMobile ? 0 : g
+    if (nameMat.current) nameMat.current.opacity = labelOpacity
+    if (subMat.current) subMat.current.opacity = labelOpacity * 0.85
   })
 
   return (

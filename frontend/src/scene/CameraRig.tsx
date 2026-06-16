@@ -12,19 +12,19 @@ const KEYS: { at: number; pos: [number, number, number]; look: [number, number, 
   // keys sit ~65–70% into each pinned span so the camera holds before transitioning.
   { at: 0.0,   pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — closer + framed higher for a more commanding figurine
   { at: 0.06,  pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — hold while figurine spins 360°
-  { at: 0.092, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.092
-  { at: 0.140, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.140)
-  { at: 0.301, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across the pinned span
-  { at: 0.370, pos: [-13, 1.25, 10.5], look: [-13, 0.55, 0] }, // conjuring (service) — entry, spell chamber far-left (measured 0.370)
-  { at: 0.445, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held across the pinned span
-  { at: 0.486, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },     // grimoire (projects) — center framing (measured 0.486)
-  { at: 0.546, pos: [-7, 1.1, 5.0],   look: [-7, 0.5, -1] },   // pact — entry, framing the left-offset chamber (measured 0.546)
-  { at: 0.645, pos: [-7, 1.35, 4.0],  look: [-7, 0.45, -1] },  // pact — held late so the camera lingers on the pair, then whips to the tracker (shorter empty gap)
-  { at: 0.661, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.661)
-  { at: 0.751, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
-  { at: 0.799, pos: [22, 1.25, 5.2],  look: [22, -0.45, 0] }, // map (Marauder's Map) — entry: closer + tilted down to fill frame (measured 0.799)
-  { at: 0.889, pos: [22, 1.7, 6.1],   look: [22, -0.2, 0] },  // map — held: ease back/up, table stays large and legible
-  { at: 0.937, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.937)
+  { at: 0.094, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.094
+  { at: 0.143, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.143)
+  { at: 0.272, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across the pinned span
+  { at: 0.378, pos: [-13, 1.25, 10.5], look: [-13, 0.55, 0] }, // conjuring (service) — entry, spell chamber far-left (measured 0.378)
+  { at: 0.442, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held across the pinned span
+  { at: 0.495, pos: [-7, 1.1, 5.0],   look: [-7, 0.5, -1] },   // pact — entry, framing the left-offset chamber (measured 0.495)
+  { at: 0.585, pos: [-7, 1.35, 4.0],  look: [-7, 0.45, -1] },  // pact — held late so the camera lingers on the pair, then whips to the tracker
+  { at: 0.612, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.612)
+  { at: 0.690, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
+  { at: 0.753, pos: [22, 1.25, 5.2],  look: [22, -0.45, 0] }, // map (Marauder's Map) — entry: closer + tilted down to fill frame (measured 0.753)
+  { at: 0.830, pos: [22, 1.7, 6.1],   look: [22, -0.2, 0] },  // map — held: ease back/up, table stays large and legible
+  { at: 0.894, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.894)
+  { at: 0.942, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },    // grimoire (projects) — center framing, now just before contact (measured 0.942)
   { at: 1.0,   pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost
 ]
 
@@ -47,19 +47,19 @@ const KEYS: { at: number; pos: [number, number, number]; look: [number, number, 
 const KEYS_MOBILE: typeof KEYS = [
   { at: 0.0,   pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },     // hero — close, figurine fills the portrait frame
   { at: 0.07,  pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },     // hero — hold while the figurine spins 360°
-  { at: 0.141, pos: [2.1, 1.1, 3.5],   look: [0, 0.25, 0] },     // about — tight 3/4 (text + photo card)
-  { at: 0.256, pos: [-2.2, 1.3, 3.7],  look: [0, 0.35, 0] },     // spells — orbit the central wizard (skill chips)
-  { at: 0.370, pos: [-11.0, 0.7, 6.3], look: [-11.0, -0.55, 1.4] }, // conjuring — caster lifted into top band (entry)
-  { at: 0.440, pos: [-11.0, 0.7, 6.3], look: [-11.0, -0.55, 1.4] }, // conjuring — hold through the reading window
-  { at: 0.501, pos: [2.4, 0.35, 3.8],  look: [0, 0.05, 0] },     // grimoire — central wizard, low hero angle (cards)
-  { at: 0.620, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — both figures lifted above copy (entry)
-  { at: 0.690, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — hold through the reading window
-  { at: 0.710, pos: [12, 0.7, 5.8],    look: [12, -0.45, 0] },   // tracker — lifted above the copy (entry)
-  { at: 0.770, pos: [12, 0.7, 5.8],    look: [12, -0.45, 0] },   // tracker — hold through the reading window
-  { at: 0.795, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — angled down, parchment fills top band (entry)
-  { at: 0.865, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — hold through the reading window
-  { at: 0.905, pos: [-2.1, 1.3, 3.8],  look: [0, 0.3, 0] },      // chronicles — central wizard (timeline)
-  { at: 0.987, pos: [0, 0.9, 8.0],     look: [0, 0.2, 0] },      // owlpost — pull back
+  { at: 0.125, pos: [2.1, 1.1, 3.5],   look: [0, 0.25, 0] },     // about — tight 3/4 (text + photo card)
+  { at: 0.221, pos: [-2.2, 1.3, 3.7],  look: [0, 0.35, 0] },     // spells — orbit the central wizard (skill chips)
+  { at: 0.351, pos: [-11.0, 0.7, 6.3], look: [-11.0, -0.55, 1.4] }, // conjuring — caster lifted into top band (entry)
+  { at: 0.423, pos: [-11.0, 0.7, 6.3], look: [-11.0, -0.55, 1.4] }, // conjuring — hold through the reading window
+  { at: 0.481, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — both figures lifted above copy (entry)
+  { at: 0.538, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — hold through the reading window
+  { at: 0.585, pos: [12, 0.7, 5.8],    look: [12, -0.45, 0] },   // tracker — lifted above the copy (entry)
+  { at: 0.639, pos: [12, 0.7, 5.8],    look: [12, -0.45, 0] },   // tracker — hold through the reading window
+  { at: 0.684, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — angled down, parchment fills top band (entry)
+  { at: 0.748, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — hold through the reading window
+  { at: 0.800, pos: [-2.1, 1.3, 3.8],  look: [0, 0.3, 0] },      // chronicles — central wizard (timeline)
+  { at: 0.888, pos: [2.4, 0.35, 3.8],  look: [0, 0.05, 0] },     // grimoire — central wizard, low hero angle (cards), now before contact
+  { at: 0.971, pos: [0, 0.9, 8.0],     look: [0, 0.2, 0] },      // owlpost — pull back
 ]
 
 const isMobile =

@@ -12,12 +12,12 @@ export const DATASTORE_POS: [number, number, number] = [1.85, 0.6, 0]
 export const AICORE_POS: [number, number, number] = [0, 2.4, 0]
 
 /**
- * Scroll fractions spanning the pinned #tracker section. Recalibrated 2026-06-06 for
- * the page carrying both the Pact and Marauder's Map chapters (scripts/measure.mjs):
- * tracker top ≈ 0.661, map top ≈ 0.799. Keep in sync with the #tracker CameraRig KEYS.
+ * Scroll fractions spanning the pinned #tracker section. Re-measured 2026-06-16 after
+ * the Grimoire chapter moved to just before contact: tracker top ≈ 0.612, map top
+ * ≈ 0.753. Keep in sync with the #tracker CameraRig KEYS.
  */
-export const SECTION_START = 0.661
-export const SECTION_END = 0.799
+export const SECTION_START = 0.612
+export const SECTION_END = 0.753
 
 /** Maps global scroll progress (0→1 across the page) to 0→1 local progress within the tracker section. */
 export function localProgress(progress: number) {

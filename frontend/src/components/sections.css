@@ -325,6 +325,45 @@
   color: var(--rune);
 }
 
+/* Repo link — the dossier's "open the case file" footer action */
+.spell-card__repo {
+  margin-top: 1.4rem;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(231, 194, 125, 0.3);
+  transition:
+    color 0.25s,
+    border-color 0.25s,
+    gap 0.25s;
+}
+.spell-card__repo-glyph {
+  font-size: 0.9rem;
+  transition: transform 0.25s;
+}
+.spell-card__repo:hover,
+.spell-card__repo:focus-visible {
+  color: #fff;
+  border-color: var(--gold-bright);
+  gap: 0.7rem;
+}
+.spell-card__repo:hover .spell-card__repo-glyph,
+.spell-card__repo:focus-visible .spell-card__repo-glyph {
+  transform: translate(2px, -2px);
+}
+.spell-card__repo:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 4px;
+}
+
 /* ── Chronicles timeline ── */
 .timeline { position: relative; padding-left: 2.4rem; }
 .timeline__line {
@@ -483,6 +522,9 @@
   font-size: clamp(1.1rem, 2.2vw, 1.5rem);
   line-height: 1.5;
 }
+
+/* Desktop shows the live numbers in the 3D HUD; the HTML readout is mobile-only. */
+.tracker__vitals { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .tracker--pinned { height: auto; }
@@ -789,9 +831,10 @@
     background: linear-gradient(
       180deg,
       rgba(7, 7, 13, 0) 0%,
-      rgba(7, 7, 13, 0) 34%,
-      rgba(7, 7, 13, 0.66) 58%,
-      rgba(7, 7, 13, 0.93) 100%
+      rgba(7, 7, 13, 0) 24%,
+      rgba(7, 7, 13, 0.55) 40%,
+      rgba(7, 7, 13, 0.85) 56%,
+      rgba(7, 7, 13, 0.96) 100%
     ) !important;
   }
 
@@ -818,7 +861,98 @@
   .pact__lede,
   .conjuring__lede,
   .tracker__lede {
-    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.9);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 2px 18px rgba(0, 0, 0, 0.85);
+  }
+
+  /* The pipeline/legend lists (Conjuring, Pact, Map) are the canonical step
+     sequence on phones — the wide 3D arc can't fit a portrait frame and its
+     floating labels are hidden here (see PipelineNodes). Promote the list to a
+     self-contained, numbered panel so the chapter reads as complete. */
+  .conjuring__legend,
+  .pact__legend {
+    max-width: 100% !important;
+    margin-top: 1.2rem !important;
+    padding: 0.4rem 1.05rem !important;
+    background: rgba(7, 7, 13, 0.5);
+    border: 1px solid rgba(231, 194, 125, 0.18);
+    border-radius: 14px;
+    backdrop-filter: blur(3px);
+    counter-reset: legendstep;
+  }
+  .conjuring__legend-item,
+  .pact__legend-item {
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2rem 0.9rem;
+    position: relative;
+    padding: 0.7rem 0 0.7rem 2rem;
+    border-top: none;
+    border-bottom: 1px solid rgba(231, 194, 125, 0.12);
+    counter-increment: legendstep;
+  }
+  .conjuring__legend-item:last-child,
+  .pact__legend-item:last-child { border-bottom: none; }
+  .conjuring__legend-item::before,
+  .pact__legend-item::before {
+    content: counter(legendstep, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 0.78rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    color: var(--rune);
+    opacity: 0.65;
+  }
+  .conjuring__legend-name,
+  .pact__legend-name { font-size: 1rem; }
+  .conjuring__legend-tags,
+  .pact__legend-tags { text-align: left; }
+
+  /* Tracker live readout — the mobile stand-in for the floating 3D vitals HUD. */
+  .tracker__vitals {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+    list-style: none;
+    padding: 0;
+    margin: 1.3rem 0 0;
+    max-width: 24rem;
+  }
+  .tracker__vital {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid rgba(127, 208, 196, 0.22);
+    border-radius: 12px;
+    background: rgba(7, 7, 13, 0.5);
+    backdrop-filter: blur(3px);
+  }
+  /* The heartbeat tile spans the row and warms to the ECG's red. */
+  .tracker__vital--hot {
+    grid-column: 1 / -1;
+    border-color: rgba(255, 90, 110, 0.35);
+    background: rgba(40, 10, 16, 0.45);
+  }
+  .tracker__vital-k {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--rune);
+  }
+  .tracker__vital--hot .tracker__vital-k { color: #ff8a96; }
+  .tracker__vital--hot .tracker__vital-k::before {
+    content: '♥ ';
+    font-size: 0.9rem;
+    vertical-align: 0.1em;
+  }
+  .tracker__vital-u {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--parchment-dim);
   }
 }
 

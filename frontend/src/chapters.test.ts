@@ -4,8 +4,8 @@ import { chapters } from './chapters'
 describe('chapters', () => {
   it('lists all ten chapters in scroll order including The Pact and the Marauder\'s Map', () => {
     expect(chapters.map((c) => c.id)).toEqual([
-      'top', 'wizard', 'spells', 'conjuring', 'grimoire',
-      'pact', 'tracker', 'map', 'chronicles', 'owlpost',
+      'top', 'wizard', 'spells', 'conjuring', 'pact',
+      'tracker', 'map', 'chronicles', 'grimoire', 'owlpost',
     ])
   })
   it('numbers them sequentially I→X', () => {

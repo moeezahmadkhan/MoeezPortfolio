@@ -16,6 +16,10 @@ export const scrollState = {
 
 export const responsiveState = {
   zoom: 1, // computed once per resize
+  // True when the stacked mobile/tablet layout is active (matches the ≤1024px
+  // CSS block). The 3D scene reads it to suppress overlays — e.g. the pipeline
+  // node labels, which collide with the HTML legend once chapters stack.
+  isMobile: typeof window !== 'undefined' && window.innerWidth < 1024,
 }
 
 export function useScrollTracker() {
@@ -35,6 +39,7 @@ export function useScrollTracker() {
       // foreground — the mobile camera track + wider FOV handle framing instead
       // of shrinking the whole scene. Tablets still ease back slightly.
       responsiveState.zoom = vw < 640 ? 1 : vw < 1024 ? 0.95 : 1
+      responsiveState.isMobile = vw < 1024
     }
 
     // When Lenis is active, read its smoothed scroll; otherwise fall back to

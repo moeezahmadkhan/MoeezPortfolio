@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
 import * as THREE from 'three'
-import { scrollState } from '../../scroll'
+import { scrollState, responsiveState } from '../../scroll'
 import { WRIST_ANCHOR, localProgress, ramp, metricsAt } from './phases'
 
 const N = 80          // ECG samples
@@ -54,7 +54,9 @@ export function Heartbeat() {
     const t = state.clock.elapsedTime
     const speed = 0.6 + intensity * 1.2              // trace scrolls faster as HR rises
 
-    if (root.current) root.current.visible = fade > 0.01
+    // On the stacked mobile layout these world-positioned readouts land on top
+    // of the copy; an HTML vitals readout carries the numbers there instead.
+    if (root.current) root.current.visible = fade > 0.01 && !responsiveState.isMobile
     lineMaterial.opacity = fade
     if (text.current) text.current.fillOpacity = fade
     if (label.current) label.current.fillOpacity = fade

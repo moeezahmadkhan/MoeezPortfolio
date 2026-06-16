@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Billboard, Text } from '@react-three/drei'
-import { scrollState } from '../../scroll'
+import * as THREE from 'three'
+import { scrollState, responsiveState } from '../../scroll'
 import { localProgress, revealState, detectionAt, PASSERSBY } from './map'
 
 function driveNow(): number {
@@ -14,8 +15,13 @@ function driveNow(): number {
  * Guarded setState only fires when the rendered string actually changes. */
 export function DetectionHud() {
   const [line, setLine] = useState('AWAITING OATH')
+  const root = useRef<THREE.Group>(null)
 
   useFrame(() => {
+    // Hidden on the stacked mobile layout — this status line lands on the
+    // chapter heading there; the HTML legend carries the pipeline instead.
+    if (root.current) root.current.visible = !responsiveState.isMobile
+    if (responsiveState.isMobile) return
     const drive = driveNow()
     const det = detectionAt(drive)
     const count = PASSERSBY.filter((p) => drive >= p.at && det.locked).length
@@ -28,17 +34,19 @@ export function DetectionHud() {
   })
 
   return (
-    <Billboard position={[0, 1.6, 0]}>
-      <Text
-        fontSize={0.16}
-        color="#bfefff"
-        anchorX="center"
-        outlineWidth={0.004}
-        outlineColor="#07070d"
-        letterSpacing={0.05}
-      >
-        {line}
-      </Text>
-    </Billboard>
+    <group ref={root}>
+      <Billboard position={[0, 1.6, 0]}>
+        <Text
+          fontSize={0.16}
+          color="#bfefff"
+          anchorX="center"
+          outlineWidth={0.004}
+          outlineColor="#07070d"
+          letterSpacing={0.05}
+        >
+          {line}
+        </Text>
+      </Billboard>
+    </group>
   )
 }

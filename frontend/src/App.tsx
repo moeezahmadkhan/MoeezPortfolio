@@ -110,11 +110,11 @@ export default function App() {
         <About />
         <Spells />
         <Conjuring />
-        <Grimoire />
         <Pact />
         <Tracker />
         <Marauders />
         <Chronicles />
+        <Grimoire />
         <OwlPost />
       </main>
     </MotionConfig>

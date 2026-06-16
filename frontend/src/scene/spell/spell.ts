@@ -49,14 +49,14 @@ export const STATION: [number, number, number] = [-13, 0, 0]
 
 /**
  * Scroll window over which the chamber is visible. The conjuring (service) section
- * sits before the grimoire. Recalibrated 2026-06-06 for the page carrying both the
- * Pact and Marauder's Map chapters (scripts/measure.mjs): conjuring top ≈ 0.370,
- * grimoire top ≈ 0.486. We pad the start a little earlier so the chamber is already
- * lit when the scroll-settle magnet rests on the section top (where localProgress
- * would otherwise be 0 and the visibility gate would hide it).
+ * is now followed directly by the Pact. Re-measured 2026-06-16 after the Grimoire
+ * chapter moved to just before contact: conjuring top ≈ 0.378, pact top ≈ 0.495.
+ * We pad the start a little earlier so the chamber is already lit when the
+ * scroll-settle magnet rests on the section top (where localProgress would
+ * otherwise be 0 and the visibility gate would hide it).
  */
-export const SECTION_START = 0.358
-export const SECTION_END = 0.486
+export const SECTION_START = 0.366
+export const SECTION_END = 0.495
 
 /** Global scroll progress → 0→1 local progress within the conjuring section. */
 export function localProgress(progress: number): number {

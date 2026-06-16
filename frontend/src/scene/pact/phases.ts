@@ -11,12 +11,13 @@ export const STATION: [number, number, number] = [-7, 0, -1]
 
 /**
  * Pact band in GLOBAL scroll fraction (0→1 down the whole page). Calibrated from
- * scripts/measure.mjs (2026-06-06, page with both Pact + Marauder's Map): pact top
- * ≈ 0.546, tracker top ≈ 0.661. START is nudged slightly before the measured section
- * top so the station isn't gated off at the very entry; END meets the tracker band.
+ * Re-measured 2026-06-16 after the Grimoire (projects) chapter moved to just before
+ * contact: pact top ≈ 0.495, tracker top ≈ 0.612. START is nudged slightly before the
+ * measured section top so the station isn't gated off at the very entry; END meets the
+ * tracker band.
  */
-export const SECTION_START = 0.534
-export const SECTION_END = 0.661
+export const SECTION_START = 0.483
+export const SECTION_END = 0.612
 
 /** Global progress → local 0→1 within the Pact band. */
 export function localProgress(progress: number): number {
