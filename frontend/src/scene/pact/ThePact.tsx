@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { scrollState } from '../../scroll'
 import { localProgress, pactProgress } from './phases'
 import { applyWizardingMaterials, disposeModel } from '../characterMaterial'
+import { LABEL_FONT } from '../labelFont'
 
 useGLTF.preload('/models/pact_pair.glb')
 
@@ -97,12 +98,12 @@ export function ThePact() {
 
       {/* floating labels over each figure */}
       <Billboard position={[-LABEL_X, 1.35, 0]}>
-        <Text fontSize={0.13} color="#cdbfae" anchorX="center">
+        <Text font={LABEL_FONT} fontSize={0.13} letterSpacing={0.12} color="#cdbfae" anchorX="center">
           FOUNDER
         </Text>
       </Billboard>
       <Billboard position={[LABEL_X, 1.35, 0]}>
-        <Text fontSize={0.13} color="#cdbfae" anchorX="center">
+        <Text font={LABEL_FONT} fontSize={0.13} letterSpacing={0.12} color="#cdbfae" anchorX="center">
           INVESTOR
         </Text>
       </Billboard>

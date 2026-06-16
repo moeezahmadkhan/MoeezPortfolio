@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { Billboard, Text } from '@react-three/drei'
 import { scrollState } from '../../scroll'
 import { localProgress, revealState, detectionAt, walkerPosition, PASSERSBY } from './map'
+import { LABEL_FONT } from '../labelFont'
 
 function driveNow(): number {
   return revealState.active
@@ -26,7 +27,9 @@ function Tag({ name, at }: { name: string; at: number }) {
   return (
     <Billboard position={[pos[0], pos[1] + 0.6, pos[2]]}>
       <Text
+        font={LABEL_FONT}
         fontSize={0.16}
+        letterSpacing={0.04}
         color={resolved ? '#ffe2b0' : '#7fd0c4'}
         anchorX="center"
         anchorY="bottom"

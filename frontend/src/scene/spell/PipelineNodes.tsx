@@ -4,6 +4,7 @@ import { Billboard, Text } from '@react-three/drei'
 import * as THREE from 'three'
 import { NODES, nodePosition, nodeGlow, spellState } from './spell'
 import { responsiveState } from '../../scroll'
+import { LABEL_FONT } from '../labelFont'
 
 /** One glowing rune-orb whose emissive/scale + labels follow its place in the cast sequence. */
 function Orb({ index }: { index: number }) {
@@ -51,7 +52,9 @@ function Orb({ index }: { index: number }) {
       </mesh>
       <Billboard position={[0, 0.42, 0]}>
         <Text
+          font={LABEL_FONT}
           fontSize={0.16}
+          letterSpacing={0.04}
           color={node.color}
           anchorX="center"
           anchorY="bottom"
@@ -61,7 +64,15 @@ function Orb({ index }: { index: number }) {
           {node.name}
           <meshBasicMaterial ref={nameMat} transparent opacity={0} color={node.color} toneMapped={false} />
         </Text>
-        <Text position={[0, -0.04, 0]} fontSize={0.085} color="#cdbfae" anchorX="center" anchorY="top">
+        <Text
+          font={LABEL_FONT}
+          position={[0, -0.04, 0]}
+          fontSize={0.08}
+          letterSpacing={0.06}
+          color="#cdbfae"
+          anchorX="center"
+          anchorY="top"
+        >
           {node.sub}
           <meshBasicMaterial ref={subMat} transparent opacity={0} color="#cdbfae" toneMapped={false} />
         </Text>
