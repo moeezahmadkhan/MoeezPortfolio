@@ -17,8 +17,13 @@ const PAIR_POS: [number, number, number] = [0, 0.5, 0]
 const PAIR_SCALE = 2.6
 /** Turn the pair's separation axis toward world-X so both read side-by-side. */
 const PAIR_FACING_Y = Math.PI / 2
-/** Horizontal offset of each figure's head, for the floating labels. */
-const LABEL_X = 1.0
+/** Horizontal offset of each figure's head, for the floating labels. On mobile
+ *  the camera pulls in + widens its FOV, so the wide offset splayed the labels
+ *  off the screen edges — pull them inward there so they read over each head. */
+const isMobile =
+  typeof window !== 'undefined' &&
+  (window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 720)
+const LABEL_X = isMobile ? 0.62 : 1.0
 const CARDS = 3
 
 /** The founder & investor stand together over a portal ring; as the pact forms
@@ -31,6 +36,9 @@ export function ThePact() {
   const cord = useRef<THREE.Mesh>(null)
   const ring = useRef<THREE.Mesh>(null)
   const cards = useRef<THREE.Group>(null)
+  // troika Text exposes imperative `.fillOpacity` — typed as any (cf. AnalysisCore).
+  const founderLabel = useRef<any>(null)
+  const investorLabel = useRef<any>(null)
 
   const { scene } = useGLTF('/models/pact_pair.glb')
   const model = useMemo(() => {
@@ -47,11 +55,17 @@ export function ThePact() {
 
     // The pair is conjured in early (over the first fifth of the chapter) and
     // stays present; the bond between them is what forms later.
+    const rise = easeOut(THREE.MathUtils.clamp(lp / 0.2, 0, 1))
     if (pair.current) {
-      const rise = easeOut(THREE.MathUtils.clamp(lp / 0.2, 0, 1))
       pair.current.scale.setScalar(PAIR_SCALE * rise)
       pair.current.position.y = PAIR_POS[1] + Math.sin(now * 0.7) * 0.03
     }
+
+    // The name labels belong to the figures, not to the deck-reading core that
+    // shares this station — fade them in WITH the pair's rise so they never hang
+    // over the wireframe sphere before the founder/investor exist.
+    if (founderLabel.current) founderLabel.current.fillOpacity = rise
+    if (investorLabel.current) investorLabel.current.fillOpacity = rise
 
     // Chalice-glow + cord between them ignite as the deal is struck.
     if (bond.current) bond.current.intensity = p * 3.2 + Math.sin(now * 3) * 0.3 * p
@@ -98,12 +112,12 @@ export function ThePact() {
 
       {/* floating labels over each figure */}
       <Billboard position={[-LABEL_X, 1.35, 0]}>
-        <Text font={LABEL_FONT} fontSize={0.13} letterSpacing={0.12} color="#cdbfae" anchorX="center">
+        <Text ref={founderLabel} font={LABEL_FONT} fontSize={0.13} letterSpacing={0.12} color="#cdbfae" anchorX="center" fillOpacity={0}>
           FOUNDER
         </Text>
       </Billboard>
       <Billboard position={[LABEL_X, 1.35, 0]}>
-        <Text font={LABEL_FONT} fontSize={0.13} letterSpacing={0.12} color="#cdbfae" anchorX="center">
+        <Text ref={investorLabel} font={LABEL_FONT} fontSize={0.13} letterSpacing={0.12} color="#cdbfae" anchorX="center" fillOpacity={0}>
           INVESTOR
         </Text>
       </Billboard>

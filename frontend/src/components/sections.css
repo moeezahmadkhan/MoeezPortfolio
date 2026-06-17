@@ -203,18 +203,38 @@
   background: linear-gradient(160deg, rgba(231, 194, 125, 0.05), rgba(231, 194, 125, 0));
 }
 .spell-group__title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: clamp(1.05rem, 1.7vw, 1.4rem);
   letter-spacing: 0.04em;
   color: var(--gold);
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid rgba(231, 194, 125, 0.14);
 }
-.spell-group__list { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+.spell-group__count {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rune);
+  opacity: 0.75;
+}
+.spell-group__list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.7rem 1.4rem;
+}
 .spell-chip {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  font-size: 1.05rem;
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
   color: var(--parchment);
 }
 .spell-chip__rune { color: var(--rune); font-size: 0.7rem; opacity: 0.8; }
@@ -464,23 +484,65 @@
 .spells__steps {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr);
   align-items: center;
   gap: clamp(1rem, 5vw, 4rem);
   min-height: 42vh;
 }
 .spells__index {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.2rem, 3vw, 2.4rem);
+}
+.spells__count {
   font-family: 'Cinzel', serif;
-  font-size: clamp(4rem, 14vw, 12rem);
+  font-size: clamp(3.4rem, 10vw, 9rem);
   line-height: 0.9;
   color: var(--gold);
-  opacity: 0.85;
+  opacity: 0.9;
+  text-shadow: 0 0 38px rgba(231, 194, 125, 0.22);
 }
 .spells__index-total {
   display: block;
-  font-size: 0.18em;
+  font-size: 0.2em;
   letter-spacing: 0.3em;
-  opacity: 0.6;
+  opacity: 0.55;
+}
+/* Grimoire table of contents — the schools of magic, active one illuminated */
+.spells__toc {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(231, 194, 125, 0.16);
+}
+.spells__toc-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  padding: 0.5rem 0 0.5rem 1.1rem;
+  margin-left: -1px;
+  border-left: 1px solid transparent;
+  color: var(--parchment-dim);
+  opacity: 0.4;
+  transition: opacity 0.45s ease, color 0.45s ease, border-color 0.45s ease;
+}
+.spells__toc-item.is-past { opacity: 0.6; }
+.spells__toc-item.is-active {
+  opacity: 1;
+  color: var(--gold-bright);
+  border-left-color: var(--gold);
+}
+.spells__toc-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  opacity: 0.7;
+}
+.spells__toc-title {
+  font-family: var(--font-display);
+  font-size: clamp(0.92rem, 1.3vw, 1.15rem);
+  letter-spacing: 0.03em;
 }
 .spells__panel {
   position: relative;
@@ -488,7 +550,9 @@
 }
 .spell-group--step {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 /* Reduced motion: drop the pin, restore a normal stacked grid. */
@@ -785,6 +849,16 @@
   }
 
   .spells__index {
+    display: block !important;
+  }
+
+  /* The stepping table-of-contents is meaningless on mobile, where the pin is
+     dropped and every school's card is shown stacked. */
+  .spells__toc {
+    display: none !important;
+  }
+
+  .spells__count {
     font-size: 3.5rem !important;
     display: flex !important;
     align-items: baseline !important;

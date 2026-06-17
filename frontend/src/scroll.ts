@@ -17,9 +17,16 @@ export const scrollState = {
 export const responsiveState = {
   zoom: 1, // computed once per resize
   // True when the stacked mobile/tablet layout is active (matches the ≤1024px
-  // CSS block). The 3D scene reads it to suppress overlays — e.g. the pipeline
-  // node labels, which collide with the HTML legend once chapters stack.
+  // CSS block). Drives the responsive zoom and other ≤1024 tweaks.
   isMobile: typeof window !== 'undefined' && window.innerWidth < 1024,
+  // True only on the true phone layout — coarse pointer OR <720px — matching the
+  // mobile CAMERA track (CameraRig) and Scene tier. The pipeline node labels +
+  // the compact-constellation scale key off THIS, not isMobile: in the 720–1024
+  // band the desktop camera is still active and frames the full labelled arc, so
+  // suppressing labels / shrinking orbs there left "no circles, no text".
+  isPhone:
+    typeof window !== 'undefined' &&
+    (window.matchMedia?.('(pointer: coarse)').matches || window.innerWidth < 720),
 }
 
 export function useScrollTracker() {
@@ -40,6 +47,8 @@ export function useScrollTracker() {
       // of shrinking the whole scene. Tablets still ease back slightly.
       responsiveState.zoom = vw < 640 ? 1 : vw < 1024 ? 0.95 : 1
       responsiveState.isMobile = vw < 1024
+      responsiveState.isPhone =
+        window.matchMedia?.('(pointer: coarse)').matches || vw < 720
     }
 
     // When Lenis is active, read its smoothed scroll; otherwise fall back to

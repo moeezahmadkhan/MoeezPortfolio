@@ -89,9 +89,25 @@ export function Spells() {
         <IgniteHeading className="section__title" text="Spells & Incantations" />
 
         <div className="spells__steps">
-          <div className="spells__index" aria-hidden>
-            {String(step + 1).padStart(2, '0')}
-            <span className="spells__index-total">/ {String(spellbook.length).padStart(2, '0')}</span>
+          <div className="spells__index">
+            <div className="spells__count" aria-hidden>
+              {String(step + 1).padStart(2, '0')}
+              <span className="spells__index-total">/ {String(spellbook.length).padStart(2, '0')}</span>
+            </div>
+            <ol className="spells__toc" aria-label="Schools of magic">
+              {spellbook.map((group, i) => (
+                <li
+                  key={group.title}
+                  className={`spells__toc-item${i === step ? ' is-active' : ''}${
+                    i < step ? ' is-past' : ''
+                  }`}
+                  aria-current={i === step ? 'true' : undefined}
+                >
+                  <span className="spells__toc-num">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="spells__toc-title">{group.title}</span>
+                </li>
+              ))}
+            </ol>
           </div>
 
           <div className="spells__panel">
@@ -103,7 +119,10 @@ export function Spells() {
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 style={{ pointerEvents: i === step ? 'auto' : 'none' }}
               >
-                <h3 className="spell-group__title">{group.title}</h3>
+                <h3 className="spell-group__title">
+                  {group.title}
+                  <span className="spell-group__count">{group.spells.length} incantations</span>
+                </h3>
                 <ul className="spell-group__list">
                   {group.spells.map((s) => (
                     <li key={s} className="spell-chip">

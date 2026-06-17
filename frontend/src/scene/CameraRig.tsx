@@ -49,12 +49,12 @@ const KEYS_MOBILE: typeof KEYS = [
   { at: 0.07,  pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },     // hero — hold while the figurine spins 360°
   { at: 0.125, pos: [2.1, 1.1, 3.5],   look: [0, 0.25, 0] },     // about — tight 3/4 (text + photo card)
   { at: 0.221, pos: [-2.2, 1.3, 3.7],  look: [0, 0.35, 0] },     // spells — orbit the central wizard (skill chips)
-  { at: 0.351, pos: [-11.0, 0.7, 6.3], look: [-11.0, -0.55, 1.4] }, // conjuring — caster lifted into top band (entry)
-  { at: 0.423, pos: [-11.0, 0.7, 6.3], look: [-11.0, -0.55, 1.4] }, // conjuring — hold through the reading window
+  { at: 0.351, pos: [-11.1, 0.9, 9.0], look: [-11.1, -0.25, 1.4] }, // conjuring — pulled back so the full caster reads in the top band (entry)
+  { at: 0.423, pos: [-11.1, 0.9, 9.0], look: [-11.1, -0.25, 1.4] }, // conjuring — hold through the reading window
   { at: 0.481, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — both figures lifted above copy (entry)
   { at: 0.538, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — hold through the reading window
-  { at: 0.585, pos: [12, 0.7, 5.8],    look: [12, -0.45, 0] },   // tracker — lifted above the copy (entry)
-  { at: 0.639, pos: [12, 0.7, 5.8],    look: [12, -0.45, 0] },   // tracker — hold through the reading window
+  { at: 0.585, pos: [12, 0.95, 8.6],   look: [12, -0.2, 0] },    // tracker — pulled back so the whole cricketer reads (entry)
+  { at: 0.639, pos: [12, 0.95, 8.6],   look: [12, -0.2, 0] },    // tracker — hold through the reading window
   { at: 0.684, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — angled down, parchment fills top band (entry)
   { at: 0.748, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — hold through the reading window
   { at: 0.800, pos: [-2.1, 1.3, 3.8],  look: [0, 0.3, 0] },      // chronicles — central wizard (timeline)

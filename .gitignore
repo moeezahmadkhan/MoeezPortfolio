@@ -5,3 +5,6 @@ dist/
 
 # brainstorming visual companion
 .superpowers/
+
+# verification screenshots (scratch)
+.shots/

@@ -28,11 +28,11 @@ function Orb({ index }: { index: number }) {
       const s = 0.18 + g * (isFinal ? 0.16 : 0.08)
       mesh.current.scale.setScalar(s + Math.sin(t * 1.6 + index) * 0.004)
     }
-    // On the stacked mobile layout the wide pipeline arc can't fit the portrait
-    // frame, so these floating labels land on top of the HTML legend (which
-    // already lists every stage). Hide them there and let the legend be the
-    // canonical pipeline; the glowing orbs stay as ambience.
-    const labelOpacity = responsiveState.isMobile ? 0 : g
+    // Only on the true phone layout does the wide pipeline arc not fit the
+    // portrait frame (labels would land on top of the HTML legend, which already
+    // lists every stage). Hide them there and let the legend be canonical. In the
+    // 720–1024 band the desktop camera frames the full labelled arc, so keep them.
+    const labelOpacity = responsiveState.isPhone ? 0 : g
     if (nameMat.current) nameMat.current.opacity = labelOpacity
     if (subMat.current) subMat.current.opacity = labelOpacity * 0.85
   })

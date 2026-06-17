@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
-import { scrollState } from '../../scroll'
+import { scrollState, responsiveState } from '../../scroll'
 import { STATION, SECTION_START, SECTION_END, spellState, castProgress, CAST_DURATION } from './spell'
 import { visibleInSpan } from '../stationVisibility'
 import { PipelineNodes } from './PipelineNodes'
@@ -71,8 +71,14 @@ export function SpellStation() {
       {/* the caster — a wizard mid-incantation, wand thrust down the pipeline */}
       <SpellCaster />
 
-      <PipelineNodes />
-      <SpellBolt />
+      {/* The pipeline arc spans ±4.2 world units — too wide for the portrait frame,
+          where the orbs + connecting strings sprawl over the copy. Shrink the whole
+          constellation on true phones only (the 720–1024 band keeps the desktop
+          camera + labels, so it wants the full-size arc). */}
+      <group scale={responsiveState.isPhone ? 0.72 : 1}>
+        <PipelineNodes />
+        <SpellBolt />
+      </group>
 
       <Sparkles count={50} scale={[8, 4, 4]} size={3} speed={0.2} color="#7fd0c4" opacity={0.5} />
     </group>

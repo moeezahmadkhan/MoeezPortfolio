@@ -8,6 +8,7 @@ import {
   Float,
   AdaptiveDpr,
   PerformanceMonitor,
+  Preload,
 } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette, SMAA } from '@react-three/postprocessing'
 import { KernelSize } from 'postprocessing'
@@ -118,6 +119,11 @@ export function Scene({ reveal }: { reveal: number }) {
           <Lightformer intensity={0.4} color="#7fb6d8" position={[-4, 1, -3]} scale={[4, 6, 1]} />
           <Lightformer intensity={0.3} color="#e7c27d" position={[4, 0, 2]} scale={[4, 4, 1]} />
         </Environment>
+
+        {/* Warm every station's materials/textures onto the GPU during the load
+            screen so the camera doesn't stall (~1s) the first time each far-offset
+            station scrolls into frame and its shaders compile mid-scroll. */}
+        <Preload all />
       </Suspense>
 
       {/* Bloom is the signature gold glow, kept on both tiers. On mobile we shrink
