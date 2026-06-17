@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { useGLTF, Center, Sparkles } from '@react-three/drei'
+import { Center, Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 import { applyWizardingMaterials, disposeModel } from '../characterMaterial'
+import { useKtx2Gltf } from '../ktx2'
 import { spellState } from './spell'
-
-useGLTF.preload('/models/spellcaster.glb')
 
 const MODEL = '/models/spellcaster.glb'
 
@@ -27,7 +26,7 @@ const WAND_TIP_RAW: [number, number, number] = [0.5, 0.1, -0.38]
 export function SpellCaster() {
   const wandLight = useRef<THREE.PointLight>(null)
   const body = useRef<THREE.Group>(null)
-  const { scene } = useGLTF(MODEL)
+  const { scene } = useKtx2Gltf(MODEL)
 
   const model = useMemo(() => {
     const clone = scene.clone(true)

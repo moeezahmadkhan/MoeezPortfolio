@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { useGLTF, Center, Sparkles } from '@react-three/drei'
+import { Center, Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from '../scroll'
-
-useGLTF.preload('/models/wizard_improved.glb')
+import { useKtx2Gltf } from './ktx2'
 
 /**
  * Wand-tip magic position, in the scaled + centred model space.
@@ -30,7 +29,7 @@ export function WizardModel({ reveal = 1 }: Props) {
   const group = useRef<THREE.Group>(null)
   const wandLight = useRef<THREE.PointLight>(null)
   const spinRef = useRef(0)
-  const { scene } = useGLTF('/models/wizard_improved.glb')
+  const { scene } = useKtx2Gltf('/models/wizard_improved.glb')
 
   // Clone so HMR / multiple mounts never share mutated material state.
   const model = useMemo(() => {

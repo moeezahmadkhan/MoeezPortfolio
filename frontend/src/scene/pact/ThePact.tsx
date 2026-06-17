@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { useGLTF, Center, Billboard, Text, Sparkles } from '@react-three/drei'
+import { Center, Billboard, Text, Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from '../../scroll'
 import { localProgress, pactProgress } from './phases'
 import { applyWizardingMaterials, disposeModel } from '../characterMaterial'
+import { useKtx2Gltf } from '../ktx2'
 import { LABEL_FONT } from '../labelFont'
-
-useGLTF.preload('/models/pact_pair.glb')
 
 // The founder (young, satchel, offering a chalice) and the investor (robed,
 // staff) come as ONE composed mesh, already posed facing each other. We place
@@ -40,7 +39,7 @@ export function ThePact() {
   const founderLabel = useRef<any>(null)
   const investorLabel = useRef<any>(null)
 
-  const { scene } = useGLTF('/models/pact_pair.glb')
+  const { scene } = useKtx2Gltf('/models/pact_pair.glb')
   const model = useMemo(() => {
     const clone = scene.clone(true)
     applyWizardingMaterials(clone)

@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { useGLTF, Center } from '@react-three/drei'
+import { Center } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from '../../scroll'
+import { useKtx2Gltf } from '../ktx2'
 import { STATION, WRIST_ANCHOR, SECTION_START, SECTION_END } from './phases'
 import { visibleInSpan } from '../stationVisibility'
 import { ScanRings } from './ScanRings'
@@ -17,12 +18,10 @@ const RING_FLOOR_Y = -1.32
 /** Base yaw of the cricketer — turned to face the camera/viewer. */
 const FACING_Y = -1.5
 
-useGLTF.preload('/models/cricket_improved.glb')
-
 export function TrackerStation() {
   const group = useRef<THREE.Group>(null)
   const figure = useRef<THREE.Group>(null)
-  const { scene } = useGLTF('/models/cricket_improved.glb')
+  const { scene } = useKtx2Gltf('/models/cricket_improved.glb')
 
   // Clone + tune materials so HMR / remounts never mutate shared state.
   const model = useMemo(() => {
