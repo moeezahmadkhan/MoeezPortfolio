@@ -75,6 +75,23 @@
 }
 .nav__link:hover { color: var(--gold-bright); }
 
+/* Understated GitHub link — low-emphasis, sits quietly beside the CTA */
+.nav__gh {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(231, 194, 125, 0.42);
+  text-decoration: none;
+  padding: 0.4rem 0.2rem;
+  transition: color 0.2s;
+}
+.nav__gh:hover { color: rgba(231, 194, 125, 0.82); }
+.nav__gh-rune { color: inherit; }
+
 /* CTA pill */
 .nav__cta {
   display: inline-flex;
@@ -106,4 +123,6 @@
   .nav__brand-sub { display: none; }
   .nav { padding: 0.7rem 1rem; }
   .nav__cta { font-size: 0.66rem; padding: 0.5rem 0.95rem; }
+  .nav__gh-text { display: none; }
+  .nav__gh { font-size: 0.85rem; padding: 0.4rem; }
 }

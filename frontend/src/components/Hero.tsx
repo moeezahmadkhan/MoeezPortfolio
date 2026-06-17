@@ -93,6 +93,16 @@ export function Hero() {
               <span>The Scroll (CV)</span>
               <span className="btn__glyph" aria-hidden="true">↗</span>
             </a>
+            <a
+              className="btn btn--ghost"
+              href="https://github.com/moeezahmadkhan"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="The Spellbook — Moeez on GitHub"
+            >
+              <span>The Spellbook (GitHub)</span>
+              <span className="btn__glyph" aria-hidden="true">↗</span>
+            </a>
           </motion.div>
         </motion.div>
 

@@ -41,6 +41,17 @@ export function SiteNav() {
         ))}
       </nav>
 
+      <a
+        className="nav__gh"
+        href="https://github.com/moeezahmadkhan"
+        target="_blank"
+        rel="noreferrer"
+        aria-label="The Spellbook — Moeez on GitHub"
+      >
+        <span className="nav__gh-rune" aria-hidden="true">⌥</span>
+        <span className="nav__gh-text">Spellbook</span>
+      </a>
+
       <a className="nav__cta" href="#owlpost">
         Send an Owl <span className="nav__rune">✦</span>
       </a>
