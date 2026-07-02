@@ -44,7 +44,7 @@ export function HudText() {
       <Text
         ref={statText}
         fontSize={0.12}
-        color="#7cffb0"
+        color="#9fe8dc"
         anchorX="center"
         anchorY="middle"
         lineHeight={1.5}

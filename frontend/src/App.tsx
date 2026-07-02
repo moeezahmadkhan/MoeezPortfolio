@@ -27,8 +27,8 @@ export default function App() {
   useScrollTracker()
   useScrollSettle()
 
-  // Once assets finish, hold a beat then play the cinematic intro. It plays on
-  // every load (no once-per-session gate).
+  // Once assets finish, hold a beat then play the cinematic intro. The intro
+  // itself is session-gated: full sequence first visit, short dissolve after.
   useEffect(() => {
     if (phase !== 'loading') return
     if (!active && progress >= 100) {

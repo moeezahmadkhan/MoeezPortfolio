@@ -16,8 +16,8 @@ export const STATION: [number, number, number] = [-7, 0, -1]
  * measured section top so the station isn't gated off at the very entry; END meets the
  * tracker band.
  */
-export const SECTION_START = 0.483
-export const SECTION_END = 0.612
+export const SECTION_START = 0.435
+export const SECTION_END = 0.574
 
 /** Global progress → local 0→1 within the Pact band. */
 export function localProgress(progress: number): number {

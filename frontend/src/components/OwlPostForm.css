@@ -19,8 +19,8 @@
 
 .owlform__label {
   font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--gold);
   opacity: 0.85;
@@ -30,7 +30,7 @@
 .owlform__input {
   width: 100%;
   background: rgba(12, 12, 22, 0.6);
-  border: 1px solid rgba(231, 194, 125, 0.18);
+  border: 1px solid rgba(231, 194, 125, 0.4);
   border-radius: 4px;
   padding: 0.7rem 0.85rem;
   color: var(--parchment);

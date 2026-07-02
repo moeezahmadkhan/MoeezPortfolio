@@ -55,8 +55,8 @@ export const STATION: [number, number, number] = [-13, 0, 0]
  * scroll-settle magnet rests on the section top (where localProgress would
  * otherwise be 0 and the visibility gate would hide it).
  */
-export const SECTION_START = 0.366
-export const SECTION_END = 0.495
+export const SECTION_START = 0.307
+export const SECTION_END = 0.447
 
 /** Global scroll progress → 0→1 local progress within the conjuring section. */
 export function localProgress(progress: number): number {

@@ -264,6 +264,7 @@
   transition: background 0.2s, border-color 0.2s;
 }
 .intro__skip:hover { background: rgba(231, 194, 125, 0.12); border-color: var(--gold); }
+.intro__skip-hint { opacity: 0.65; letter-spacing: 0.06em; text-transform: lowercase; }
 
 /* Touch / small screens: comfortable tap target + tuned proportions so the
    scene doesn't feel oversized on a phone. */

@@ -24,7 +24,7 @@ export function DataStream() {
     () =>
       new THREE.MeshStandardMaterial({
         color: '#08251c',
-        emissive: '#2bd47e',
+        emissive: '#7fd0c4',
         emissiveIntensity: 0.35,
         metalness: 0.35,
         roughness: 0.3,
@@ -65,7 +65,7 @@ export function DataStream() {
     <group>
       <instancedMesh ref={mesh} args={[undefined, undefined, COUNT]} frustumCulled={false}>
         <sphereGeometry args={[1, 8, 8]} />
-        <meshBasicMaterial color="#7cffb0" transparent opacity={0.9} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#9fe8dc" transparent opacity={0.9} blending={THREE.AdditiveBlending} depthWrite={false} />
       </instancedMesh>
 
       <group ref={store} position={DATASTORE_POS}>
@@ -73,13 +73,13 @@ export function DataStream() {
         {SLAB_Y.map((y) => (
           <mesh key={y} position={[0, y, 0]} material={slabMat}>
             <boxGeometry args={[0.52, 0.12, 0.52]} />
-            <Edges threshold={15} color="#9bffd0" />
+            <Edges threshold={15} color="#b8ece2" />
           </mesh>
         ))}
         {/* faint orbiting halo ring so the store reads as "active storage" */}
         <mesh ref={halo} rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[0.42, 0.46, 48]} />
-          <meshBasicMaterial color="#7cffb0" transparent opacity={0.12} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+          <meshBasicMaterial color="#9fe8dc" transparent opacity={0.12} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
         </mesh>
       </group>
     </group>

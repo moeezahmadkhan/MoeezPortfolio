@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
@@ -12,6 +12,8 @@ import { ThePact } from './ThePact'
 /** The Pact chamber. Lit, floor-ringed, and gated to its scroll band. */
 export function PactStation() {
   const group = useRef<THREE.Group>(null)
+  // Spotlight target must live in the scene graph or the cone aims at world origin.
+  const spotTarget = useMemo(() => new THREE.Object3D(), [])
 
   useFrame(() => {
     if (group.current)
@@ -23,13 +25,14 @@ export function PactStation() {
       {/* chamber light rig — cool key + warm fill so the sigils read against the dark */}
       <pointLight position={[0, 3, 3]} intensity={5} color="#bfefff" distance={16} decay={2} />
       <pointLight position={[3, 1, 2]} intensity={2.5} color="#e7c27d" distance={12} decay={2} />
+      <primitive object={spotTarget} position={[0, 0.4, 0]} />
       <spotLight
         position={[0, 5, 4]}
         angle={0.7}
         penumbra={1}
         intensity={9}
         color="#dff6ff"
-        target-position={[STATION[0], 0.4, STATION[2]]}
+        target={spotTarget}
       />
 
       {/* floor rune ring */}

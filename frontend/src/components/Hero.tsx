@@ -86,7 +86,7 @@ export function Hero() {
 
           <motion.div className="hero__actions" variants={rise}>
             <a className="btn btn--primary" href="#grimoire">
-              <span>Open the Grimoire</span>
+              <span>Open the Grimoire (Projects)</span>
               <span className="btn__glyph" aria-hidden="true">→</span>
             </a>
             <a className="btn btn--ghost" href="/Moeez_Ahmad_Khan_CV.pdf" target="_blank" rel="noreferrer">

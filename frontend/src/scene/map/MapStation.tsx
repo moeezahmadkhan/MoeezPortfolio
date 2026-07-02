@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
@@ -17,6 +17,8 @@ const reduceMotion =
 
 export function MapStation() {
   const group = useRef<THREE.Group>(null)
+  // Spotlight target must live in the scene graph or the cone aims at world origin.
+  const spotTarget = useMemo(() => new THREE.Object3D(), [])
 
   useFrame((state) => {
     if (group.current)
@@ -54,13 +56,14 @@ export function MapStation() {
       {/* light rig: warm parchment key + cool detection rim */}
       <pointLight position={[0, 3, 3]} intensity={5} color="#ffe2b0" distance={16} decay={2} />
       <pointLight position={[-3, 1.5, 2]} intensity={3} color="#35e0ff" distance={12} decay={2} />
+      <primitive object={spotTarget} position={[0, 0.2, 0]} />
       <spotLight
         position={[0, 5, 4]}
         angle={0.7}
         penumbra={1}
         intensity={9}
         color="#dff6ff"
-        target-position={[STATION[0], 0.2, 0]}
+        target={spotTarget}
       />
 
       <MapTable />

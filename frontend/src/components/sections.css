@@ -56,13 +56,36 @@
   border: 1px solid currentColor;
   border-radius: 999px;
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   letter-spacing: 0.26em;
   text-transform: uppercase;
   opacity: 0.9;
 }
 .section__cat--project { color: var(--gold-deep); }
 .section__cat--service { color: var(--rune); }
+
+/* Fact-strip — the mono attribution line under showcase headlines:
+   project name · what it is · where it shipped. Plain facts, archive voice. */
+.fact-strip {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(231, 194, 125, 0.75);
+  border-left: 2px solid rgba(127, 208, 196, 0.5);
+  padding-left: 0.7rem;
+  margin: -1.2rem 0 0.4rem;
+}
+
+/* Small plain-language gloss under a themed CTA button */
+.cast-gloss {
+  margin-top: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--parchment-dim);
+  opacity: 0.85;
+}
 
 /* Backgrounds: dark scrims that let the candlelight & sparkles bleed through edges */
 .section--about {
@@ -179,9 +202,9 @@
   font-family: var(--font-mono);
 }
 .about__portrait-id {
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
-  color: rgba(231, 194, 125, 0.55);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: rgba(231, 194, 125, 0.65);
 }
 .about__portrait-name {
   font-size: 0.72rem;
@@ -292,8 +315,8 @@
 .spell-card__index {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  color: rgba(231, 194, 125, 0.55);
+  letter-spacing: 0.14em;
+  color: rgba(231, 194, 125, 0.65);
 }
 .spell-card__glyph { font-size: 2rem; filter: drop-shadow(0 0 14px rgba(231, 194, 125, 0.4)); }
 .spell-card__incant {
@@ -336,7 +359,7 @@
 }
 .spell-card__tags li {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 0.3rem 0.6rem;
@@ -383,6 +406,35 @@
   outline: 2px solid var(--gold-bright);
   outline-offset: 4px;
 }
+/* Outbound proof — repo / demo / case-study actions in the gold chip voice */
+.spell-card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(231, 194, 125, 0.14);
+}
+.spell-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.42rem 0.8rem;
+  border: 1px solid rgba(231, 194, 125, 0.35);
+  border-radius: 999px;
+  color: var(--gold);
+  transition: color 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.spell-card__link:hover {
+  color: var(--gold-bright);
+  border-color: rgba(231, 194, 125, 0.7);
+  box-shadow: 0 0 18px rgba(231, 194, 125, 0.25);
+}
+.spell-card__link-rune { color: var(--rune); font-size: 0.85em; }
 
 /* ── Chronicles timeline ── */
 .timeline { position: relative; padding-left: 2.4rem; }
@@ -446,6 +498,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
+  min-height: 44px; /* touch target */
+  padding: 0 0.4rem;
   transition: color 0.3s, text-shadow 0.3s;
 }
 .owl__link:hover { color: var(--gold-bright); text-shadow: 0 0 16px rgba(231, 194, 125, 0.5); }
@@ -455,10 +509,10 @@
 .owl__footer {
   margin-top: 4rem;
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: 0.72rem;
   letter-spacing: 0.12em;
   color: var(--parchment-dim);
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
 @media (max-width: 720px) {
@@ -467,7 +521,7 @@
 
 /* Pinned Spells: tall section (one viewport per step + one) with a sticky stage. */
 .spells--pinned {
-  height: 500vh;            /* 4 steps + 1; tune for pacing */
+  height: 320vh;            /* compressed dwell: ~0.7 viewport per step + release */
   padding: 0;
 }
 .spells__stage {
@@ -546,7 +600,7 @@
 }
 .spells__panel {
   position: relative;
-  min-height: 38vh;
+  min-height: 22rem; /* shared card box so steps don't resize mid-crossfade */
 }
 .spell-group--step {
   position: absolute;
@@ -576,6 +630,7 @@
   flex-direction: column;
   justify-content: center;
   gap: 1.2rem;
+  max-width: 42rem; /* match sibling stages so pill/headline don't strike through the 3D */
   padding: clamp(2rem, 6vw, 6rem);
   box-sizing: border-box;
 }
@@ -607,9 +662,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.9rem;
   max-width: 42rem;
   padding: clamp(2rem, 6vw, 6rem);
+  /* keep the eyebrow clear of the fixed nav and the legend inside short viewports */
+  padding-top: calc(80px + 1.5rem);
+  padding-bottom: 2rem;
   box-sizing: border-box;
 }
 /* legibility scrim so the pitch copy reads over the 3D chamber behind it */
@@ -658,11 +716,11 @@
 }
 .cast-btn__rune { color: var(--rune); }
 .conjuring__legend {
-  margin: 1.4rem 0 0;
+  margin: 1rem 0 0;
   list-style: none;
   padding: 0;
   display: grid;
-  gap: 0.45rem;
+  gap: 0.35rem;
   max-width: 30rem;
 }
 .conjuring__legend-item {
@@ -751,6 +809,7 @@
   flex-direction: column;
   justify-content: center;
   gap: 1.2rem;
+  max-width: 42rem; /* match sibling stages so pill/headline don't strike through the 3D */
   padding: clamp(2rem, 6vw, 6rem);
   box-sizing: border-box;
 }
@@ -775,9 +834,10 @@
 }
 
 .pact__lede {
-  max-width: 30rem;
+  max-width: 34ch;
   color: var(--parchment);
-  font-size: 1.15rem;
+  font-family: var(--font-body);
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
   line-height: 1.6;
   text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
 }
@@ -813,6 +873,17 @@
 @media (prefers-reduced-motion: reduce) {
   .section--pact.pact--pinned { height: auto; }
   .pact__stage { position: static; min-height: 0; }
+}
+
+/* Align the pinned model-chapter stages to the same 1180px content grid the
+   wrapped chapters use, so the page's left edge stops ping-ponging. */
+@media (min-width: 1025px) {
+  .conjuring__stage,
+  .pact__stage,
+  .tracker__stage,
+  .map__stage {
+    margin-left: max(0px, calc((100vw - 1180px) / 2 - clamp(2rem, 6vw, 6rem)));
+  }
 }
 
 @media (max-width: 1024px) {

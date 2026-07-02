@@ -21,8 +21,8 @@ export const MAP_TILT = 0.34
  * tracker band is harmless since the two chambers sit far apart (tracker +12, map +22).
  * Keep in sync with the #map CameraRig KEYS.
  */
-export const SECTION_START = 0.741
-export const SECTION_END = 0.894
+export const SECTION_START = 0.715
+export const SECTION_END = 0.880
 
 /** Global scroll progress (0→1) → 0→1 local progress within the map section. */
 export function localProgress(progress: number): number {

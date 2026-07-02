@@ -20,6 +20,8 @@ const FACING_Y = -1.5
 
 export function TrackerStation() {
   const group = useRef<THREE.Group>(null)
+  // Spotlight target must live in the scene graph or the cone aims at world origin.
+  const spotTarget = useMemo(() => new THREE.Object3D(), [])
   const figure = useRef<THREE.Group>(null)
   const { scene } = useKtx2Gltf('/models/cricket_improved.glb')
 
@@ -70,15 +72,16 @@ export function TrackerStation() {
   return (
     <group ref={group} position={STATION} dispose={null}>
       {/* cool scanner light rig, local to the station */}
-      <pointLight position={[2, 3, 3]} intensity={6} color="#35e0ff" distance={14} decay={2} />
-      <pointLight position={[-2.5, 1.5, 2]} intensity={3} color="#1f8fb0" distance={12} decay={2} />
-      <spotLight position={[0, 5, 4]} angle={0.6} penumbra={1} intensity={10} color="#bfefff" target-position={[STATION[0], 0.5, 0]} />
+      <pointLight position={[2, 3, 3]} intensity={6} color="#86d9cc" distance={14} decay={2} />
+      <pointLight position={[-2.5, 1.5, 2]} intensity={3} color="#3f9a8d" distance={12} decay={2} />
+      <primitive object={spotTarget} position={[0, 0.5, 0]} />
+      <spotLight position={[0, 5, 4]} angle={0.6} penumbra={1} intensity={10} color="#dcf2ee" target={spotTarget} />
 
       {/* gentle wrist fill so the watch lifts out of shadow — kept dim to stay under Bloom */}
       <pointLight
         position={[WRIST_ANCHOR[0], WRIST_ANCHOR[1], WRIST_ANCHOR[2] + 0.2]}
         intensity={1.1}
-        color="#dff6ff"
+        color="#e9f7f3"
         distance={0.9}
         decay={2}
       />
@@ -87,11 +90,11 @@ export function TrackerStation() {
       <group position={[0, RING_FLOOR_Y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <mesh>
           <ringGeometry args={[1.5, 1.55, 64]} />
-          <meshBasicMaterial color="#35e0ff" transparent opacity={0.7} side={THREE.DoubleSide} />
+          <meshBasicMaterial color="#86d9cc" transparent opacity={0.7} side={THREE.DoubleSide} />
         </mesh>
         <mesh>
           <ringGeometry args={[2.0, 2.02, 64]} />
-          <meshBasicMaterial color="#35e0ff" transparent opacity={0.3} side={THREE.DoubleSide} />
+          <meshBasicMaterial color="#86d9cc" transparent opacity={0.3} side={THREE.DoubleSide} />
         </mesh>
       </group>
 

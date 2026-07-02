@@ -141,6 +141,7 @@
   opacity: 0.92;
   margin-bottom: 1.6rem;
   max-width: 33rem;
+  text-wrap: pretty; /* no one-word widow on the most-read line of the site */
 }
 
 .hero__spell {

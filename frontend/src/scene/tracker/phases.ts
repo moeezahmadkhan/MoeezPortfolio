@@ -16,8 +16,8 @@ export const AICORE_POS: [number, number, number] = [0, 2.4, 0]
  * the Grimoire chapter moved to just before contact: tracker top ≈ 0.612, map top
  * ≈ 0.753. Keep in sync with the #tracker CameraRig KEYS.
  */
-export const SECTION_START = 0.612
-export const SECTION_END = 0.753
+export const SECTION_START = 0.574
+export const SECTION_END = 0.727
 
 /** Maps global scroll progress (0→1 across the page) to 0→1 local progress within the tracker section. */
 export function localProgress(progress: number) {

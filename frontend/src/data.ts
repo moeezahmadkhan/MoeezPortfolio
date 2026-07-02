@@ -4,7 +4,11 @@ export type Project = {
   blurb: string
   tags: string[]
   glyph: string
-  repo: string // GitHub repository URL
+  links?: {
+    repo?: string // public source
+    demo?: string // live deployment
+    caseStudy?: string // write-up / article
+  }
 }
 
 export const projects: Project[] = [
@@ -15,7 +19,7 @@ export const projects: Project[] = [
       'A Flutter community app with real-time messaging and Firebase integration — cross-platform conjuring with live sync.',
     tags: ['Flutter', 'Firebase', 'Realtime', 'Mobile'],
     glyph: '🔮',
-    repo: 'https://github.com/moeezahmadkhan/querysphere',
+    links: { repo: 'https://github.com/moeezahmadkhan/querysphere' },
   },
   {
     name: 'Airbnb Replica',
@@ -24,7 +28,6 @@ export const projects: Project[] = [
       'A full MERN-stack application with property management and secure JWT authentication — research instincts brought into production-grade web engineering.',
     tags: ['MongoDB', 'Express', 'React', 'Node', 'JWT'],
     glyph: '🏰',
-    repo: 'https://github.com/moeezahmadkhan/querysphere',
   },
 ]
 
@@ -104,6 +107,14 @@ export type PactStep = {
   name: string // themed pipeline step
   tags: string[] // real stack chips
 }
+
+/** The four pipeline steps shown in the Pulse/tracker chapter legend. */
+export const trackerSteps: PactStep[] = [
+  { name: 'The Wrist', tags: ['Whoop stream', 'Live biometrics'] },
+  { name: 'The Pulse', tags: ['Signal parsing'] },
+  { name: 'The Scribe', tags: ['Real-time store'] },
+  { name: 'The Oracle', tags: ['LLM insights', 'Low latency'] },
+]
 
 /** The four pipeline steps shown in the Pact chapter legend. */
 export const pactSteps: PactStep[] = [

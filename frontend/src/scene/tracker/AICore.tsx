@@ -27,9 +27,9 @@ export function AICore() {
     <group position={AICORE_POS}>
       <mesh ref={mesh}>
         <icosahedronGeometry args={[1, 1]} />
-        <meshStandardMaterial color="#0c2e22" emissive="#3dffa6" emissiveIntensity={0.3} metalness={0.4} roughness={0.2} wireframe />
+        <meshStandardMaterial color="#0c2e22" emissive="#8fdfd2" emissiveIntensity={0.3} metalness={0.4} roughness={0.2} wireframe />
       </mesh>
-      <pointLight ref={halo} color="#3dffa6" intensity={0} distance={6} decay={2} />
+      <pointLight ref={halo} color="#8fdfd2" intensity={0} distance={6} decay={2} />
     </group>
   )
 }

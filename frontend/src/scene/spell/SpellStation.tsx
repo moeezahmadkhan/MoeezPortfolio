@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
@@ -16,6 +16,8 @@ const reduceMotion =
 
 export function SpellStation() {
   const group = useRef<THREE.Group>(null)
+  // Spotlight target must live in the scene graph or the cone aims at world origin.
+  const spotTarget = useMemo(() => new THREE.Object3D(), [])
 
   useFrame((state) => {
     if (group.current)
@@ -47,13 +49,14 @@ export function SpellStation() {
       {/* chamber light rig — cool key + warm fill so orbs read against the dark */}
       <pointLight position={[0, 3, 3]} intensity={5} color="#bfefff" distance={16} decay={2} />
       <pointLight position={[-3, 1, 2]} intensity={2.5} color="#e7c27d" distance={12} decay={2} />
+      <primitive object={spotTarget} position={[0, 0.4, 0]} />
       <spotLight
         position={[0, 5, 4]}
         angle={0.7}
         penumbra={1}
         intensity={9}
         color="#dff6ff"
-        target-position={[STATION[0], 0.4, 0]}
+        target={spotTarget}
       />
 
       {/* casting circle on the floor */}

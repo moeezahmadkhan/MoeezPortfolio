@@ -30,7 +30,7 @@ export function Heartbeat() {
   }, [])
 
   const lineMaterial = useMemo(
-    () => new THREE.LineBasicMaterial({ color: '#ff3344', transparent: true }),
+    () => new THREE.LineBasicMaterial({ color: '#d9743b', transparent: true }),
     [],
   )
   const line = useMemo(() => {
@@ -92,15 +92,15 @@ export function Heartbeat() {
     // datastore cube, the torso, and the left-hand chapter copy
     <group ref={root} position={[WRIST_ANCHOR[0] + 1.4, WRIST_ANCHOR[1] + 1.7, WRIST_ANCHOR[2]]}>
       <primitive object={line} />
-      <Text ref={text} position={[0, 0.48, 0]} fontSize={0.34} color="#ff4d5e" anchorX="center" anchorY="middle">
+      <Text ref={text} position={[0, 0.48, 0]} fontSize={0.34} color="#f09a52" anchorX="center" anchorY="middle">
         72
       </Text>
-      <Text ref={label} position={[0, 0.23, 0]} fontSize={0.1} color="#ff8a96" anchorX="center" anchorY="middle">
+      <Text ref={label} position={[0, 0.23, 0]} fontSize={0.1} color="#f5c197" anchorX="center" anchorY="middle">
         BPM
       </Text>
       <mesh ref={beat} position={[-WIDTH / 2, 0, 0]}>
         <sphereGeometry args={[1, 16, 16]} />
-        <meshBasicMaterial color="#ff5566" transparent opacity={0.6} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#e8874a" transparent opacity={0.6} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
     </group>
   )

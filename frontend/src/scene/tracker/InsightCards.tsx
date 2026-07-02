@@ -76,7 +76,7 @@ export function InsightCards() {
                 texts.current[i] = el
               }}
               fontSize={0.135}
-              color="#bfffe0"
+              color="#d5f3ed"
               anchorX="center"
               anchorY="middle"
               maxWidth={2.1}

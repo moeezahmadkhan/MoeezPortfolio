@@ -15,9 +15,9 @@ interface Tile {
 // BPM is owned by the big Heartbeat readout, so the tiles carry the rest —
 // fanned into a tidy, evenly-spaced column to the right of the wrist (no orbit).
 const TILES: Tile[] = [
-  { key: 'cal', color: '#8fe9ff', offset: [1.5, 0.4], format: (m) => `${m.cal} cal` },
-  { key: 'steps', color: '#7cffb0', offset: [1.62, 0.0], format: (m) => `${(m.steps / 1000).toFixed(1)}k` },
-  { key: 'spo2', color: '#8fe9ff', offset: [1.5, -0.4], format: (m) => `SpO2 ${m.spo2}%` },
+  { key: 'cal', color: '#a8e6db', offset: [1.5, 0.4], format: (m) => `${m.cal} cal` },
+  { key: 'steps', color: '#9fe8dc', offset: [1.62, 0.0], format: (m) => `${(m.steps / 1000).toFixed(1)}k` },
+  { key: 'spo2', color: '#a8e6db', offset: [1.5, -0.4], format: (m) => `SpO2 ${m.spo2}%` },
 ]
 
 const ANCHOR = new THREE.Vector3(...WRIST_ANCHOR)

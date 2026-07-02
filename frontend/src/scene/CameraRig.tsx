@@ -11,20 +11,20 @@ const KEYS: { at: number; pos: [number, number, number]; look: [number, number, 
   // Pact and Marauder's Map chapters. Entry keys sit on measured section tops; "held"
   // keys sit ~65–70% into each pinned span so the camera holds before transitioning.
   { at: 0.0,   pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — closer + framed higher for a more commanding figurine
-  { at: 0.06,  pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — hold while figurine spins 360°
-  { at: 0.094, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.094
-  { at: 0.143, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.143)
-  { at: 0.272, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across the pinned span
-  { at: 0.378, pos: [-13, 1.25, 10.5], look: [-13, 0.55, 0] }, // conjuring (service) — entry, spell chamber far-left (measured 0.378)
-  { at: 0.442, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held across the pinned span
-  { at: 0.495, pos: [-7, 1.1, 5.0],   look: [-7, 0.5, -1] },   // pact — entry, framing the left-offset chamber (measured 0.495)
-  { at: 0.585, pos: [-7, 1.35, 4.0],  look: [-7, 0.45, -1] },  // pact — held late so the camera lingers on the pair, then whips to the tracker
-  { at: 0.612, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.612)
-  { at: 0.690, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
-  { at: 0.753, pos: [22, 1.25, 5.2],  look: [22, -0.45, 0] }, // map (Marauder's Map) — entry: closer + tilted down to fill frame (measured 0.753)
-  { at: 0.830, pos: [22, 1.7, 6.1],   look: [22, -0.2, 0] },  // map — held: ease back/up, table stays large and legible
-  { at: 0.894, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.894)
-  { at: 0.942, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },    // grimoire (projects) — center framing, now just before contact (measured 0.942)
+  { at: 0.065, pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — hold while figurine spins 360°
+  { at: 0.102, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.094
+  { at: 0.156, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.143)
+  { at: 0.245, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across the pinned span
+  { at: 0.319, pos: [-13, 1.25, 10.5], look: [-13, 0.55, 0] }, // conjuring (service) — entry, spell chamber far-left (measured 0.378)
+  { at: 0.389, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held across the pinned span
+  { at: 0.447, pos: [-7, 1.1, 5.0],   look: [-7, 0.5, -1] },   // pact — entry, framing the left-offset chamber (measured 0.495)
+  { at: 0.545, pos: [-7, 1.35, 4.0],  look: [-7, 0.45, -1] },  // pact — held late so the camera lingers on the pair, then whips to the tracker
+  { at: 0.574, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.612)
+  { at: 0.659, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
+  { at: 0.727, pos: [22, 1.25, 5.2],  look: [22, -0.45, 0] }, // map (Marauder's Map) — entry: closer + tilted down to fill frame (measured 0.753)
+  { at: 0.810, pos: [22, 1.7, 6.1],   look: [22, -0.2, 0] },  // map — held: ease back/up, table stays large and legible
+  { at: 0.880, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.894)
+  { at: 0.933, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },    // grimoire (projects) — center framing, now just before contact (measured 0.942)
   { at: 1.0,   pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost
 ]
 
@@ -68,6 +68,10 @@ const isMobile =
 
 const ACTIVE_KEYS = isMobile ? KEYS_MOBILE : KEYS
 
+const reduceMotion =
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
 const current = new THREE.Vector3()
 const currentLook = new THREE.Vector3()
 const target = new THREE.Vector3()
@@ -90,22 +94,40 @@ function sampleKeyframes(progress: number, key: 'pos' | 'look', destination: THR
   destination.fromArray(ACTIVE_KEYS[ACTIVE_KEYS.length - 1][key])
 }
 
+/** Reduced motion: hold the containing chapter's entry pose (no continuous travel). */
+function sampleStepped(progress: number, key: 'pos' | 'look', destination: THREE.Vector3) {
+  let active = ACTIVE_KEYS[0]
+  for (const k of ACTIVE_KEYS) {
+    if (progress >= k.at) active = k
+    else break
+  }
+  destination.fromArray(active[key])
+}
+
 export function CameraRig() {
   const { camera } = useThree()
 
   useFrame((_, delta) => {
     const progress = scrollState.progress
-    sampleKeyframes(progress, 'pos', target)
-    sampleKeyframes(progress, 'look', targetLook)
+    if (reduceMotion) {
+      // Step between chapter entry poses with a short micro-lerp; no parallax,
+      // no continuous large-field travel (the primary vestibular trigger here).
+      sampleStepped(progress, 'pos', target)
+      sampleStepped(progress, 'look', targetLook)
+    } else {
+      sampleKeyframes(progress, 'pos', target)
+      sampleKeyframes(progress, 'look', targetLook)
 
-    // Steady on first page, light parallax after intro completes.
-    const intro = THREE.MathUtils.smoothstep(scrollState.progress / 0.10, 0, 1)
-    const parallax = THREE.MathUtils.lerp(0.08, 0.6, intro)
-    target.x += scrollState.pointerX * parallax
-    target.y += -scrollState.pointerY * parallax * 0.5
+      // Steady on first page, light parallax after intro completes.
+      const intro = THREE.MathUtils.smoothstep(scrollState.progress / 0.10, 0, 1)
+      const parallax = THREE.MathUtils.lerp(0.08, 0.6, intro)
+      target.x += scrollState.pointerX * parallax
+      target.y += -scrollState.pointerY * parallax * 0.5
+    }
 
     // Reduce motion smoothing slightly for crisper responsiveness.
-    const smooth = 1 - Math.pow(0.055, delta)
+    // (~150ms settle under reduced motion so pose changes read as cuts, not flights)
+    const smooth = reduceMotion ? 1 - Math.pow(0.002, delta) : 1 - Math.pow(0.055, delta)
     current.lerp(target, smooth)
     currentLook.lerp(targetLook, smooth)
 

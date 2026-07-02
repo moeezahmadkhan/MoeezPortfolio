@@ -3,7 +3,7 @@ import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import { Reveal, IgniteHeading, MaskReveal } from './Reveal'
 import { OwlPostForm } from './OwlPostForm'
 import { Tilt } from './Tilt'
-import { projects, spellbook, chronicles, pactSteps } from '../data'
+import { projects, spellbook, chronicles, pactSteps, trackerSteps } from '../data'
 import { spellState, NODES } from '../scene/spell/spell'
 import { revealState, PIPELINE_BEATS, EDGE_STACK } from '../scene/map/map'
 import { useParallax } from './useParallax'
@@ -160,18 +160,25 @@ function GrimoireCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
               <li key={t}>{t}</li>
             ))}
           </ul>
-          <a
-            className="spell-card__repo"
-            href={p.repo}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={`View ${p.name} on GitHub`}
-          >
-            <span className="spell-card__repo-glyph" aria-hidden>
-              ↗
-            </span>
-            View repository
-          </a>
+          {p.links && (
+            <div className="spell-card__links">
+              {p.links.demo && (
+                <a className="spell-card__link" href={p.links.demo} target="_blank" rel="noreferrer">
+                  <span className="spell-card__link-rune">✦</span> Live demo
+                </a>
+              )}
+              {p.links.repo && (
+                <a className="spell-card__link" href={p.links.repo} target="_blank" rel="noreferrer">
+                  <span className="spell-card__link-rune">⌥</span> View code
+                </a>
+              )}
+              {p.links.caseStudy && (
+                <a className="spell-card__link" href={p.links.caseStudy} target="_blank" rel="noreferrer">
+                  <span className="spell-card__link-rune">❧</span> Case study
+                </a>
+              )}
+            </div>
+          )}
         </Tilt>
       </Reveal>
     </motion.div>
@@ -226,6 +233,7 @@ export function Conjuring() {
             <span className="cast-btn__rune">✦</span>
             {cast ? 'Recast the spell' : 'Cast the spell'}
           </button>
+          <p className="cast-gloss">— assembles the full-stack AI pipeline, live</p>
         </Reveal>
         <Reveal delay={0.24}>
           <ol className="conjuring__legend">
@@ -253,6 +261,9 @@ export function Pact() {
           ✦ Project · AI founder–investor matchmaking
         </span>
         <IgniteHeading className="section__title" text="The deck, read. The deal, bound." />
+        <Reveal delay={0.06}>
+          <p className="fact-strip">Silmaril AI · founder–investor matchmaking · shipped at QUIDSol</p>
+        </Reveal>
         <Reveal delay={0.1}>
           <p className="pact__lede">
             A founder uploads a pitch deck. An LLM reads it, scores it, and surfaces the
@@ -283,6 +294,9 @@ export function Tracker() {
         </MaskReveal>
         <span className="section__cat section__cat--project">✦ Project · live demo</span>
         <IgniteHeading className="section__title" text="It reads the pulse" />
+        <Reveal delay={0.06}>
+          <p className="fact-strip">Whoop wearable AI chat · Ecommerce Steem · in production</p>
+        </Reveal>
         <Reveal delay={0.1}>
           <p className="tracker__lede">
             A wrist. A heartbeat climbing under effort. The signal is caught,
@@ -307,6 +321,16 @@ export function Tracker() {
               </li>
             ))}
           </ul>
+        </Reveal>
+        <Reveal delay={0.24}>
+          <ol className="pact__legend">
+            {trackerSteps.map((s) => (
+              <li key={s.name} className="pact__legend-item">
+                <span className="pact__legend-name">{s.name}</span>
+                <span className="pact__legend-tags">{s.tags.join(' · ')}</span>
+              </li>
+            ))}
+          </ol>
         </Reveal>
       </div>
     </section>
@@ -334,6 +358,9 @@ export function Marauders() {
         </MaskReveal>
         <span className="section__cat section__cat--project">✦ Project · live demo · on-device</span>
         <IgniteHeading className="section__title" text="It knows who passes" />
+        <Reveal delay={0.06}>
+          <p className="fact-strip">Project Horus · on-device re-identification · QUIDSol</p>
+        </Reveal>
         <Reveal delay={0.1}>
           <p className="map__lede">
             A camera watches the threshold. A palm-sized NPU — no cloud behind it — wakes
@@ -346,6 +373,7 @@ export function Marauders() {
             <span className="cast-btn__rune">✦</span>
             {sworn ? 'Mischief managed' : 'I solemnly swear that I am up to no good'}
           </button>
+          <p className="cast-gloss">— runs the live detection demo</p>
         </Reveal>
         <Reveal delay={0.24}>
           <ol className="conjuring__legend">
