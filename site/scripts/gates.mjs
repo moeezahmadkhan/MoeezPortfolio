@@ -42,7 +42,14 @@ const fmt = (n) => `${(n / KB).toFixed(1)}KB`
 
 const js = files.filter((f) => extname(f) === '.js')
 const threeChunks = js.filter((f) => /three/i.test(f))
-const entryChunks = js.filter((f) => !threeChunks.includes(f))
+
+// "Entry" is what a `<script>` tag in the document actually pulls in — not
+// everything that is not three. A chunk reached only through a dynamic
+// import() is not on the first-load path and must not be charged to it.
+const indexHtml = readFileSync(join(DIST, 'index.html'), 'utf8')
+const scriptSrcs = [...indexHtml.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1])
+const entryChunks = js.filter((f) => scriptSrcs.some((src) => f.endsWith(src.replace(/^\//, ''))))
+const lazyChunks = js.filter((f) => !entryChunks.includes(f) && !threeChunks.includes(f))
 
 // ── Gate 1: nothing in the entry graph may pull three ───────────────────────
 // A dynamic import() is what keeps three out of the first load. If the string
@@ -92,11 +99,14 @@ if (world > BUDGETS.worldTotal) {
   notes.push(`total build ${fmt(world)} / ${fmt(BUDGETS.worldTotal)}`)
 }
 
+// ── Gate 5b: lazy chunks are reported, never charged to the entry ──────────
+const lazyBytes = lazyChunks.reduce((n, f) => n + gz(f), 0)
+if (lazyChunks.length) notes.push(`lazy chunks ${fmt(lazyBytes)} gzip (not on the first-load path)`)
+
 // ── Gate 6: the document still carries the argument without JavaScript ─────
 // The static path is the default output, not a degraded mode, so every claim
 // has to survive in the HTML response. If a refactor ever moves a case study
 // into a script, this fails.
-const html = readFileSync(join(DIST, 'index.html'), 'utf8')
 const required = [
   '10,291 faces seen',
   '214 prompts graded',
@@ -106,7 +116,7 @@ const required = [
   'reply within one working day',
 ]
 for (const needle of required) {
-  if (!html.includes(needle)) {
+  if (!indexHtml.includes(needle)) {
     failures.push(`dist/index.html is missing "${needle}" — the no-JS path lost content`)
   }
 }

@@ -299,12 +299,36 @@
 
   /* Reserved before the canvas exists, so the 3D upgrade never shifts layout. */
   .stage {
+    position: relative;
     aspect-ratio: 4 / 3; inline-size: 100%;
     border: 1px solid var(--rule); background: var(--plate);
     contain: layout paint;
     display: grid; place-items: center; padding: clamp(0.75rem, 2vw, 1.25rem);
   }
   .stage-figure { inline-size: 100%; max-inline-size: 30rem; }
+
+  .stage > canvas {
+    position: absolute; inset: 0; inline-size: 100%; block-size: 100%;
+  }
+
+  /* When the instrument is live the static plate stops being drawn but stays
+     in the accessibility tree, so a screen reader still gets every number the
+     canvas is showing. */
+  .stage[data-enhanced] .stage-figure {
+    position: absolute; inline-size: 1px; block-size: 1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+
+  .stage-caption {
+    position: absolute; inset-inline: 0; inset-block-end: 0;
+    padding: 0.6rem 0.9rem; margin: 0;
+    font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+    background: linear-gradient(to top, var(--plate) 55%, transparent);
+  }
+
+  .index a[aria-current] { background: color-mix(in srgb, var(--sodium) 10%, transparent); }
+  .index a[aria-current] .thr { color: var(--sodium); }
   .stage-figure figcaption {
     font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.14em;
     text-transform: uppercase; color: var(--muted); margin-block-start: 0.85rem;
@@ -337,6 +361,28 @@
     text-transform: uppercase; letter-spacing: 0.12em; text-decoration: none;
   }
   .skip:focus-visible { transform: translateY(0); }
+}
+
+@layer components {
+  /* "Exposure" — the one orchestrated moment. Measured figures develop like a
+     cyanotype print, ink flooding each to full density in a staggered wash.
+     Unmeasured figures never fill, so within the first second the page has
+     shown which of its own numbers it stands behind.
+
+     Deliberately not a count-up: a number ticking from zero says only that it
+     is a number. Density says whether it was measured. */
+  @keyframes expose {
+    from { color: transparent; -webkit-text-stroke: 1px var(--cyanotype-lift); }
+    to   { color: var(--cyanotype-lift); -webkit-text-stroke: 0 var(--cyanotype-lift); }
+  }
+  .fig[data-measured="yes"] {
+    animation: expose 900ms cubic-bezier(0.2, 0.6, 0.2, 1) both;
+  }
+  .claim:nth-child(2) .fig { animation-delay: 90ms; }
+  .claim:nth-child(3) .fig { animation-delay: 180ms; }
+  .stat:nth-child(2) .fig { animation-delay: 60ms; }
+  .stat:nth-child(3) .fig { animation-delay: 120ms; }
+  .stat:nth-child(4) .fig { animation-delay: 180ms; }
 }
 
 @layer utilities {
