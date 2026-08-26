@@ -79,6 +79,16 @@ export function createTurret(stage) {
   canvas.tabIndex = -1
   stage.append(canvas)
 
+  // Render statistics, for the budget test. three already counts these per
+  // frame; exposing the read costs nothing and means the draw-call and
+  // triangle budgets are asserted against the renderer rather than assumed.
+  canvas.getRenderStats = () => ({
+    calls: renderer.info.render.calls,
+    triangles: renderer.info.render.triangles,
+    geometries: renderer.info.memory.geometries,
+    textures: renderer.info.memory.textures,
+  })
+
   // A live caption, so everything the canvas communicates also exists as text.
   const caption = document.createElement('p')
   caption.className = 'stage-caption'

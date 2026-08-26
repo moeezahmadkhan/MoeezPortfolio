@@ -10,3 +10,5 @@ dist/
 site/node_modules/
 site/dist/
 explore/shots/
+site/test-results/
+site/playwright-report/
