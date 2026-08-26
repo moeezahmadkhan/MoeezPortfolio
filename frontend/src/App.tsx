@@ -10,7 +10,8 @@ import { ScrollCues } from './components/ScrollCues'
 import { GrimoireChat } from './components/GrimoireChat'
 import { SiteNav } from './components/SiteNav'
 import { CinematicIntro } from './components/CinematicIntro'
-import { About, Spells, Grimoire, Conjuring, Pact, Tracker, Marauders, Chronicles, OwlPost } from './components/Sections'
+import { SceneBoundary } from './components/SceneBoundary'
+import { About, Spells, Grimoire, Pact, Tracker, Marauders, Chronicles, OwlPost } from './components/Sections'
 import { useSmoothScroll, getLenis } from './smoothScroll'
 import { useScrollTracker } from './scroll'
 import { useScrollSettle } from './useScrollSettle'
@@ -36,6 +37,20 @@ export default function App() {
       return () => clearTimeout(t)
     }
   }, [active, progress, phase])
+
+  // Watchdog. `useProgress` only reaches 100 when every queued asset resolves; one
+  // hung GLB fetch or a 404 leaves it short forever, and the lock effect below keeps
+  // the page scroll-locked meanwhile — a permanent spinner with the portfolio behind
+  // it. Advance regardless after the deadline: a late model simply pops in behind
+  // copy the visitor can already read.
+  useEffect(() => {
+    if (phase !== 'loading') return
+    const t = setTimeout(() => {
+      console.warn('[app] asset load exceeded 12s — entering without waiting')
+      setPhase('intro')
+    }, 12_000)
+    return () => clearTimeout(t)
+  }, [phase])
 
   // Drive the conjuring reveal 0 → 1 once we leave the loader, so the figurine
   // is alive behind the intro and ready when it dissolves. Runs exactly once.
@@ -75,8 +90,17 @@ export default function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="canvas-layer">
-        <Scene reveal={reveal} />
+      {/* Keyboard users land here first. Everything above <main> in the DOM is
+          decoration or chrome; without this the first Tab walks the whole nav. */}
+      <a className="skip-link" href="#top">Skip to content</a>
+
+      {/* aria-hidden: the canvas is atmosphere. Its drei <Text> labels are decorative
+          duplicates of copy that already exists in the DOM, so exposing them to a
+          screen reader only adds noise. */}
+      <div className="canvas-layer" aria-hidden="true">
+        <SceneBoundary onError={() => setPhase('live')}>
+          <Scene reveal={reveal} />
+        </SceneBoundary>
       </div>
 
       <Candles />
@@ -109,7 +133,6 @@ export default function App() {
         <Hero />
         <About />
         <Spells />
-        <Conjuring />
         <Pact />
         <Tracker />
         <Marauders />

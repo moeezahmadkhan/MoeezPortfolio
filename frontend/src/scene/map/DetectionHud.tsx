@@ -35,7 +35,7 @@ export function DetectionHud() {
 
   return (
     <group ref={root}>
-      <Billboard position={[0, 1.6, 0]}>
+      <Billboard position={[0, 1.15, 0]}>
         <Text
           fontSize={0.16}
           color="#bfefff"

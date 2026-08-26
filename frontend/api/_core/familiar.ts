@@ -3,6 +3,7 @@ import {
   MAX_MESSAGE_CHARS,
   MAX_OUTPUT_TOKENS,
   MAX_TURNS,
+  MODEL_TIMEOUT_MS,
   MODELS,
   OPENROUTER_ENDPOINT,
   RATE_PER_HOUR,
@@ -70,6 +71,8 @@ export type HandleArgs = {
   now?: number
   rateLimiter?: RateLimiter
   fetchImpl?: typeof fetch
+  /** Tests pass their own signal; production leaves this unset for a per-model timeout. */
+  signal?: AbortSignal
 }
 
 export async function handleFamiliarRequest(args: HandleArgs): Promise<FamiliarResult> {
@@ -91,9 +94,14 @@ export async function handleFamiliarRequest(args: HandleArgs): Promise<FamiliarR
   }
 
   for (const model of MODELS) {
+    // Each model gets its own deadline so one hung upstream can't consume the whole
+    // cascade's budget. AbortSignal.timeout rejects the fetch, which the catch below
+    // treats like any other failure and falls through to the next model.
+    const signal = args.signal ?? AbortSignal.timeout(MODEL_TIMEOUT_MS)
     try {
       const res = await doFetch(OPENROUTER_ENDPOINT, {
         method: 'POST',
+        signal,
         headers: {
           Authorization: `Bearer ${args.apiKey}`,
           'Content-Type': 'application/json',

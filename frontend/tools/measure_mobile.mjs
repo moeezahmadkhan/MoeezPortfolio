@@ -26,7 +26,7 @@ await sleep(1200)
 await p.evaluate(() => window.scrollTo(0, 0))
 await sleep(400)
 const data = await p.evaluate(() => {
-  const ids = ['wizard', 'spells', 'grimoire', 'conjuring', 'pact', 'tracker', 'map', 'chronicles', 'owlpost']
+  const ids = ['wizard', 'spells', 'grimoire', 'pact', 'tracker', 'map', 'chronicles', 'owlpost']
   const max = document.documentElement.scrollHeight - window.innerHeight
   const vh = window.innerHeight
   const sy = window.scrollY

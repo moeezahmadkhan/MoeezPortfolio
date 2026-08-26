@@ -7,25 +7,25 @@ import { scrollState, responsiveState } from '../scroll'
 // The duplicated hero pose (0.0 + 0.10) HOLDS the camera still through the hero
 // runway so the figurine can finish its full 360° spin before the descent begins.
 const KEYS: { at: number; pos: [number, number, number]; look: [number, number, number] }[] = [
-  // Recalibrated 2026-06-06 via scripts/measure.mjs for the page carrying BOTH the
-  // Pact and Marauder's Map chapters. Entry keys sit on measured section tops; "held"
-  // keys sit ~65–70% into each pinned span so the camera holds before transitioning.
+  // Re-measured 2026-08-26 via scripts/measure.mjs for the nine-chapter page (the
+  // Conjuring service chapter was removed). Entry keys sit on measured section tops;
+  // "held" keys sit ~65% into each pinned span. The station spans in scene/spans.ts
+  // are generated from these same numbers — change one, regenerate the other.
   { at: 0.0,   pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — closer + framed higher for a more commanding figurine
   { at: 0.065, pos: [0, 1.12, 5.0],   look: [0, 0.22, 0] },   // hero — hold while figurine spins 360°
-  { at: 0.102, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.094
-  { at: 0.156, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.143)
-  { at: 0.245, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across the pinned span
-  { at: 0.319, pos: [-13, 1.25, 10.5], look: [-13, 0.55, 0] }, // conjuring (service) — entry, spell chamber far-left (measured 0.378)
-  { at: 0.389, pos: [-13, 1.55, 10.0], look: [-13, 0.7, 0] },  // conjuring — held across the pinned span
-  { at: 0.447, pos: [-7, 1.1, 5.0],   look: [-7, 0.5, -1] },   // pact — entry, framing the left-offset chamber (measured 0.495)
-  { at: 0.545, pos: [-7, 1.35, 4.0],  look: [-7, 0.45, -1] },  // pact — held late so the camera lingers on the pair, then whips to the tracker
-  { at: 0.574, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.612)
-  { at: 0.659, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held
-  { at: 0.727, pos: [22, 1.25, 5.2],  look: [22, -0.45, 0] }, // map (Marauder's Map) — entry: closer + tilted down to fill frame (measured 0.753)
-  { at: 0.810, pos: [22, 1.7, 6.1],   look: [22, -0.2, 0] },  // map — held: ease back/up, table stays large and legible
-  { at: 0.880, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.894)
-  { at: 0.933, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },    // grimoire (projects) — center framing, now just before contact (measured 0.942)
-  { at: 1.0,   pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost
+  { at: 0.118, pos: [4.5, 1.8, 3.8],  look: [0, 0.3, 0] },    // about (#wizard) — measured 0.118
+  { at: 0.170, pos: [-4.5, 2.6, 4.2], look: [0, 0.5, 0] },    // spells — entry (measured 0.170)
+  { at: 0.293, pos: [-3.6, 2.2, 4.4], look: [0, 0.4, 0] },    // spells — held across the pinned span
+  { at: 0.359, pos: [-7, 1.1, 5.0],   look: [-7, 0.5, -1] },  // pact — entry (measured 0.359)
+  { at: 0.455, pos: [-7, 1.35, 4.0],  look: [-7, 0.45, -1] }, // pact — held; the bond finishes forming here
+  { at: 0.507, pos: [12, 1.0, 6.2],   look: [12, 0.5, 0] },   // tracker — entry (measured 0.507)
+  { at: 0.622, pos: [12.6, 1.5, 7.8], look: [12, 0.9, 0] },   // tracker — held; save → answer → insights all play inside this window
+  { at: 0.684, pos: [22, 1.25, 5.2],  look: [22, -0.45, 0] }, // map — entry (measured 0.684)
+  { at: 0.799, pos: [22, 1.7, 6.1],   look: [22, -0.2, 0] },  // map — held; reticle locks and names resolve here
+  { at: 0.861, pos: [-4.5, 1.6, 4.2], look: [0, 0.3, 0] },    // chronicles (measured 0.861)
+  { at: 0.923, pos: [4.5, 0.4, 4.6],  look: [0, 0.0, 0] },    // grimoire (projects) — measured 0.923
+  { at: 0.974, pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost — entry (measured 0.974)
+  { at: 1.0,   pos: [0, 1.0, 10.5],   look: [0, 0.2, 0] },    // owlpost — terminal hold, so the contact chapter is framed while it is read
 ]
 
 // ── Mobile camera track ────────────────────────────────────────────────────
@@ -45,21 +45,23 @@ const KEYS: { at: number; pos: [number, number, number]; look: [number, number, 
 // frame). About/Spells/Grimoire/Chronicles are text/photo chapters (the central
 // wizard is incidental there), so they keep a single key.
 const KEYS_MOBILE: typeof KEYS = [
-  { at: 0.0,   pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },     // hero — close, figurine fills the portrait frame
-  { at: 0.07,  pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },     // hero — hold while the figurine spins 360°
-  { at: 0.125, pos: [2.1, 1.1, 3.5],   look: [0, 0.25, 0] },     // about — tight 3/4 (text + photo card)
-  { at: 0.221, pos: [-2.2, 1.3, 3.7],  look: [0, 0.35, 0] },     // spells — orbit the central wizard (skill chips)
-  { at: 0.351, pos: [-11.1, 0.9, 9.0], look: [-11.1, -0.25, 1.4] }, // conjuring — pulled back so the full caster reads in the top band (entry)
-  { at: 0.423, pos: [-11.1, 0.9, 9.0], look: [-11.1, -0.25, 1.4] }, // conjuring — hold through the reading window
-  { at: 0.481, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — both figures lifted above copy (entry)
-  { at: 0.538, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] },  // pact — hold through the reading window
-  { at: 0.585, pos: [12, 0.95, 8.6],   look: [12, -0.2, 0] },    // tracker — pulled back so the whole cricketer reads (entry)
-  { at: 0.639, pos: [12, 0.95, 8.6],   look: [12, -0.2, 0] },    // tracker — hold through the reading window
-  { at: 0.684, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — angled down, parchment fills top band (entry)
-  { at: 0.748, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — hold through the reading window
-  { at: 0.800, pos: [-2.1, 1.3, 3.8],  look: [0, 0.3, 0] },      // chronicles — central wizard (timeline)
-  { at: 0.888, pos: [2.4, 0.35, 3.8],  look: [0, 0.05, 0] },     // grimoire — central wizard, low hero angle (cards), now before contact
-  { at: 0.971, pos: [0, 0.9, 8.0],     look: [0, 0.2, 0] },      // owlpost — pull back
+  // Re-measured 2026-08-26 via `PORT=5173 node tools/measure_mobile.mjs` at 390×844.
+  // Model chapters get an entry + hold pair bracketing the reading window; text/photo
+  // chapters (about, spells, chronicles, grimoire) keep a single key.
+  { at: 0.0,   pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },  // hero — close, figurine fills the portrait frame
+  { at: 0.07,  pos: [0, 0.7, 3.9],     look: [0, 0.12, 0] },  // hero — hold while the figurine spins 360°
+  { at: 0.145, pos: [2.1, 1.1, 3.5],   look: [0, 0.25, 0] },  // about — tight 3/4 (text + photo card)
+  { at: 0.268, pos: [-2.2, 1.3, 3.7],  look: [0, 0.35, 0] },  // spells — orbit the central wizard
+  { at: 0.378, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] }, // pact — both figures lifted above copy (entry)
+  { at: 0.457, pos: [-7, 0.6, 6.0],    look: [-7, -0.45, -1] }, // pact — hold through the reading window
+  { at: 0.499, pos: [12, 0.95, 8.6],   look: [12, -0.2, 0] }, // tracker — pulled back so the whole cricketer reads (entry)
+  { at: 0.587, pos: [12, 0.95, 8.6],   look: [12, -0.2, 0] }, // tracker — hold through the reading window
+  { at: 0.634, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — angled down, parchment fills top band (entry)
+  { at: 0.719, pos: [22, 2.9, 8.0],    look: [22, -0.85, 0.35] }, // map — hold; the reticle locks here
+  { at: 0.783, pos: [-2.1, 1.3, 3.8],  look: [0, 0.3, 0] },   // chronicles — central wizard (timeline)
+  { at: 0.883, pos: [2.4, 0.35, 3.8],  look: [0, 0.05, 0] },  // grimoire — central wizard, low hero angle (cards)
+  { at: 0.964, pos: [0, 0.9, 8.0],     look: [0, 0.2, 0] },   // owlpost — pull back (entry)
+  { at: 1.0,   pos: [0, 0.9, 8.0],     look: [0, 0.2, 0] },   // owlpost — terminal hold
 ]
 
 const isMobile =

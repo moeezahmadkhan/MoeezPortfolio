@@ -1,0 +1,563 @@
+- generic [ref=e2]:
+  - banner:
+    - link "Back to top":
+      - /url: "#"
+      - generic: ✦
+      - generic: M·A·K
+      - generic: // the archive
+    - navigation "Chapters":
+      - link "The Wizard · about /":
+        - /url: "#wizard"
+        - text: The Wizard
+        - generic: · about
+        - text: /
+      - link "Spells · skills /":
+        - /url: "#spells"
+        - text: Spells
+        - generic: · skills
+        - text: /
+      - link "Grimoire · projects /":
+        - /url: "#grimoire"
+        - text: Grimoire
+        - generic: · projects
+        - text: /
+      - link "Chronicles · experience":
+        - /url: "#chronicles"
+        - text: Chronicles
+        - generic: · experience
+    - generic:
+      - generic:
+        - link "GitHub":
+          - /url: https://github.com/moeezahmadkhan
+        - link "LinkedIn":
+          - /url: https://www.linkedin.com/in/moeez-ahmad-khan-68a403364/
+      - link "Send an Owl ✦":
+        - /url: "#owlpost"
+        - text: Send an Owl
+        - generic: ✦
+  - dialog "Chapter index":
+    - generic:
+      - generic: ✦ The Index
+      - button "Close chapter index": ✕
+    - list:
+      - listitem:
+        - link "I The Conjuring intro":
+          - /url: "#top"
+          - generic: I
+          - generic: The Conjuring
+          - generic: intro
+      - listitem:
+        - link "II The Mind about me":
+          - /url: "#wizard"
+          - generic: II
+          - generic: The Mind
+          - generic: about me
+      - listitem:
+        - link "III Spells skills":
+          - /url: "#spells"
+          - generic: III
+          - generic: Spells
+          - generic: skills
+      - listitem:
+        - link "IV The Conjuring of Apps service · full-stack AI":
+          - /url: "#conjuring"
+          - generic: IV
+          - generic: The Conjuring of Apps
+          - generic: service · full-stack AI
+      - listitem:
+        - link "V The Pact AI matchmaking":
+          - /url: "#pact"
+          - generic: V
+          - generic: The Pact
+          - generic: AI matchmaking
+      - listitem:
+        - link "VI The Pulse live AI demo":
+          - /url: "#tracker"
+          - generic: VI
+          - generic: The Pulse
+          - generic: live AI demo
+      - listitem:
+        - link "VII The Marauder's Map edge AI · on-device":
+          - /url: "#map"
+          - generic: VII
+          - generic: The Marauder's Map
+          - generic: edge AI · on-device
+      - listitem:
+        - link "VIII The Path experience":
+          - /url: "#chronicles"
+          - generic: VIII
+          - generic: The Path
+          - generic: experience
+      - listitem:
+        - link "IX The Grimoire projects":
+          - /url: "#grimoire"
+          - generic: IX
+          - generic: The Grimoire
+          - generic: projects
+      - listitem:
+        - link "X Owl Post contact":
+          - /url: "#owlpost"
+          - generic: X
+          - generic: Owl Post
+          - generic: contact
+    - generic:
+      - link "GitHub":
+        - /url: https://github.com/moeezahmadkhan
+      - link "LinkedIn":
+        - /url: https://www.linkedin.com/in/moeez-ahmad-khan-68a403364/
+  - navigation "Chapters":
+    - list:
+      - listitem:
+        - link "Chapter I" [ref=e7]:
+          - /url: "#top"
+          - generic [ref=e9]: I
+      - listitem:
+        - link "Chapter II" [ref=e10]:
+          - /url: "#wizard"
+          - generic [ref=e12]: II
+      - listitem:
+        - link "Chapter III" [ref=e13]:
+          - /url: "#spells"
+          - generic [ref=e15]: III
+      - listitem:
+        - link "Chapter IV" [ref=e16]:
+          - /url: "#conjuring"
+          - generic [ref=e18]: IV
+      - listitem:
+        - link "Chapter V" [ref=e19]:
+          - /url: "#pact"
+          - generic [ref=e21]: V
+      - listitem:
+        - link "Chapter VI" [ref=e22]:
+          - /url: "#tracker"
+          - generic [ref=e24]: VI
+      - listitem:
+        - link "Chapter VII" [ref=e25]:
+          - /url: "#map"
+          - generic [ref=e27]: VII
+      - listitem:
+        - link "Chapter VIII" [ref=e28]:
+          - /url: "#chronicles"
+          - generic [ref=e30]: VIII
+      - listitem:
+        - link "Chapter IX" [ref=e31]:
+          - /url: "#grimoire"
+          - generic [ref=e33]: IX
+      - listitem:
+        - link "Chapter X" [ref=e34]:
+          - /url: "#owlpost"
+          - generic [ref=e36]: X
+  - generic:
+    - generic: next
+    - generic: ↓
+    - generic: you've reached the end
+  - button "Open the Talking Grimoire — ask the Familiar about Moeez":
+    - generic: 📖
+    - generic: Ask the Familiar
+  - dialog "The Talking Grimoire" [ref=e408]:
+    - banner [ref=e409]:
+      - generic [ref=e410]: 📖 The Familiar
+      - button "Close" [ref=e411]: ✕
+    - generic [ref=e412]:
+      - paragraph [ref=e414]: Well met, traveller. I am the Familiar of these halls — I keep my master Moeez’s secrets. Ask, and I shall reveal his craft.
+      - generic [ref=e415]: Is he a fit for my role?
+      - paragraph [ref=e417]: The Familiar must rest a moment — its magic flickers. Owl my master directly via the Owl Post below, and he shall answer in person.
+    - generic [ref=e418]:
+      - textbox "Ask the Familiar…" [ref=e419]
+      - button "Send" [disabled] [ref=e420]: ➤
+    - link "🦉 Owl my master" [ref=e421]:
+      - /url: "#owlpost"
+  - main [ref=e45]:
+    - generic:
+      - generic:
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - text: Available for new conjurings
+            - generic [ref=e50]: Remote · Lahore, PK
+          - paragraph [ref=e51]: Chapter I — The Conjuring
+          - heading "Moeez Ahmad Khan" [level=1] [ref=e53]:
+            - generic [ref=e54]: Moeez Moeez
+            - generic [ref=e55]: Ahmad Ahmad
+            - generic [ref=e56]: Khan Khan
+          - paragraph [ref=e57]: AI / ML engineer building autonomous agents, computer-vision pipelines & generative systems — conjured from brief to deploy.
+          - code [ref=e58]:
+            - generic [ref=e59]: ">"
+            - text: cast(
+            - generic [ref=e60]: "\"intelligence\""
+            - text: ) · YOLO · ArcFace · QLoRA · FAISS · LLMs
+          - generic [ref=e62]:
+            - link "Open the Grimoire (Projects)" [ref=e63]:
+              - /url: "#grimoire"
+              - generic [ref=e65]: →
+            - link "The Scroll (CV)" [ref=e66]:
+              - /url: /Moeez_Ahmad_Khan_CV.pdf
+              - generic [ref=e68]: ↗
+            - link "The Spellbook — Moeez on GitHub" [ref=e69]:
+              - /url: https://github.com/moeezahmadkhan
+              - generic [ref=e70]: The Spellbook (GitHub)
+              - generic [ref=e71]: ↗
+        - link "Scroll to descend into the archive" [ref=e72]:
+          - /url: "#wizard"
+          - generic [ref=e73]: scroll to descend
+    - generic [ref=e76]:
+      - generic [ref=e77]: ✦ Chapter II — The Wizard
+      - heading "The mind behind the wand" [level=2] [ref=e80]:
+        - generic [ref=e81]: The
+        - generic [ref=e82]: mind
+        - generic [ref=e83]: behind
+        - generic [ref=e84]: the
+        - generic [ref=e85]: wand
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - paragraph [ref=e89]:
+            - text: I’m
+            - strong [ref=e90]: Moeez Ahmad Khan
+            - text: "— an AI/ML engineer who treats models like spells: precise incantations that turn raw data into something that"
+            - emphasis [ref=e91]: acts
+            - text: . I architect autonomous agents, high-performance computer-vision pipelines, and generative systems, then carry them from research into production-ready software.
+          - paragraph [ref=e93]: Trained at Information Technology University, Lahore (BSCS — specializing in Agentic AI, Computer Vision & Reinforcement Learning), I live in the space between a research paper and a deploy button.
+        - figure "SUBJECT Nº MAK·01 // engineer of spells" [ref=e95]:
+          - img "Moeez Ahmad Khan" [ref=e98]
+          - generic [ref=e99]:
+            - generic [ref=e100]: SUBJECT Nº MAK·01
+            - generic [ref=e101]: // engineer of spells
+      - generic [ref=e102]:
+        - generic [ref=e103]:
+          - generic [ref=e104]: 15+
+          - generic [ref=e105]: production AI deployments
+        - generic [ref=e106]:
+          - generic [ref=e107]: "3"
+          - generic [ref=e108]: houses served — Steem · QUIDSol · ITU
+        - generic [ref=e109]:
+          - generic [ref=e110]: ∞
+          - generic [ref=e111]: agents conjured
+    - generic [ref=e113]:
+      - generic [ref=e114]: ✦ Chapter III — The Arsenal
+      - heading "Spells & Incantations" [level=2] [ref=e117]:
+        - generic [ref=e118]: Spells
+        - generic [ref=e119]: "&"
+        - generic [ref=e120]: Incantations
+      - generic [ref=e121]:
+        - generic [ref=e122]:
+          - generic [ref=e123]:
+            - text: "01"
+            - generic [ref=e124]: / 04
+          - list "Schools of magic" [ref=e125]:
+            - listitem [ref=e126]:
+              - generic [ref=e127]: "01"
+              - generic [ref=e128]: MLOps & Orchestration
+            - listitem [ref=e129]:
+              - generic [ref=e130]: "02"
+              - generic [ref=e131]: Model Deployment & Serving
+            - listitem [ref=e132]:
+              - generic [ref=e133]: "03"
+              - generic [ref=e134]: Cloud & Infrastructure
+            - listitem [ref=e135]:
+              - generic [ref=e136]: "04"
+              - generic [ref=e137]: Ancient Tongues
+        - generic [ref=e138]:
+          - generic [ref=e139]:
+            - heading "MLOps & Orchestration 5 incantations" [level=3] [ref=e140]:
+              - text: MLOps & Orchestration
+              - generic [ref=e141]: 5 incantations
+            - list [ref=e142]:
+              - listitem [ref=e143]:
+                - generic [ref=e144]: ✦
+                - text: Docker
+              - listitem [ref=e145]:
+                - generic [ref=e146]: ✦
+                - text: Kafka
+              - listitem [ref=e147]:
+                - generic [ref=e148]: ✦
+                - text: QLoRA Fine-Tuning
+              - listitem [ref=e149]:
+                - generic [ref=e150]: ✦
+                - text: n8n Automation
+              - listitem [ref=e151]:
+                - generic [ref=e152]: ✦
+                - text: CI/CD
+          - generic:
+            - heading "Model Deployment & Serving 5 incantations" [level=3]:
+              - text: Model Deployment & Serving
+              - generic: 5 incantations
+            - list:
+              - listitem:
+                - generic: ✦
+                - text: FastAPI
+              - listitem:
+                - generic: ✦
+                - text: Nginx
+              - listitem:
+                - generic: ✦
+                - text: LLM Serving & Quantization
+              - listitem:
+                - generic: ✦
+                - text: Edge Deployment
+              - listitem:
+                - generic: ✦
+                - text: REST APIs
+          - generic:
+            - heading "Cloud & Infrastructure 5 incantations" [level=3]:
+              - text: Cloud & Infrastructure
+              - generic: 5 incantations
+            - list:
+              - listitem:
+                - generic: ✦
+                - text: AWS (EC2 · Bedrock)
+              - listitem:
+                - generic: ✦
+                - text: GCP
+              - listitem:
+                - generic: ✦
+                - text: Linux / Ubuntu
+              - listitem:
+                - generic: ✦
+                - text: FAISS
+              - listitem:
+                - generic: ✦
+                - text: PostgreSQL
+          - generic:
+            - heading "Ancient Tongues 4 incantations" [level=3]:
+              - text: Ancient Tongues
+              - generic: 4 incantations
+            - list:
+              - listitem:
+                - generic: ✦
+                - text: Python
+              - listitem:
+                - generic: ✦
+                - text: C++
+              - listitem:
+                - generic: ✦
+                - text: SQL
+              - listitem:
+                - generic: ✦
+                - text: Bash
+    - generic [ref=e154]:
+      - generic: ✦ Chapter IV — The Conjuring of Apps
+      - generic [ref=e157]: ✦ Service · AI systems, brief to deploy
+      - heading "One spell, end to end" [level=2] [ref=e158]:
+        - generic [ref=e159]: One
+        - generic [ref=e160]: spell,
+        - generic [ref=e161]: end
+        - generic [ref=e162]: to
+        - generic [ref=e163]: end
+      - paragraph [ref=e165]: From a brief to a deployed AI system — embeddings & retrieval, agentic reasoning, fine-tuned models served behind a FastAPI spine, containerized and summoned onto AWS Bedrock or GCP. Cast the spell and watch a full-stack AI app assemble itself, A → Z.
+      - generic [ref=e166]:
+        - button "✦ Cast the spell" [ref=e167]:
+          - generic [ref=e168]: ✦
+          - text: Cast the spell
+        - paragraph [ref=e169]: — assembles the full-stack AI pipeline, live
+      - list [ref=e171]:
+        - listitem [ref=e172]:
+          - generic [ref=e173]: The Brief
+          - generic [ref=e174]: Discovery · Scope
+        - listitem [ref=e175]:
+          - generic [ref=e176]: The Corpus
+          - generic [ref=e177]: Parsing · FAISS · Vectors
+        - listitem [ref=e178]:
+          - generic [ref=e179]: The Mind
+          - generic [ref=e180]: RAG · LangChain · LLMs
+        - listitem [ref=e181]:
+          - generic [ref=e182]: The Familiars
+          - generic [ref=e183]: Multi-agent · Orchestration
+        - listitem [ref=e184]:
+          - generic [ref=e185]: The Forge
+          - generic [ref=e186]: QLoRA · Quantization
+        - listitem [ref=e187]:
+          - generic [ref=e188]: The Conduit
+          - generic [ref=e189]: FastAPI · LLM Serving
+        - listitem [ref=e190]:
+          - generic [ref=e191]: The Summoning
+          - generic [ref=e192]: Docker · AWS Bedrock · GCP · CI/CD
+        - listitem [ref=e193]:
+          - generic [ref=e194]: Live App
+          - generic [ref=e195]: Full-stack AI
+    - generic [ref=e197]:
+      - generic: ✦ Chapter V — The Pact
+      - generic [ref=e200]: ✦ Project · AI founder–investor matchmaking
+      - heading "The deck, read. The deal, bound." [level=2] [ref=e201]:
+        - generic [ref=e202]: The
+        - generic [ref=e203]: deck,
+        - generic [ref=e204]: read.
+        - generic [ref=e205]: The
+        - generic [ref=e206]: deal,
+        - generic [ref=e207]: bound.
+      - paragraph [ref=e209]: Silmaril AI · founder–investor matchmaking · shipped at QUIDSol
+      - paragraph [ref=e211]: A founder uploads a pitch deck. An LLM reads it, scores it, and surfaces the investors who actually fit — then binds founder to backer to carry the deal forward.
+      - list [ref=e213]:
+        - listitem [ref=e214]:
+          - generic [ref=e215]: Ingest
+          - generic [ref=e216]: Deck upload · Parsing
+        - listitem [ref=e217]:
+          - generic [ref=e218]: Legilimency
+          - generic [ref=e219]: LLM deck analysis
+        - listitem [ref=e220]:
+          - generic [ref=e221]: The Match
+          - generic [ref=e222]: Embeddings + matching
+        - listitem [ref=e223]:
+          - generic [ref=e224]: The Pact
+          - generic [ref=e225]: FastAPI · React · Kanban
+    - generic [ref=e227]:
+      - generic [ref=e228]: ✦ Chapter VI — The Tracker
+      - generic [ref=e231]: ✦ Project · live demo
+      - heading "It reads the pulse" [level=2] [ref=e232]:
+        - generic [ref=e233]: It
+        - generic [ref=e234]: reads
+        - generic [ref=e235]: the
+        - generic [ref=e236]: pulse
+      - paragraph [ref=e238]: Whoop wearable AI chat · Ecommerce Steem · in production
+      - paragraph [ref=e240]: A wrist. A heartbeat climbing under effort. The signal is caught, saved, and read — an intelligence that answers for the body in motion.
+      - list [ref=e242]:
+        - listitem [ref=e243]:
+          - generic [ref=e244]: The Wrist
+          - generic [ref=e245]: Whoop stream · Live biometrics
+        - listitem [ref=e246]:
+          - generic [ref=e247]: The Pulse
+          - generic [ref=e248]: Signal parsing
+        - listitem [ref=e249]:
+          - generic [ref=e250]: The Scribe
+          - generic [ref=e251]: Real-time store
+        - listitem [ref=e252]:
+          - generic [ref=e253]: The Oracle
+          - generic [ref=e254]: LLM insights · Low latency
+    - generic [ref=e256]:
+      - generic: ✦ Chapter VII — The Marauder's Map
+      - generic [ref=e259]: ✦ Project · live demo · on-device
+      - heading "It knows who passes" [level=2] [ref=e260]:
+        - generic [ref=e261]: It
+        - generic [ref=e262]: knows
+        - generic [ref=e263]: who
+        - generic [ref=e264]: passes
+      - paragraph [ref=e266]: Project Horus · on-device re-identification · QUIDSol
+      - paragraph [ref=e268]: A camera watches the threshold. A palm-sized NPU — no cloud behind it — wakes on motion, follows the footsteps, and names who just passed. Detection, tracking, and re-identification run entirely on the device; no footage ever leaves the room.
+      - generic [ref=e269]:
+        - button "✦ I solemnly swear that I am up to no good" [ref=e270]:
+          - generic [ref=e271]: ✦
+          - text: I solemnly swear that I am up to no good
+        - paragraph [ref=e272]: — runs the live detection demo
+      - list [ref=e274]:
+        - listitem [ref=e275]:
+          - generic [ref=e276]: Motion
+          - generic [ref=e277]: RV1688 NPU
+        - listitem [ref=e278]:
+          - generic [ref=e279]: Detect
+          - generic [ref=e280]: On-device detection
+        - listitem [ref=e281]:
+          - generic [ref=e282]: Track
+          - generic [ref=e283]: Re-ID embeddings
+        - listitem [ref=e284]:
+          - generic [ref=e285]: Identify
+          - generic [ref=e286]: Vector match
+        - listitem [ref=e287]:
+          - generic [ref=e288]: Log
+          - generic [ref=e289]: No cloud
+    - generic [ref=e291]:
+      - generic [ref=e292]: ✦ Chapter VIII — Chronicles
+      - heading "The path so far" [level=2] [ref=e295]:
+        - generic [ref=e296]: The
+        - generic [ref=e297]: path
+        - generic [ref=e298]: so
+        - generic [ref=e299]: far
+      - generic [ref=e300]:
+        - generic [ref=e301]:
+          - paragraph [ref=e303]: Jan 2026 — Present
+          - heading "AI Developer · Ecommerce Steem" [level=3] [ref=e304]:
+            - text: AI Developer
+            - generic [ref=e305]: · Ecommerce Steem
+          - list [ref=e306]:
+            - listitem [ref=e307]: ✦ Architecting low-latency AI chat software for Whoop wearables.
+            - listitem [ref=e308]: ✦ Processing live biometric data into real-time health & performance insights.
+            - listitem [ref=e309]: ✦ Optimizing LLM prompt strategies & context management within hardware limits.
+        - generic [ref=e310]:
+          - paragraph [ref=e312]: 2025 — Present
+          - heading "AI & Computer Vision Developer · QUIDSol" [level=3] [ref=e313]:
+            - text: AI & Computer Vision Developer
+            - generic [ref=e314]: · QUIDSol
+          - list [ref=e315]:
+            - listitem [ref=e316]: "✦ Built Project Horus: YOLO/SCRFD detection + ArcFace identification via FAISS."
+            - listitem [ref=e317]: "✦ Built Silmaril AI: financial-metric extraction & founder insights from pitch decks."
+            - listitem [ref=e318]: ✦ Hardened pipelines for reliability across varied lighting and high-speed processing.
+        - generic [ref=e319]:
+          - paragraph [ref=e321]: 2024 — 2025
+          - heading "Teacher's Assistant · Information Technology University" [level=3] [ref=e322]:
+            - text: Teacher's Assistant
+            - generic [ref=e323]: · Information Technology University
+          - list [ref=e324]:
+            - listitem [ref=e325]: ✦ Mentoring MS students in Agentic AI — multi-agent systems and RAG.
+            - listitem [ref=e326]: ✦ Running workshops on agent orchestration and scalable workflows.
+            - listitem [ref=e327]: ✦ Refining student AI projects to production-level engineering standards.
+    - generic [ref=e329]:
+      - generic [ref=e330]: ✦ Chapter IX — The Grimoire
+      - generic [ref=e333]: ✦ Projects · shipped work
+      - heading "Built & shipped" [level=2] [ref=e334]:
+        - generic [ref=e335]: Built
+        - generic [ref=e336]: "&"
+        - generic [ref=e337]: shipped
+      - generic [ref=e338]:
+        - generic [ref=e342]:
+          - generic [ref=e343]:
+            - generic [ref=e344]: Nº01
+            - generic [ref=e345]: 🔮
+          - paragraph [ref=e346]: // Protego Totalum
+          - heading "Query Sphere" [level=3] [ref=e347]
+          - paragraph [ref=e348]: A Flutter community app with real-time messaging and Firebase integration — cross-platform conjuring with live sync.
+          - list [ref=e349]:
+            - listitem [ref=e350]: Flutter
+            - listitem [ref=e351]: Firebase
+            - listitem [ref=e352]: Realtime
+            - listitem [ref=e353]: Mobile
+          - link "⌥ View code" [ref=e355]:
+            - /url: https://github.com/moeezahmadkhan/querysphere
+            - generic [ref=e356]: ⌥
+            - text: View code
+        - generic [ref=e360]:
+          - generic [ref=e361]:
+            - generic [ref=e362]: Nº02
+            - generic [ref=e363]: 🏰
+          - paragraph [ref=e364]: // Domus Revelio
+          - heading "Airbnb Replica" [level=3] [ref=e365]
+          - paragraph [ref=e366]: A full MERN-stack application with property management and secure JWT authentication — research instincts brought into production-grade web engineering.
+          - list [ref=e367]:
+            - listitem [ref=e368]: MongoDB
+            - listitem [ref=e369]: Express
+            - listitem [ref=e370]: React
+            - listitem [ref=e371]: Node
+            - listitem [ref=e372]: JWT
+    - generic [ref=e374]:
+      - generic [ref=e375]: ✦ Chapter X — Owl Post
+      - heading "Send an owl" [level=2] [ref=e378]:
+        - generic [ref=e379]: Send
+        - generic [ref=e380]: an
+        - generic [ref=e381]: owl
+      - paragraph [ref=e383]: Building something that needs intelligence woven into it? Let’s talk shop — agents, vision pipelines, or model deployment.
+      - generic [ref=e386]:
+        - generic [ref=e387]:
+          - generic [ref=e388]: Your name
+          - textbox "Your name" [ref=e389]:
+            - /placeholder: What shall I call you?
+        - generic [ref=e390]:
+          - generic [ref=e391]: Return address
+          - textbox "Return address" [ref=e392]:
+            - /placeholder: Where should the owl return?
+        - generic [ref=e393]:
+          - generic [ref=e394]: Your message
+          - textbox "Your message" [ref=e395]:
+            - /placeholder: Agents, vision pipelines, model deployment…
+        - checkbox [ref=e396]
+        - button "Send the owl" [ref=e397]
+      - generic [ref=e398]:
+        - link "✉ kmoeez2018@gmail.com" [ref=e399]:
+          - /url: mailto:kmoeez2018@gmail.com
+          - generic [ref=e400]: ✉
+          - text: kmoeez2018@gmail.com
+        - link "⌥ github.com/moeezahmadkhan" [ref=e401]:
+          - /url: https://github.com/moeezahmadkhan
+          - generic [ref=e402]: ⌥
+          - text: github.com/moeezahmadkhan
+        - generic [ref=e403]:
+          - generic [ref=e404]: ⌖
+          - text: Lahore, Pakistan
+      - link "Unfurl the full scroll (CV)" [ref=e406]:
+        - /url: /Moeez_Ahmad_Khan_CV.pdf
+      - paragraph [ref=e407]: Conjured with React · three.js · a little Lumos. © 2026 Moeez Ahmad Khan

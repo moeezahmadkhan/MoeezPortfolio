@@ -8,7 +8,7 @@ const ENDPOINT = 'https://api.web3forms.com/submit'
 
 const EMPTY: OwlFields = { name: '', email: '', message: '' }
 
-type Status = 'idle' | 'submitting' | 'success' | 'error'
+type Status = 'idle' | 'submitting' | 'success' | 'error' | 'misconfigured'
 
 export function OwlPostForm() {
   const [fields, setFields] = useState<OwlFields>(EMPTY)
@@ -28,11 +28,15 @@ export function OwlPostForm() {
     const found = validate(fields)
     if (Object.keys(found).length > 0) {
       setErrors(found)
+      // Move focus to the first invalid control. aria-describedby only speaks once a
+      // field already has focus, so without this the errors are silent.
+      const firstKey = (['name', 'email', 'message'] as const).find((k) => found[k])
+      if (firstKey) requestAnimationFrame(() => document.getElementById(`owl-${firstKey}`)?.focus())
       return
     }
     if (!ACCESS_KEY) {
       console.warn('[OwlPostForm] VITE_WEB3FORMS_KEY is not set — cannot send.')
-      setStatus('error')
+      setStatus('misconfigured')
       return
     }
 
@@ -62,6 +66,9 @@ export function OwlPostForm() {
           <motion.div
             key="sent"
             className="owlform__sent"
+            role="status"
+            tabIndex={-1}
+            ref={(el) => el?.focus()}
             initial={{ opacity: 0, y: 16, filter: 'blur(8px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -131,6 +138,15 @@ export function OwlPostForm() {
                 <a href="mailto:kmoeez2018@gmail.com">kmoeez2018@gmail.com</a>.
               </p>
             )}
+
+            {/* A missing form key can never succeed on retry, so telling the visitor
+                to try again would waste their time. Lead with the address instead. */}
+            {status === 'misconfigured' && (
+              <p className="owlform__error" role="alert">
+                The owlery is closed for repairs. Write me directly at{' '}
+                <a href="mailto:kmoeez2018@gmail.com">kmoeez2018@gmail.com</a> and I&rsquo;ll answer in person.
+              </p>
+            )}
           </motion.form>
         )}
       </AnimatePresence>
@@ -178,7 +194,7 @@ function Field({
         <input {...shared} type={type} autoComplete={autoComplete} />
       )}
       {invalid && (
-        <span id={`${id}-error`} className="owlform__field-error">
+        <span id={`${id}-error`} className="owlform__field-error" role="alert">
           {error}
         </span>
       )}

@@ -54,7 +54,7 @@ export function AnalysisCore() {
   })
 
   return (
-    <group position={[0, 0.6, 0]}>
+    <group position={[0, 0.6, -1.25]}>
       <mesh ref={core}>
         <icosahedronGeometry args={[0.5, 1]} />
         <meshStandardMaterial color="#7fd0c4" emissive="#7fd0c4" emissiveIntensity={0.6} wireframe />
@@ -69,11 +69,11 @@ export function AnalysisCore() {
         ))}
       </group>
 
-      <Billboard position={[0, 1.5, 0]}>
-        <Text ref={scoreText} fontSize={0.6} color="#f6dfa6" anchorX="center" anchorY="middle" fillOpacity={0}>
+      <Billboard position={[0, 1.12, 0]}>
+        <Text ref={scoreText} fontSize={0.78} color="#f6dfa6" anchorX="center" anchorY="middle" fillOpacity={0}>
           {''}
         </Text>
-        <Text ref={scoreLabel} position={[0, -0.42, 0]} fontSize={0.12} color="#cdbfae" anchorX="center" anchorY="top" fillOpacity={0}>
+        <Text ref={scoreLabel} position={[0, -0.5, 0]} fontSize={0.15} color="#cdbfae" anchorX="center" anchorY="top" fillOpacity={0}>
           PITCH SCORE
         </Text>
       </Billboard>

@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { spanFor } from '../spans'
 
 /**
  * World placement of the whole tracker station, offset from the wizard at the
@@ -12,12 +13,14 @@ export const DATASTORE_POS: [number, number, number] = [1.85, 0.6, 0]
 export const AICORE_POS: [number, number, number] = [0, 2.4, 0]
 
 /**
- * Scroll fractions spanning the pinned #tracker section. Re-measured 2026-06-16 after
- * the Grimoire chapter moved to just before contact: tracker top ≈ 0.612, map top
- * ≈ 0.753. Keep in sync with the #tracker CameraRig KEYS.
+ * Scroll fractions spanning the pinned #tracker section, resolved per viewport.
+ * See scene/spans.ts. Ending at the camera's HOLD key is what puts the save, the
+ * saved-stats HUD, the AI core and the three insight cards back on screen — they
+ * previously fired while the camera was already framing the Map.
  */
-export const SECTION_START = 0.574
-export const SECTION_END = 0.727
+const [SPAN_START, SPAN_END] = spanFor('tracker')
+export const SECTION_START = SPAN_START
+export const SECTION_END = SPAN_END
 
 /** Maps global scroll progress (0→1 across the page) to 0→1 local progress within the tracker section. */
 export function localProgress(progress: number) {

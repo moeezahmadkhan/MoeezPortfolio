@@ -19,7 +19,6 @@ import { Candlelight } from './Candlelight'
 import { CameraRig } from './CameraRig'
 import { ScrollDriver } from './ScrollDriver'
 import { TrackerStation } from './tracker/TrackerStation'
-import { SpellStation } from './spell/SpellStation'
 import { MapStation } from './map/MapStation'
 import { PactStation } from './pact/PactStation'
 
@@ -35,7 +34,13 @@ export function Scene({ reveal }: { reveal: number }) {
 
   return (
     <Canvas
-      shadows={!isMobile}
+      /* No `shadows`. Every light in the scene sets castShadow={false}, so the shadow
+         maps were allocated and never rendered into — the castShadow flags on meshes
+         were inert. Worse, that shadow state made the renderer's depth-stencil buffer
+         both the read and write attachment of the post-processing blit, which spammed
+         ~190 GL_INVALID_OPERATION warnings per load and painted hard black squares
+         around bright bloom sources. ContactShadows below is independent of this flag
+         and still draws the ground shadow. */
       dpr={dpr}
       gl={{ antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 0.85 }}
       camera={{ position: [0, 0.4, 6.4], fov: isMobile ? 52 : 38 }}
@@ -96,7 +101,6 @@ export function Scene({ reveal }: { reveal: number }) {
 
         <RuneCircle />
         <TrackerStation />
-        <SpellStation />
         <MapStation />
         <PactStation />
 
@@ -105,6 +109,10 @@ export function Scene({ reveal }: { reveal: number }) {
         <Sparkles count={isMobile ? 48 : 120} scale={[10, 7, 10]} size={1.6} speed={0.15} color="#ffffff" opacity={0.35} />
 
         <ContactShadows
+          /* drei defaults to frames={Infinity}: a full depth render plus two blur
+             passes every frame, forever, even when the camera is 22 units away at the
+             Map. The wizard barely moves — 60 frames is enough to settle. */
+          frames={60}
           position={[0, -1.34, 0]}
           opacity={0.18}
           scale={9}
@@ -130,7 +138,7 @@ export function Scene({ reveal }: { reveal: number }) {
           the blur kernel and drop the extra SMAA pass to cut fill-rate (the
           per-frame depth-stencil blit went away with the Canvas shadow maps). */}
       {isMobile ? (
-        <EffectComposer multisampling={0}>
+        <EffectComposer multisampling={0} depthBuffer={false} stencilBuffer={false}>
           <Bloom
             intensity={0.9}
             luminanceThreshold={0.5}
@@ -141,7 +149,7 @@ export function Scene({ reveal }: { reveal: number }) {
           <Vignette eskil={false} offset={0.25} darkness={0.92} />
         </EffectComposer>
       ) : (
-        <EffectComposer multisampling={0}>
+        <EffectComposer multisampling={0} depthBuffer={false} stencilBuffer={false}>
           <Bloom
             intensity={0.9}
             luminanceThreshold={0.5}

@@ -110,12 +110,12 @@ export function ThePact() {
       </group>
 
       {/* floating labels over each figure */}
-      <Billboard position={[-LABEL_X, 1.35, 0]}>
+      <Billboard position={[-LABEL_X, 0.62, 0]}>
         <Text ref={founderLabel} font={LABEL_FONT} fontSize={0.13} letterSpacing={0.12} color="#cdbfae" anchorX="center" fillOpacity={0}>
           FOUNDER
         </Text>
       </Billboard>
-      <Billboard position={[LABEL_X, 1.35, 0]}>
+      <Billboard position={[LABEL_X, 0.62, 0]}>
         <Text ref={investorLabel} font={LABEL_FONT} fontSize={0.13} letterSpacing={0.12} color="#cdbfae" anchorX="center" fillOpacity={0}>
           INVESTOR
         </Text>

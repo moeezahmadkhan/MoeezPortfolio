@@ -59,7 +59,7 @@ export function SiteNav() {
 
   return (
     <>
-    <header className={`nav ${visible ? 'nav--visible' : ''}`}>
+    <header className={`nav ${visible ? 'nav--visible' : ''}`} role="none">
       <a className="nav__brand" href="#" onClick={toTop} aria-label="Back to top">
         <span className="nav__rune">✦</span>
         <span className="nav__brand-text">M·A·K</span>
@@ -99,6 +99,7 @@ export function SiteNav() {
           className="nav__index-btn"
           aria-label="Open chapter index"
           aria-expanded={indexOpen}
+          aria-controls="nav-index"
           onClick={() => setIndexOpen(true)}
         >
           ☰
@@ -110,7 +111,7 @@ export function SiteNav() {
       {/* Grimoire index — full-screen table of contents for small screens.
           Rendered outside the header: its backdrop-filter/transform would
           otherwise become the containing block for this fixed overlay. */}
-      <div className={`nav__index ${indexOpen ? 'nav__index--open' : ''}`} role="dialog" aria-label="Chapter index">
+      <div id="nav-index" className={`nav__index ${indexOpen ? 'nav__index--open' : ''}`} role="dialog" aria-modal="true" aria-label="Chapter index">
         <div className="nav__index-head">
           <span className="nav__index-title">✦ The Index</span>
           <button type="button" className="nav__index-close" aria-label="Close chapter index" onClick={() => setIndexOpen(false)}>

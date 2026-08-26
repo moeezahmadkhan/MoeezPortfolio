@@ -5,7 +5,7 @@ import puppeteer from 'puppeteer-core'
 
 const URL = process.env.URL || 'http://localhost:5173/'
 
-const ids = ['top', 'wizard', 'spells', 'conjuring', 'grimoire', 'pact', 'tracker', 'map', 'chronicles', 'owlpost']
+const ids = ['top', 'wizard', 'spells', 'pact', 'tracker', 'map', 'chronicles', 'grimoire', 'owlpost']
 const browser = await puppeteer.launch({
   executablePath: '/usr/bin/google-chrome-stable',
   headless: 'new',

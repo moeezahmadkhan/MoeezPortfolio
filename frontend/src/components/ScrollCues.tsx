@@ -19,27 +19,56 @@ export function ScrollCues({ visible }: { visible: boolean }) {
 
   useEffect(() => {
     let raf = 0
+
+    // Section tops were re-measured every frame: 10 getElementById plus 10
+    // getBoundingClientRect, each forcing a style/layout flush, at 60fps alongside a
+    // WebGL scene, a post-processing chain, Lenis and the cursor loop. Layout only
+    // changes on resize, so measure there instead and read the cache per frame.
+    let cache: { top: number; ci: number }[] = []
+    const measure = () => {
+      const scrollY = window.scrollY
+      cache = chapters
+        .map((c, ci) => {
+          const el = document.getElementById(c.id)
+          return el ? { top: el.getBoundingClientRect().top + scrollY, ci } : null
+        })
+        .filter((e): e is { top: number; ci: number } => e !== null)
+    }
+    measure()
+
+    window.addEventListener('resize', measure)
+    // Section tops also move when the document reflows (fonts landing, images sizing,
+    // a pinned stage changing height), which no resize event covers.
+    const ro = new ResizeObserver(measure)
+    ro.observe(document.documentElement)
+
+    // Show/hide together: an element faded to opacity 0 keeps its focusable children
+    // in the tab order, so the back-to-top button was reachable while invisible.
+    const setShown = (root: HTMLElement, shown: boolean) => {
+      root.style.opacity = shown ? '1' : '0'
+      root.style.visibility = shown ? 'visible' : 'hidden'
+    }
+
     const tick = () => {
       raf = requestAnimationFrame(tick)
       const root = rootRef.current
       const text = textRef.current
       if (!root || !text) return
 
-      const scrollY = window.scrollY
-      const vh = window.innerHeight
-      // Pair each present section's top with its chapter index so the labels stay
-      // correct even if a section id is missing from the DOM.
-      const entries = chapters
-        .map((c, ci) => {
-          const el = document.getElementById(c.id)
-          return el ? { top: el.getBoundingClientRect().top + scrollY, ci } : null
-        })
-        .filter((e): e is { top: number; ci: number } => e !== null)
-      if (entries.length < 2) {
-        root.style.opacity = '0'
+      // Nothing to show during the preloader and intro — skip the whole body rather
+      // than run the cue maths behind a hidden overlay.
+      if (!visible) {
+        setShown(root, false)
         return
       }
-      const tops = entries.map((e) => e.top)
+
+      if (cache.length < 2) {
+        setShown(root, false)
+        return
+      }
+      const tops = cache.map((e) => e.top)
+      const scrollY = window.scrollY
+      const vh = window.innerHeight
 
       const idx = activeIndex(scrollY + vh * 0.5, tops)
 
@@ -47,14 +76,14 @@ export function ScrollCues({ visible }: { visible: boolean }) {
       if (idx >= tops.length - 1) {
         root.dataset.mode = 'end'
         text.textContent = "you've reached the end"
-        root.style.opacity = '1'
+        setShown(root, true)
         return
       }
 
       // Hide in the hero so we don't double Hero's own "scroll to descend" cue.
       if (idx === 0) {
         root.dataset.mode = 'next'
-        root.style.opacity = '0'
+        setShown(root, false)
         return
       }
 
@@ -63,16 +92,20 @@ export function ScrollCues({ visible }: { visible: boolean }) {
       const { active, nextIndex } = nextCue(scrollY, tops, threshold)
       root.dataset.mode = 'next'
       if (active && nextIndex !== null) {
-        const c = chapters[entries[nextIndex].ci]
+        const c = chapters[cache[nextIndex].ci]
         text.textContent = `${c.theme} · ${c.plain}`
-        root.style.opacity = '1'
+        setShown(root, true)
       } else {
-        root.style.opacity = '0'
+        setShown(root, false)
       }
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [])
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', measure)
+      ro.disconnect()
+    }
+  }, [visible])
 
   const toTop = () => {
     const lenis = getLenis()

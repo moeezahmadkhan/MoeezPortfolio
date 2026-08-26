@@ -3,7 +3,7 @@
   z-index: 2;
   padding: clamp(6rem, 14vh, 12rem) clamp(1.5rem, 7vw, 9rem);
   border-top: 1px solid rgba(231, 194, 125, 0.07);
-  scroll-margin-top: 80px; /* keep titles clear of the fixed nav on anchor jumps */
+  scroll-margin-top: calc(var(--nav-h) + 1rem); /* keep titles clear of the fixed nav on anchor jumps */
 }
 
 .section__wrap { max-width: 1180px; margin: 0 auto; }
@@ -67,6 +67,8 @@
 /* Fact-strip — the mono attribution line under showcase headlines:
    project name · what it is · where it shipped. Plain facts, archive voice. */
 .fact-strip {
+  text-wrap: balance;
+  hyphens: none;
   font-family: var(--font-mono);
   font-size: 0.74rem;
   letter-spacing: 0.12em;
@@ -117,22 +119,6 @@
   max-width: 44rem;
   color: var(--parchment-dim);
 }
-.about__stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(1.5rem, 5vw, 4rem);
-  margin-top: 3.2rem;
-}
-.stat { display: flex; flex-direction: column; gap: 0.3rem; }
-.stat__k {
-  font-family: var(--font-display);
-  font-size: clamp(2.2rem, 4vw, 3rem);
-  font-weight: 800;
-  color: var(--gold-bright);
-  text-shadow: 0 0 26px rgba(231, 194, 125, 0.3);
-}
-.stat__v { font-size: 0.95rem; letter-spacing: 0.04em; color: var(--parchment-dim); max-width: 14rem; }
-
 /* About body: copy beside a "dossier" portrait. The photo is deliberately
    duotone-treated (gold-on-ink) so it reads as an archive plate and the grain
    of the source image disappears into the candlelit palette. Swap /moeez.jpeg
@@ -368,44 +354,6 @@
   color: var(--rune);
 }
 
-/* Repo link — the dossier's "open the case file" footer action */
-.spell-card__repo {
-  margin-top: 1.4rem;
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--gold-bright);
-  text-decoration: none;
-  padding-bottom: 2px;
-  border-bottom: 1px solid rgba(231, 194, 125, 0.3);
-  transition:
-    color 0.25s,
-    border-color 0.25s,
-    gap 0.25s;
-}
-.spell-card__repo-glyph {
-  font-size: 0.9rem;
-  transition: transform 0.25s;
-}
-.spell-card__repo:hover,
-.spell-card__repo:focus-visible {
-  color: #fff;
-  border-color: var(--gold-bright);
-  gap: 0.7rem;
-}
-.spell-card__repo:hover .spell-card__repo-glyph,
-.spell-card__repo:focus-visible .spell-card__repo-glyph {
-  transform: translate(2px, -2px);
-}
-.spell-card__repo:focus-visible {
-  outline: 2px solid var(--gold-bright);
-  outline-offset: 4px;
-}
 /* Outbound proof — repo / demo / case-study actions in the gold chip voice */
 .spell-card__links {
   display: flex;
@@ -515,9 +463,6 @@
   opacity: 0.8;
 }
 
-@media (max-width: 720px) {
-  .about__stats { gap: 1.6rem; }
-}
 
 /* Pinned Spells: tall section (one viewport per step + one) with a sticky stage. */
 .spells--pinned {
@@ -577,10 +522,12 @@
   margin-left: -1px;
   border-left: 1px solid transparent;
   color: var(--parchment-dim);
-  opacity: 0.4;
+  /* Was 0.4 (2.27:1) — an index you cannot read is not an index. Let colour, not
+     opacity alone, carry the active state. */
+  opacity: 0.68;
   transition: opacity 0.45s ease, color 0.45s ease, border-color 0.45s ease;
 }
-.spells__toc-item.is-past { opacity: 0.6; }
+.spells__toc-item.is-past { opacity: 0.82; }
 .spells__toc-item.is-active {
   opacity: 1;
   color: var(--gold-bright);
@@ -591,7 +538,9 @@
   font-size: 0.7rem;
   letter-spacing: 0.18em;
   color: var(--gold);
-  opacity: 0.7;
+  /* No extra fade: this nests inside .spells__toc-item, whose own opacity already
+     dims idle rows. Compounding the two put the numeral at 3.31:1. */
+  opacity: 1;
 }
 .spells__toc-title {
   font-family: var(--font-display);
@@ -628,11 +577,68 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 1.2rem;
-  max-width: 42rem; /* match sibling stages so pill/headline don't strike through the 3D */
+  /* Reads from the baseline, against the Pact's centred column and the Map's
+     top-pinned card — the three chapters should not resolve to the same picture. */
+  justify-content: flex-end;
+  gap: 1.1rem;
+  max-width: 42rem;
   padding: clamp(2rem, 6vw, 6rem);
+  padding-bottom: clamp(4rem, 12vh, 9rem);
   box-sizing: border-box;
+}
+/* This chapter had no scrim at all — its siblings each declared one, and the mobile
+   block styled a `.tracker__stage::before` that was never generated, so on a phone
+   the lede sat straight on the cricketer. Same left-dark ramp as the Pact and Map. */
+.tracker__stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(7, 7, 13, 0.92) 0%,
+    rgba(7, 7, 13, 0.78) 40%,
+    rgba(7, 7, 13, 0.4) 70%,
+    rgba(7, 7, 13, 0) 100%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+.tracker__stage > * { position: relative; }
+
+/* Instrument strip: readings side by side, the way they'd sit on a watch face.
+   Deliberately un-numbered — these are simultaneous, and numbering them would
+   assert an order the data doesn't have. */
+.tracker__strip {
+  list-style: none;
+  margin: 0;
+  padding: 0.9rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 clamp(0.8rem, 2vw, 1.6rem);
+  border-top: 1px solid rgb(var(--gold-rgb) / 0.28);
+}
+@media (max-width: 860px) {
+  .tracker__strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem 1.2rem; }
+}
+.tracker__strip-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-block: 0.2rem;
+}
+.tracker__strip-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--gold-bright);
+}
+.tracker__strip-tags {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  color: var(--rune);
+  text-wrap: balance;
 }
 .tracker__lede {
   max-width: 32ch;
@@ -666,7 +672,7 @@
   max-width: 42rem;
   padding: clamp(2rem, 6vw, 6rem);
   /* keep the eyebrow clear of the fixed nav and the legend inside short viewports */
-  padding-top: calc(80px + 1.5rem);
+  padding-top: calc(var(--nav-h) + 1.5rem);
   padding-bottom: 2rem;
   box-sizing: border-box;
 }
@@ -759,11 +765,65 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
-  max-width: 42rem;
+  /* Top-aligned, against the Pact's centre and the Pulse's baseline. The card below
+     carries its own contrast, so the parchment can stay bright underneath it. */
+  justify-content: flex-start;
+  gap: 0.7rem;
+  max-width: 40rem;
   padding: clamp(2rem, 6vw, 6rem);
+  padding-top: clamp(4rem, 11vh, 6.5rem);
   box-sizing: border-box;
+}
+/* The stage copy sits on a solid ground because the Marauder's Map art behind it is
+   the brightest surface on the site — the gradient scrim alone left teal-on-parchment
+   labels well under 4.5:1. */
+.map__stage .map__lede,
+.map__stage .map__stages {
+  max-width: 30rem;
+  background: rgba(7, 7, 13, 0.82);
+  border: 1px solid rgb(var(--gold-rgb) / 0.22);
+  border-radius: var(--r-base);
+  padding: 0.9rem 1.1rem;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.map__stages {
+  counter-reset: map-stage;
+  list-style: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.42rem;
+}
+.map__stages-item {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-left: 1.5rem;
+}
+.map__stages-item::before {
+  counter-increment: map-stage;
+  content: counter(map-stage, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: rgb(var(--gold-rgb) / 0.7);
+}
+.map__stages-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--gold-bright);
+}
+.map__stages-tags {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rune);
+  text-align: right;
 }
 /* legibility scrim so copy reads over the 3D map behind it */
 .map__stage::before {
@@ -782,11 +842,11 @@
 }
 .map__stage > * { position: relative; }
 .map__lede {
-  max-width: 34ch;
+  max-width: 40ch;
   color: var(--parchment);
   font-family: var(--font-body);
-  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
-  line-height: 1.5;
+  font-size: clamp(1rem, 1.7vw, 1.22rem);
+  line-height: 1.55;
   text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
 }
 
@@ -843,20 +903,36 @@
 }
 
 .pact__legend {
+  /* A ledger of terms. Numbering is earned here: deck in → read → matched → bound is
+     an actual order of operations, and the reader needs it. The rule down the left is
+     the binding that the chapter is named for. */
+  counter-reset: pact-term;
   list-style: none;
-  padding: 0;
+  padding: 0 0 0 1.6rem;
   margin: 0;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   max-width: 30rem;
+  border-left: 1px solid rgb(var(--gold-rgb) / 0.35);
 }
 .pact__legend-item {
+  position: relative;
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  border-bottom: 1px solid rgba(231, 194, 125, 0.14);
+  border-bottom: 1px solid rgb(var(--gold-rgb) / 0.14);
   padding-bottom: 0.4rem;
+}
+.pact__legend-item::before {
+  counter-increment: pact-term;
+  content: counter(pact-term);
+  position: absolute;
+  left: -1.6rem;
+  top: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: rgb(var(--gold-rgb) / 0.75);
 }
 .pact__legend-name {
   font-family: var(--font-display);

@@ -26,6 +26,9 @@
 }
 .grim-launcher--hidden {
   opacity: 0;
+  /* Otherwise the launcher stays tabbable behind the open panel, so tabbing out of
+     the "modal" silently lands on an invisible control. */
+  visibility: hidden;
   pointer-events: none;
 }
 .grim-launcher__book {
@@ -46,7 +49,7 @@
   width: 360px;
   max-width: calc(100vw - 32px);
   height: 520px;
-  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
   display: flex;
   flex-direction: column;
   background:
@@ -167,7 +170,7 @@
 .grim-input__box {
   flex: 1;
   background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(231, 194, 125, 0.42);
   border-radius: 9px;
   padding: 9px 12px;
   color: #f3e6cc;
@@ -175,7 +178,6 @@
   font-size: 1rem;
 }
 .grim-input__box:focus {
-  outline: none;
   border-color: rgba(231, 194, 125, 0.5);
 }
 .grim-input__send {
@@ -210,7 +212,7 @@
     left: 8px;
     bottom: 8px;
     width: auto;
-    height: calc(100vh - 16px);
+    height: calc(100dvh - 16px);
     max-height: none;
   }
 }

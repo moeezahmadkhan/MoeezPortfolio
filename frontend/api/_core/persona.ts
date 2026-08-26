@@ -4,15 +4,23 @@
 // --- Models & endpoint ---
 // Models tried in order — first that responds wins. All free; the cascade keeps the
 // Familiar answering even when the primary's free endpoint is rate-limited upstream.
+// Verified against https://openrouter.ai/api/v1/models on 2026-08-26. The previous
+// list had gone stale — five of its six ids no longer resolve, so every request
+// burned five upstream 404s before reaching the one live model. Chat-tuned models
+// only: reasoning variants leak their scratchpad, and code/safety models ignore the
+// persona. Re-check this list when the Familiar starts falling through to FALLBACK_REPLY.
 export const MODELS = [
-  'moonshotai/kimi-k2.6:free', // primary (your pick); often rate-limited upstream
-  'z-ai/glm-4.5-air:free',
-  'openai/gpt-oss-120b:free',
+  'z-ai/glm-5.2:free', // primary — strongest persona adherence of the free tier
+  'google/gemma-4-31b-it:free',
   'nvidia/nemotron-3-super-120b-a12b:free',
-  'meta-llama/llama-3.3-70b-instruct:free',
-  'qwen/qwen3-next-80b-a3b-instruct:free',
+  'minimax/minimax-m2.7:free',
+  'google/gemma-4-26b-a4b-it:free',
 ]
 export const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
+
+// Per-model deadline. Without it one hung upstream stalls the whole cascade and the
+// visitor watches a typing indicator until the platform kills the function.
+export const MODEL_TIMEOUT_MS = 12_000
 
 // --- Caps (bound token spend) ---
 export const MAX_MESSAGE_CHARS = 1000 // single user message; longer is truncated
