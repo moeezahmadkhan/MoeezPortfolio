@@ -1,0 +1,23 @@
+# Moeez Ahmad Khan
+
+> AI/ML engineer in Lahore, working remotely. Edge computer vision, clinical LLM
+> systems, research agents, and the evaluation harnesses that keep them honest.
+> Available for remote work; replies within one working day.
+
+Every figure on the site is marked measured or not measured. Unmeasured claims
+are drawn as hollow outlines rather than dropped, and the open defects of each
+system are published alongside its results.
+
+## The work
+
+- [Vanguard — edge face recognition](https://moeezahmadkhan.com/#vanguard): Four networks on a Sophon BM1688 TPU, fully offline. 2,676 of 10,291 faces cleared the quality gate; every rejection shows the reading that killed it. Solo build, 186 commits.
+- [Sumero Health — clinical LLM](https://moeezahmadkhan.com/#sumero): Triage router at 93.0% over 187 prompts, a 214-prompt graded set, and a 179-case regression suite with 22 criticals still open. Owns the AI service and the whole evaluation harness.
+- [Pawlyse — research agent](https://moeezahmadkhan.com/#pawlyse): A two-round retrieval loop bounded by a 140-second wall clock, at most six citations, nothing logged. Sole author of the ML service.
+- [Nexis — LLM deal scoring](https://moeezahmadkhan.com/#nexis): Eleven weighted dimensions combined in code rather than by the model. Built with one other engineer who owned the rubrics; never reached production.
+
+## Contact
+
+- [Book a 30-minute call](https://cal.com/moeezahmadkhan/30min)
+- [Email](mailto:kmoeez2018@gmail.com)
+- [GitHub](https://github.com/moeezahmadkhan)
+- [LinkedIn](https://www.linkedin.com/in/moeez-ahmad-khan-68a403364/)
