@@ -51,7 +51,8 @@
        Iron oxide is a value outside its limit and nothing else. */
     --cyanotype: #2f6e8f;
     --cyanotype-lift: #4a90b8;
-    --brass: #8a6e3e;
+    --brass: #8a6e3e;        /* fixtures: hairlines, bezels, brackets */
+    --brass-text: #a2854e;   /* the same metal, lifted to 5.61:1 for type */
     --sodium: #f2c14e;
     --oxide: #c04a34;
 
@@ -99,7 +100,10 @@
   ::selection { background: var(--cyanotype); color: #fff; }
 
   @media (forced-colors: active) {
-    :root { --cyanotype: LinkText; --brass: CanvasText; --sodium: Highlight; --oxide: CanvasText; }
+    :root {
+      --cyanotype: LinkText; --brass: CanvasText; --brass-text: CanvasText;
+      --sodium: Highlight; --oxide: CanvasText;
+    }
   }
 }
 
@@ -226,7 +230,7 @@
 
   h4.block-head {
     font-family: var(--mono); font-size: 0.625rem; font-weight: 600;
-    letter-spacing: 0.2em; text-transform: uppercase; color: var(--brass);
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--brass-text);
   }
 
   /* ── The exposure bar. A measured value is filled cyanotype; a value that
@@ -300,14 +304,14 @@
     contain: layout paint;
     display: grid; place-items: center; padding: clamp(0.75rem, 2vw, 1.25rem);
   }
-  .stage-figure { inline-size: 100%; }
+  .stage-figure { inline-size: 100%; max-inline-size: 30rem; }
   .stage-figure figcaption {
     font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.14em;
     text-transform: uppercase; color: var(--muted); margin-block-start: 0.85rem;
   }
 
   .said-plainly {
-    border-inline-start: 2px solid var(--brass);
+    border-inline-start: 2px solid var(--brass-text);
     padding-inline-start: 1.1rem;
   }
 
@@ -316,7 +320,7 @@
     text-transform: uppercase; color: var(--ink); cursor: pointer;
     padding-block: 0.6rem; min-block-size: 44px; display: flex; align-items: center;
   }
-  .receipt > summary::marker { color: var(--brass); }
+  .receipt > summary::marker { color: var(--brass-text); }
   .receipt[open] > summary { color: var(--sodium); }
   .receipt .prose { font-size: 0.92rem; color: var(--muted); }
 
