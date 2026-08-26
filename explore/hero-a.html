@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero A — turret</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lampblack:#0A0C0B; --plate:#151A18; --cyanotype:#2F6E8F;
+    --brass:#8A6E3E; --sodium:#F2C14E; --oxide:#A63D2A;
+    --ink:#DCE3E1; --muted:#7C8A88;
+    --display:"Bodoni Moda",serif; --body:"Archivo",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--lampblack);color:var(--ink);font-family:var(--body);
+       min-height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+  /* ── reticle bracket control ── */
+  .ret{position:relative;display:inline-block;padding:9px 18px;font-family:var(--mono);
+       font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink);
+       text-decoration:none;white-space:nowrap}
+  .ret::before,.ret::after{content:"";position:absolute;width:9px;height:100%;top:0;
+       border:1px solid var(--brass)}
+  .ret::before{left:0;border-right:0}
+  .ret::after{right:0;border-left:0}
+  .ret.lit{color:var(--sodium)}
+  .ret.lit::before,.ret.lit::after{border-color:var(--sodium)}
+
+  header{display:flex;justify-content:space-between;align-items:center;
+         padding:20px 34px;border-bottom:1px solid #222A27}
+  .wordmark{font-family:var(--display);font-size:19px;letter-spacing:5.5px;font-weight:600}
+  .controls{display:flex;gap:10px}
+
+  main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 470px 190px;min-height:0}
+
+  /* ── argument plane ── */
+  .arg{padding:52px 34px 34px;display:flex;flex-direction:column;justify-content:center}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;
+           color:var(--muted);margin-bottom:26px}
+  h1{font-family:var(--body);font-weight:500;font-size:34px;line-height:1.18;
+     letter-spacing:-0.4px;max-width:14ch;margin-bottom:30px}
+  .claims{display:flex;gap:34px;margin-bottom:26px}
+  .claim{max-width:19ch}
+  .fig{font-family:var(--mono);font-weight:600;font-size:42px;line-height:1;
+       color:var(--cyanotype);display:block;margin-bottom:9px}
+  .fig.hollow{color:transparent;-webkit-text-stroke:1px var(--cyanotype)}
+  .claim p{font-size:13px;line-height:1.45;color:var(--muted)}
+  .legend{font-family:var(--mono);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;
+          color:var(--muted);display:flex;gap:16px;align-items:center;margin-bottom:26px}
+  .sw{display:inline-block;width:9px;height:9px;margin-right:6px;vertical-align:-1px}
+  .sw.f{background:var(--cyanotype)}
+  .sw.h{border:1px solid var(--cyanotype)}
+  .avail{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;color:var(--sodium);
+         margin-top:24px;text-transform:uppercase}
+
+  /* ── the turret viewport ── */
+  .stage{position:relative;border-left:1px solid #222A27;border-right:1px solid #222A27;
+         overflow:hidden;background:
+         radial-gradient(120% 90% at 62% 42%, #1B221F 0%, var(--lampblack) 62%)}
+  .stage svg{position:absolute;inset:0;width:100%;height:100%}
+  .arriving{position:absolute;right:-1px;top:0;bottom:0;width:96px;
+            background:linear-gradient(90deg,rgba(10,12,11,0) 0%,var(--lampblack) 88%)}
+  .detents{position:absolute;left:0;right:0;bottom:16px;display:flex;justify-content:center;gap:0}
+  .detent{width:52px;height:1px;background:var(--brass);opacity:.4;position:relative}
+  .detent.on{opacity:1;background:var(--sodium)}
+  .detent::after{content:"";position:absolute;left:50%;top:-4px;width:1px;height:9px;
+                 background:inherit}
+  .stagelabel{position:absolute;left:20px;top:18px;font-family:var(--mono);font-size:10px;
+              letter-spacing:2px;text-transform:uppercase;color:var(--brass)}
+  .nextlabel{position:absolute;right:16px;top:50%;transform:translateY(-50%) rotate(90deg);
+             transform-origin:center;font-family:var(--mono);font-size:9px;letter-spacing:2px;
+             text-transform:uppercase;color:var(--muted);white-space:nowrap}
+
+  /* ── index rail ── */
+  .rail{border-left:1px solid #222A27;padding:26px 18px;display:flex;flex-direction:column;gap:2px}
+  .railhead{font-family:var(--mono);font-size:9px;letter-spacing:2.2px;text-transform:uppercase;
+            color:var(--muted);margin-bottom:14px}
+  .item{display:flex;gap:9px;align-items:baseline;padding:8px 0;border-bottom:1px solid #1C2320;
+        text-decoration:none;color:var(--ink)}
+  .dot{width:6px;height:6px;border:1px solid var(--brass);border-radius:0;flex:none;
+       transform:translateY(-1px)}
+  .item.on .dot{background:var(--sodium);border-color:var(--sodium)}
+  .thr{font-family:var(--mono);font-size:12px;color:var(--cyanotype);min-width:44px}
+  .item.on .thr{color:var(--sodium)}
+  .nm{font-family:var(--mono);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;
+      color:var(--muted)}
+  .railfoot{margin-top:auto;display:flex;flex-direction:column;gap:9px;align-items:flex-start}
+
+  @media (max-width:700px){
+    body{overflow:auto}
+    header{padding:14px 16px}
+    .wordmark{font-size:14px;letter-spacing:4px}
+    .controls .ret:first-child{display:none}
+    main{grid-template-columns:1fr;grid-template-rows:auto 46vh}
+    .arg{padding:26px 16px 20px}
+    h1{font-size:26px;max-width:100%}
+    .claims{flex-direction:column;gap:18px}
+    .fig{font-size:36px}
+    .rail{display:none}
+    .stage{border-left:0;border-right:0;border-top:1px solid #222A27}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">MOEEZ AHMAD KHAN</div>
+  <nav class="controls">
+    <a class="ret" href="#">read as text</a>
+    <a class="ret lit" href="#">book a 30-minute call</a>
+  </nav>
+</header>
+
+<main>
+  <section class="arg">
+    <div class="eyebrow">AI/ML engineer · Lahore · remote</div>
+    <h1>I ship models that get measured, not demoed.</h1>
+
+    <div class="claims">
+      <div class="claim">
+        <span class="fig">74%</span>
+        <p>of what the face pipeline saw, it rejected — and it publishes why.</p>
+      </div>
+      <div class="claim">
+        <span class="fig">214</span>
+        <p>prompts grading the clinical assistant. 22 criticals still open.</p>
+      </div>
+      <div class="claim">
+        <span class="fig hollow">2 min</span>
+        <p>per pitch deck. Approximate — I never instrumented it.</p>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span><i class="sw f"></i>measured</span>
+      <span><i class="sw h"></i>not measured</span>
+    </div>
+
+    <div class="avail">remote only · reply within one working day</div>
+  </section>
+
+  <section class="stage">
+    <div class="stagelabel">0.45 — vanguard — in the light path</div>
+    <svg viewBox="0 0 470 830" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <!-- turret ring -->
+      <ellipse cx="215" cy="440" rx="248" ry="84" fill="none" stroke="#8A6E3E" stroke-opacity=".35"/>
+      <ellipse cx="215" cy="440" rx="196" ry="64" fill="none" stroke="#8A6E3E" stroke-opacity=".18"/>
+      <!-- lit station: the gate -->
+      <g transform="translate(70 236)">
+        <rect x="0" y="0" width="238" height="176" fill="#151A18" stroke="#8A6E3E" stroke-opacity=".55"/>
+        <text x="14" y="24" fill="#8A6E3E" font-family="IBM Plex Mono" font-size="9" letter-spacing="2">THE GATE</text>
+        <g font-family="IBM Plex Mono" font-size="9" fill="#7C8A88">
+          <text x="14" y="52">SEEN</text><rect x="72" y="44" width="150" height="8" fill="#2F6E8F"/><text x="196" y="52" fill="#DCE3E1" text-anchor="end" dx="26">10,291</text>
+          <text x="14" y="76">KEPT</text><rect x="72" y="68" width="39" height="8" fill="#2F6E8F"/><text x="196" y="76" fill="#DCE3E1" text-anchor="end" dx="26">2,676</text>
+          <text x="14" y="100">KNOWN</text><rect x="72" y="92" width="35" height="8" fill="#2F6E8F" fill-opacity=".82"/><text x="196" y="100" fill="#DCE3E1" text-anchor="end" dx="26">2,376</text>
+          <text x="14" y="124">STRANGER</text><rect x="72" y="116" width="5" height="8" fill="#A63D2A"/><text x="196" y="124" fill="#DCE3E1" text-anchor="end" dx="26">300</text>
+        </g>
+        <line x1="14" y1="140" x2="224" y2="140" stroke="#222A27"/>
+        <text x="14" y="160" fill="#F2C14E" font-family="IBM Plex Mono" font-size="10" letter-spacing="1">26.0% CLEARED</text>
+      </g>
+      <!-- reticle around the lit station -->
+      <g stroke="#F2C14E" stroke-width="1" fill="none" opacity=".85">
+        <path d="M54 220 h18 M54 220 v18"/><path d="M324 220 h-18 M324 220 v18"/>
+        <path d="M54 428 h18 M54 428 v-18"/><path d="M324 428 h-18 M324 428 v-18"/>
+      </g>
+      <!-- next station arriving from the right, partially cropped -->
+      <g transform="translate(352 288)" opacity=".55">
+        <rect x="0" y="0" width="150" height="150" fill="#151A18" stroke="#8A6E3E" stroke-opacity=".35"/>
+        <g fill="#2F6E8F" fill-opacity=".55">
+          <rect x="14" y="26" width="12" height="12"/><rect x="30" y="26" width="12" height="12"/>
+          <rect x="46" y="26" width="12" height="12"/><rect x="62" y="26" width="12" height="12"/>
+          <rect x="14" y="42" width="12" height="12"/><rect x="30" y="42" width="12" height="12"/>
+        </g>
+        <rect x="46" y="42" width="12" height="12" fill="#A63D2A"/>
+        <rect x="62" y="42" width="12" height="12" fill="#A63D2A"/>
+      </g>
+      <!-- platform edge -->
+      <path d="M-40 540 Q215 596 470 540" fill="none" stroke="#8A6E3E" stroke-opacity=".45"/>
+    </svg>
+    <div class="nextlabel">93.0% sumero — arriving</div>
+    <div class="arriving"></div>
+    <div class="detents">
+      <span class="detent on"></span><span class="detent"></span>
+      <span class="detent"></span><span class="detent"></span>
+    </div>
+  </section>
+
+  <aside class="rail">
+    <div class="railhead">index</div>
+    <a class="item on" href="#"><i class="dot"></i><span class="thr">0.45</span><span class="nm">vanguard</span></a>
+    <a class="item" href="#"><i class="dot"></i><span class="thr">93.0%</span><span class="nm">sumero</span></a>
+    <a class="item" href="#"><i class="dot"></i><span class="thr">140s</span><span class="nm">pawlyse</span></a>
+    <a class="item" href="#"><i class="dot"></i><span class="thr">11×w</span><span class="nm">nexis</span></a>
+    <div class="railfoot">
+      <a class="ret lit" href="#">book a call</a>
+      <a class="ret" href="#">CV, PDF</a>
+    </div>
+  </aside>
+</main>
+
+</body>
+</html>

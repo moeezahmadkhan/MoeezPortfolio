@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero C — the question</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lampblack:#0A0C0B; --plate:#151A18; --cyanotype:#2F6E8F;
+    --brass:#8A6E3E; --sodium:#F2C14E; --oxide:#A63D2A;
+    --ink:#DCE3E1; --muted:#7C8A88;
+    --display:"Bodoni Moda",serif; --body:"Archivo",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--lampblack);color:var(--ink);font-family:var(--body);
+       height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+  .ret{position:relative;display:inline-block;padding:9px 18px;font-family:var(--mono);
+       font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink);
+       text-decoration:none;white-space:nowrap}
+  .ret::before,.ret::after{content:"";position:absolute;width:9px;height:100%;top:0;
+       border:1px solid var(--brass)}
+  .ret::before{left:0;border-right:0}
+  .ret::after{right:0;border-left:0}
+  .ret.lit{color:var(--sodium)}
+  .ret.lit::before,.ret.lit::after{border-color:var(--sodium)}
+
+  header{display:flex;justify-content:space-between;align-items:center;
+         padding:20px 34px;border-bottom:1px solid #222A27;position:relative;z-index:3}
+  .wordmark{font-family:var(--display);font-size:19px;letter-spacing:5.5px;font-weight:600}
+  .controls{display:flex;gap:10px}
+
+  main{flex:1;position:relative;min-height:0;display:flex;flex-direction:column;
+       align-items:center;justify-content:center;padding:0 24px}
+  .bg{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+
+  .core{position:relative;z-index:2;width:100%;max-width:720px;text-align:center}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;
+           color:var(--muted);margin-bottom:20px}
+  h1{font-weight:500;font-size:30px;line-height:1.2;letter-spacing:-0.4px;margin-bottom:34px}
+
+  .field{display:flex;align-items:center;gap:14px;background:var(--plate);
+         border:1px solid var(--brass);padding:20px 22px;text-align:left}
+  .caret{width:8px;height:22px;background:var(--sodium);flex:none}
+  .field input{flex:1;background:none;border:0;outline:0;color:var(--ink);
+               font-family:var(--mono);font-size:16px;letter-spacing:.2px}
+  .field input::placeholder{color:var(--muted)}
+  .fieldlabel{font-family:var(--mono);font-size:9px;letter-spacing:2.4px;text-transform:uppercase;
+              color:var(--brass);text-align:left;margin-bottom:9px}
+
+  .chips{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.9px;color:var(--muted);
+        border:1px solid #2A322F;padding:7px 12px;text-decoration:none;white-space:nowrap}
+  .chip.hot{color:var(--cyanotype);border-color:#2F6E8F}
+
+  .answering{margin-top:30px;border-top:1px solid #222A27;padding-top:20px;text-align:left;
+             display:flex;gap:22px;align-items:flex-start}
+  .answering .fig{font-family:var(--mono);font-weight:600;font-size:38px;line-height:1;
+                  color:var(--cyanotype)}
+  .answering p{font-size:13px;line-height:1.5;color:var(--muted);max-width:44ch}
+  .answering .src{font-family:var(--mono);font-size:9px;letter-spacing:1.6px;
+                  text-transform:uppercase;color:var(--brass);margin-top:8px;display:block}
+
+  .avail{position:absolute;left:34px;bottom:24px;font-family:var(--mono);font-size:11px;
+         letter-spacing:1.2px;color:var(--sodium);text-transform:uppercase;z-index:2}
+  .assembling{position:absolute;right:34px;bottom:24px;font-family:var(--mono);font-size:9px;
+              letter-spacing:2.2px;text-transform:uppercase;color:var(--muted);z-index:2}
+
+  @media (max-width:700px){
+    body{height:auto;overflow:auto}
+    header{padding:14px 16px}
+    .wordmark{font-size:14px;letter-spacing:4px}
+    .controls .ret:first-child{display:none}
+    main{padding:26px 16px 90px}
+    h1{font-size:24px;margin-bottom:26px}
+    .field{padding:16px}
+    .field input{font-size:14px}
+    .chips{justify-content:flex-start}
+    .chip:nth-child(n+4){display:none}
+    .answering{flex-direction:column;gap:10px}
+    .avail{position:relative;left:0;bottom:0;margin-top:26px;display:block}
+    .assembling{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">MOEEZ AHMAD KHAN</div>
+  <nav class="controls">
+    <a class="ret" href="#">read as text</a>
+    <a class="ret lit" href="#">book a 30-minute call</a>
+  </nav>
+</header>
+
+<main>
+  <!-- unassembled world: parts waiting to be summoned by the first question -->
+  <svg class="bg" viewBox="0 0 1440 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g stroke="#8A6E3E" stroke-opacity=".16" fill="none">
+      <rect x="96" y="104" width="120" height="74" transform="rotate(-9 156 141)"/>
+      <rect x="1210" y="146" width="104" height="66" transform="rotate(7 1262 179)"/>
+      <rect x="180" y="486" width="132" height="60" transform="rotate(5 246 516)"/>
+      <rect x="1152" y="470" width="118" height="76" transform="rotate(-6 1211 508)"/>
+      <circle cx="330" cy="300" r="46"/><circle cx="1116" cy="316" r="36"/>
+      <path d="M60 330 h120 M1260 350 h120"/>
+    </g>
+    <g fill="#2F6E8F" fill-opacity=".2">
+      <rect x="112" y="120" width="52" height="6"/><rect x="112" y="134" width="30" height="6"/>
+      <rect x="1226" y="162" width="46" height="6"/><rect x="1226" y="176" width="22" height="6"/>
+      <rect x="196" y="502" width="60" height="6"/><rect x="196" y="516" width="34" height="6"/>
+      <rect x="1168" y="486" width="50" height="6"/><rect x="1168" y="500" width="26" height="6"/>
+    </g>
+    <!-- convergence lines: parts being drawn toward the question -->
+    <g stroke="#F2C14E" stroke-opacity=".22" stroke-dasharray="3 7">
+      <line x1="220" y1="150" x2="640" y2="330"/>
+      <line x1="1240" y1="180" x2="800" y2="330"/>
+      <line x1="250" y1="510" x2="640" y2="380"/>
+      <line x1="1190" y1="500" x2="800" y2="380"/>
+    </g>
+  </svg>
+
+  <section class="core">
+    <div class="eyebrow">AI/ML engineer · Lahore · remote</div>
+    <h1>I ship models that get measured, not demoed.<br>Ask this page to prove it.</h1>
+
+    <div class="fieldlabel">ask the console</div>
+    <div class="field">
+      <i class="caret"></i>
+      <input value="what did the face pipeline throw away?" aria-label="Ask the console">
+    </div>
+
+    <div class="chips">
+      <a class="chip hot" href="#">what did the face pipeline throw away?</a>
+      <a class="chip" href="#">show me something that failed</a>
+      <a class="chip" href="#">what have you not measured?</a>
+      <a class="chip" href="#">what did you build alone?</a>
+      <a class="chip" href="#">are you available?</a>
+    </div>
+
+    <div class="answering">
+      <span class="fig">7,615</span>
+      <div>
+        <p>faces of 10,291 never reached an identity — 74% failed the quality gate on
+           blur, face area or head pose. Every rejection shows the reading that killed
+           it and the limit it was measured against.</p>
+        <span class="src">assembling vanguard · 0.45 · station 1 of 4</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="avail">remote only · reply within one working day</div>
+  <div class="assembling">world assembles from your question</div>
+</main>
+
+</body>
+</html>

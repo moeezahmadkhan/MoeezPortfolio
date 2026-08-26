@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero B — orbit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lampblack:#0A0C0B; --plate:#151A18; --cyanotype:#2F6E8F;
+    --brass:#8A6E3E; --sodium:#F2C14E; --oxide:#A63D2A;
+    --ink:#DCE3E1; --muted:#7C8A88;
+    --display:"Bodoni Moda",serif; --body:"Archivo",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--lampblack);color:var(--ink);font-family:var(--body);
+       height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+  .ret{position:relative;display:inline-block;padding:9px 18px;font-family:var(--mono);
+       font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink);
+       text-decoration:none;white-space:nowrap}
+  .ret::before,.ret::after{content:"";position:absolute;width:9px;height:100%;top:0;
+       border:1px solid var(--brass)}
+  .ret::before{left:0;border-right:0}
+  .ret::after{right:0;border-left:0}
+  .ret.lit{color:var(--sodium)}
+  .ret.lit::before,.ret.lit::after{border-color:var(--sodium)}
+
+  header{display:flex;justify-content:space-between;align-items:center;
+         padding:20px 34px;border-bottom:1px solid #222A27;position:relative;z-index:3}
+  .wordmark{font-family:var(--display);font-size:19px;letter-spacing:5.5px;font-weight:600}
+  .controls{display:flex;gap:10px}
+
+  main{flex:1;position:relative;min-height:0;
+       background:radial-gradient(46% 62% at 70% 50%, #1A211E 0%, var(--lampblack) 68%)}
+  main svg{position:absolute;inset:0;width:100%;height:100%}
+
+  .copy{position:absolute;left:34px;top:50%;transform:translateY(-50%);max-width:390px;z-index:2}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;
+           color:var(--muted);margin-bottom:22px}
+  h1{font-weight:500;font-size:33px;line-height:1.18;letter-spacing:-0.4px;margin-bottom:24px}
+  .claims{display:flex;flex-direction:column;gap:14px;margin-bottom:22px}
+  .claim{display:flex;gap:14px;align-items:baseline}
+  .fig{font-family:var(--mono);font-weight:600;font-size:30px;line-height:1;
+       color:var(--cyanotype);min-width:88px}
+  .fig.hollow{color:transparent;-webkit-text-stroke:1px var(--cyanotype)}
+  .claim p{font-size:12.5px;line-height:1.45;color:var(--muted)}
+  .legend{font-family:var(--mono);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;
+          color:var(--muted);display:flex;gap:16px;margin-bottom:20px}
+  .sw{display:inline-block;width:9px;height:9px;margin-right:6px;vertical-align:-1px}
+  .sw.f{background:var(--cyanotype)}
+  .sw.h{border:1px solid var(--cyanotype)}
+  .avail{font-family:var(--mono);font-size:11px;letter-spacing:1.2px;color:var(--sodium);
+         text-transform:uppercase}
+
+  .hint{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);
+        font-family:var(--mono);font-size:9px;letter-spacing:2.2px;text-transform:uppercase;
+        color:var(--muted);z-index:2}
+
+  @media (max-width:700px){
+    body{height:auto;overflow:auto}
+    header{padding:14px 16px}
+    .wordmark{font-size:14px;letter-spacing:4px}
+    .controls .ret:first-child{display:none}
+    main{min-height:auto;display:flex;flex-direction:column-reverse}
+    main svg{position:relative;height:300px;flex:none}
+    .copy{position:relative;left:0;top:0;transform:none;max-width:100%;padding:24px 16px 8px}
+    h1{font-size:26px}
+    .fig{font-size:26px;min-width:74px}
+    .hint{position:relative;left:0;bottom:0;transform:none;text-align:center;padding:6px 0 18px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">MOEEZ AHMAD KHAN</div>
+  <nav class="controls">
+    <a class="ret" href="#">read as text</a>
+    <a class="ret lit" href="#">book a 30-minute call</a>
+  </nav>
+</header>
+
+<main>
+  <svg viewBox="0 0 1440 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <!-- orbit paths -->
+    <ellipse cx="1010" cy="350" rx="330" ry="232" fill="none" stroke="#8A6E3E" stroke-opacity=".3"/>
+    <ellipse cx="1010" cy="350" rx="228" ry="158" fill="none" stroke="#8A6E3E" stroke-opacity=".16"/>
+
+    <!-- the viewer at the centre: a fixed lens -->
+    <g transform="translate(1010 350)">
+      <circle r="52" fill="#151A18" stroke="#8A6E3E" stroke-opacity=".7"/>
+      <circle r="30" fill="none" stroke="#2F6E8F" stroke-opacity=".8"/>
+      <circle r="4" fill="#F2C14E"/>
+      <g stroke="#F2C14E" fill="none" opacity=".9">
+        <path d="M-70 -70 h16 M-70 -70 v16"/><path d="M70 -70 h-16 M70 -70 v16"/>
+        <path d="M-70 70 h16 M-70 70 v-16"/><path d="M70 70 h-16 M70 70 v-16"/>
+      </g>
+      <text y="92" text-anchor="middle" fill="#7C8A88" font-family="IBM Plex Mono"
+            font-size="9" letter-spacing="2">YOU ARE HERE</text>
+    </g>
+
+    <!-- station 1 — vanguard, lit, nearest -->
+    <g transform="translate(1010 578)">
+      <rect x="-118" y="-56" width="236" height="112" fill="#151A18" stroke="#F2C14E" stroke-opacity=".8"/>
+      <text x="-104" y="-34" fill="#F2C14E" font-family="IBM Plex Mono" font-size="9" letter-spacing="2">0.45 — VANGUARD</text>
+      <g font-family="IBM Plex Mono" font-size="8" fill="#7C8A88">
+        <text x="-104" y="-10">SEEN</text><rect x="-56" y="-17" width="140" height="7" fill="#2F6E8F"/>
+        <text x="-104" y="10">KEPT</text><rect x="-56" y="3" width="36" height="7" fill="#2F6E8F"/>
+        <text x="-104" y="30">STRANGER</text><rect x="-56" y="23" width="5" height="7" fill="#A63D2A"/>
+      </g>
+      <text x="-104" y="48" fill="#DCE3E1" font-family="IBM Plex Mono" font-size="10">26.0% CLEARED</text>
+    </g>
+
+    <!-- station 2 — sumero, right -->
+    <g transform="translate(1298 350)" opacity=".72">
+      <rect x="-92" y="-62" width="184" height="124" fill="#151A18" stroke="#8A6E3E" stroke-opacity=".5"/>
+      <text x="-78" y="-40" fill="#8A6E3E" font-family="IBM Plex Mono" font-size="9" letter-spacing="2">93.0% — SUMERO</text>
+      <g>
+        <rect x="-78" y="-26" width="13" height="13" fill="#2F6E8F"/><rect x="-62" y="-26" width="13" height="13" fill="#2F6E8F"/>
+        <rect x="-46" y="-26" width="13" height="13" fill="#2F6E8F"/><rect x="-30" y="-26" width="13" height="13" fill="#2F6E8F" fill-opacity=".5"/>
+        <rect x="-14" y="-26" width="13" height="13" fill="#A63D2A"/>
+        <rect x="-78" y="-9" width="13" height="13" fill="#2F6E8F"/><rect x="-62" y="-9" width="13" height="13" fill="#2F6E8F" fill-opacity=".5"/>
+        <rect x="-46" y="-9" width="13" height="13" fill="#A63D2A"/><rect x="-30" y="-9" width="13" height="13" fill="#2F6E8F"/>
+        <rect x="-14" y="-9" width="13" height="13" fill="#2F6E8F"/>
+      </g>
+      <text x="-78" y="32" fill="#DCE3E1" font-family="IBM Plex Mono" font-size="10">22 OPEN</text>
+    </g>
+
+    <!-- station 3 — pawlyse, top -->
+    <g transform="translate(1010 124)" opacity=".62">
+      <rect x="-96" y="-46" width="192" height="92" fill="#151A18" stroke="#8A6E3E" stroke-opacity=".45"/>
+      <text x="-82" y="-24" fill="#8A6E3E" font-family="IBM Plex Mono" font-size="9" letter-spacing="2">140s — PAWLYSE</text>
+      <rect x="-82" y="-10" width="164" height="9" fill="none" stroke="#2F6E8F" stroke-opacity=".7"/>
+      <rect x="-82" y="-10" width="58" height="9" fill="#2F6E8F"/>
+      <rect x="-24" y="-10" width="34" height="9" fill="#2F6E8F" fill-opacity=".55"/>
+      <text x="-82" y="22" fill="#DCE3E1" font-family="IBM Plex Mono" font-size="10">10 CALLS · 6 CITED</text>
+    </g>
+
+    <!-- station 4 — nexis, left, furthest -->
+    <g transform="translate(700 350)" opacity=".5">
+      <rect x="-88" y="-56" width="176" height="112" fill="#151A18" stroke="#8A6E3E" stroke-opacity=".4"/>
+      <text x="-74" y="-34" fill="#8A6E3E" font-family="IBM Plex Mono" font-size="9" letter-spacing="2">11×w — NEXIS</text>
+      <g fill="#2F6E8F">
+        <rect x="-74" y="-6" width="9" height="20"/><rect x="-61" y="-2" width="9" height="16"/>
+        <rect x="-48" y="0" width="9" height="14"/><rect x="-35" y="0" width="9" height="14"/>
+        <rect x="-22" y="0" width="9" height="14"/><rect x="-9" y="0" width="9" height="14"/>
+        <rect x="4" y="4" width="9" height="10"/><rect x="17" y="6" width="9" height="8"/>
+        <rect x="30" y="2" width="9" height="12"/><rect x="43" y="4" width="9" height="10"/>
+        <rect x="56" y="4" width="9" height="10"/>
+      </g>
+      <text x="-74" y="40" fill="#DCE3E1" font-family="IBM Plex Mono" font-size="10">100+ DECKS · 0 USERS</text>
+    </g>
+
+    <!-- sight lines from the lens to each station -->
+    <g stroke="#8A6E3E" stroke-opacity=".22" stroke-dasharray="2 5">
+      <line x1="1010" y1="350" x2="1010" y2="522"/>
+      <line x1="1010" y1="350" x2="1206" y2="350"/>
+      <line x1="1010" y1="350" x2="1010" y2="170"/>
+      <line x1="1010" y1="350" x2="788" y2="350"/>
+    </g>
+  </svg>
+
+  <section class="copy">
+    <div class="eyebrow">AI/ML engineer · Lahore · remote</div>
+    <h1>I ship models that get measured, not demoed.</h1>
+    <div class="claims">
+      <div class="claim"><span class="fig">74%</span><p>of what the face pipeline saw, it rejected — and publishes why.</p></div>
+      <div class="claim"><span class="fig">214</span><p>prompts grading the clinical assistant. 22 criticals still open.</p></div>
+      <div class="claim"><span class="fig hollow">2 min</span><p>per pitch deck. Approximate — I never instrumented it.</p></div>
+    </div>
+    <div class="legend">
+      <span><i class="sw f"></i>measured</span>
+      <span><i class="sw h"></i>not measured</span>
+    </div>
+    <div class="avail">remote only · reply within one working day</div>
+  </section>
+
+  <div class="hint">four systems in orbit · scroll to bring one into the lens</div>
+</main>
+
+</body>
+</html>
