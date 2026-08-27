@@ -34,6 +34,11 @@ test('body and label colours clear 4.5:1 against their own ground', async ({ pag
     ['muted', tokens.muted, tokens.ground],
     ['brass-text', tokens.brassText, tokens.ground],
     ['brass-text on plate', tokens.brassText, tokens.plate],
+    // Every panel on the page is --plate, and since the stage caption stopped
+    // being a gradient it is plate too. Ground alone stopped covering it.
+    ['ink on plate', tokens.ink, tokens.plate],
+    ['muted on plate', tokens.muted, tokens.plate],
+    ['cyanotype-lift on plate', tokens.cyanLift, tokens.plate],
     ['sodium', tokens.sodium, tokens.ground],
     ['cyanotype-lift', tokens.cyanLift, tokens.ground],
   ]) {

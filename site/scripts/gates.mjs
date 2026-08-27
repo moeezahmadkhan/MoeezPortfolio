@@ -47,7 +47,11 @@ const threeChunks = js.filter((f) => /three/i.test(f))
 // everything that is not three. A chunk reached only through a dynamic
 // import() is not on the first-load path and must not be charged to it.
 const indexHtml = readFileSync(join(DIST, 'index.html'), 'utf8')
-const scriptSrcs = [...indexHtml.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1])
+// Same-origin only. A future analytics tag or CDN script is not a chunk in
+// dist/ and must not be counted as one that failed to resolve.
+const scriptSrcs = [...indexHtml.matchAll(/<script[^>]+src="([^"]+)"/g)]
+  .map((m) => m[1])
+  .filter((src) => src.startsWith('/') || src.startsWith('./'))
 const entryChunks = js.filter((f) => scriptSrcs.some((src) => f.endsWith(src.replace(/^\//, ''))))
 // A zero-byte entry passes every size budget it is charged against, so an
 // unresolved <script src> has to be a breach rather than a quiet 0.0KB.

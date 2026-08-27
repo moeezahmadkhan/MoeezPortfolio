@@ -72,10 +72,19 @@ async function start() {
 
   const mount = async () => {
     if (scene) return
-    const { createTurret } = await import('./scene/turret.js')
-    scene = createTurret(stage)
-    stage.dataset.enhanced = 'true'
-    if (!toggle) toggle = mountToggle(teardown, remount)
+    try {
+      const { createTurret } = await import('./scene/turret.js')
+      scene = createTurret(stage)
+      stage.dataset.enhanced = 'true'
+      if (!toggle) toggle = mountToggle(teardown, remount)
+    } catch {
+      // A chunk that never arrives, a context that dies during construction.
+      // The static instrument is already on the page and complete, so the
+      // honest response is to leave the visitor on it. Silent for the same
+      // reason declining is silent: there is nothing here they can act on.
+      scene = null
+      delete stage.dataset.enhanced
+    }
   }
 
   const teardown = () => {

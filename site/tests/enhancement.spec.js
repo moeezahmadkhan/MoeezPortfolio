@@ -129,6 +129,31 @@ test('a lost context leaves a working page, not a dead rectangle', async ({ page
   await expect(page.locator('a[href="https://cal.com/moeezahmadkhan/30min"]').first()).toBeVisible()
 })
 
+test('a scene that never arrives leaves the page whole', async ({ page }) => {
+  const failures = []
+  page.on('pageerror', (e) => failures.push(String(e)))
+
+  // The one failure the visitor is most likely to hit: the chunk does not
+  // load. A flaky connection, a proxy, a tab closed mid-flight.
+  await page.route('**/three-*.js', (route) => route.abort())
+
+  await page.goto('/')
+  await page.locator('[data-stage]').scrollIntoViewIfNeeded()
+  await page.waitForTimeout(2000)
+
+  await expect(page.locator('[data-stage] canvas')).toHaveCount(0)
+  await expect(page.locator('[data-stage]')).not.toHaveAttribute('data-enhanced', 'true')
+
+  // The static instrument is still the page, and still says everything.
+  await expect(page.locator('[data-stage] svg')).toBeVisible()
+  await expect(page.getByRole('heading', { name: /10,291 faces seen/ })).toBeVisible()
+  await expect(page.locator('a[href="https://cal.com/moeezahmadkhan/30min"]').first()).toBeVisible()
+
+  // And no offer to turn off something that never started.
+  await expect(page.getByRole('button', { name: /read as text/i })).toHaveCount(0)
+  expect(failures, 'the failed upgrade is handled, not thrown').toEqual([])
+})
+
 test('device pixel ratio is capped', async ({ page }, testInfo) => {
   await page.goto('/')
   await stageMounted(page)

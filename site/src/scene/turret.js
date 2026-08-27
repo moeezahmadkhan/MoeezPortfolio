@@ -24,9 +24,14 @@ import {
  * the case where the module somehow runs before the tokens are parsed; they
  * are not a second source of truth.
  */
+const tokens = getComputedStyle(document.documentElement)
+
 const token = (name, fallback) => {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
-  return new Color(value || fallback)
+  const value = tokens.getPropertyValue(name).trim()
+  // Only a hex is accepted. Given oklch() or color-mix(), three warns and
+  // hands back an unchanged colour rather than throwing, so a silent wrong
+  // colour is the failure mode this guards against — not a crash.
+  return new Color(/^#[0-9a-f]{3,8}$/i.test(value) ? value : fallback)
 }
 
 const INK = {
