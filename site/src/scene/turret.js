@@ -89,6 +89,54 @@ export function createTurret(stage) {
     textures: renderer.info.memory.textures,
   })
 
+  // A frame readback, for the proof test. Counters say the renderer was asked
+  // to draw; only pixels say the GPU actually did. The renderer keeps no
+  // drawing buffer between frames, so the read has to follow its own render
+  // inside one task — hence the explicit render call rather than a toDataURL
+  // on whatever happened to be there.
+  //
+  // Returns aggregates, never the buffer: a 1440-wide frame is ~5MB of RGBA
+  // and crossing the test boundary with that would cost more than the render.
+  canvas.captureFrame = () => {
+    renderer.render(scene, camera)
+    const gl = renderer.getContext()
+    const w = canvas.width
+    const h = canvas.height
+    const px = new Uint8Array(w * h * 4)
+    gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px)
+
+    // The renderer is alpha:true over the page ground, so a covered pixel is
+    // exactly a pixel some geometry rasterised into. Tones are quantised to
+    // 5 bits per channel so anti-aliasing does not inflate the count.
+    let lit = 0
+    let checksum = 0
+    const tones = new Set()
+    for (let i = 0; i < px.length; i += 4) {
+      if (px[i + 3] < 8) continue
+      lit++
+      const tone = ((px[i] >> 3) << 10) | ((px[i + 1] >> 3) << 5) | (px[i + 2] >> 3)
+      tones.add(tone)
+      checksum = (checksum + tone * (i + 1)) % 2147483647
+    }
+    return { width: w, height: h, lit, coverage: lit / (w * h), tones: tones.size, checksum }
+  }
+
+  // The scene graph as numbers, so a test can assert that a bar is the length
+  // the prose says it is. This is the site's one real claim about itself — the
+  // geometry is the data — and an untested claim is a decoration.
+  canvas.readInstrument = () => [...built.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([index, group]) => ({
+      id: STATIONS[index].id,
+      // Bars are authored against a 1.9 unit track; the fill's x scale is the
+      // ratio times that width, so dividing gives the ratio straight back.
+      fills: group.children
+        .filter((c) => c.isMesh && (c.material === mat.fill || c.material === mat.fillOxide))
+        .map((m) => m.scale.x / 1.9),
+      declared: STATIONS[index].bars.map(([value, total]) => (total > 0 ? Math.min(1, value / total) : 0)),
+      lit: group.userData.frame.material === mat.frameLit,
+    }))
+
   // A live caption, so everything the canvas communicates also exists as text.
   const caption = document.createElement('p')
   caption.className = 'stage-caption'

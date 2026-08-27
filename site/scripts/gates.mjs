@@ -49,6 +49,11 @@ const threeChunks = js.filter((f) => /three/i.test(f))
 const indexHtml = readFileSync(join(DIST, 'index.html'), 'utf8')
 const scriptSrcs = [...indexHtml.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1])
 const entryChunks = js.filter((f) => scriptSrcs.some((src) => f.endsWith(src.replace(/^\//, ''))))
+// A zero-byte entry passes every size budget it is charged against, so an
+// unresolved <script src> has to be a breach rather than a quiet 0.0KB.
+if (entryChunks.length !== scriptSrcs.length) {
+  failures.push(`${scriptSrcs.length} script src(s) in index.html resolved to ${entryChunks.length} chunk(s) in ${DIST}`)
+}
 const lazyChunks = js.filter((f) => !entryChunks.includes(f) && !threeChunks.includes(f))
 
 // ── Gate 1: nothing in the entry graph may pull three ───────────────────────
@@ -71,11 +76,44 @@ if (entryBytes > BUDGETS.entryJsGzip) {
 }
 
 // ── Gate 3: the three chunk ────────────────────────────────────────────────
+// Presence first, size second. A budget alone is satisfied by an absent chunk,
+// so deleting the 3D layer would have read as `three chunk 0.0KB — ok`. The
+// floor is what makes the ceiling mean anything.
+const THREE_FLOOR = 60 * KB
+if (threeChunks.length !== 1) {
+  failures.push(`expected exactly 1 three chunk in ${DIST}, found ${threeChunks.length}`)
+}
 const threeBytes = threeChunks.reduce((n, f) => n + gz(f), 0)
-if (threeBytes > BUDGETS.threeChunkGzip) {
+if (threeChunks.length && threeBytes < THREE_FLOOR) {
+  failures.push(`three chunk ${fmt(threeBytes)} gzip is below ${fmt(THREE_FLOOR)} — that is not a real three build`)
+} else if (threeBytes > BUDGETS.threeChunkGzip) {
   failures.push(`three chunk ${fmt(threeBytes)} gzip exceeds ${fmt(BUDGETS.threeChunkGzip)}`)
-} else {
+} else if (threeChunks.length) {
   notes.push(`three chunk ${fmt(threeBytes)} gzip / ${fmt(BUDGETS.threeChunkGzip)}`)
+}
+
+// ── Gate 3b: the scene chunk is real, and it is the thing that pulls three ──
+// The renderer has to be constructed somewhere on the lazy path. If the turret
+// stops importing three, the three chunk goes unreferenced and the whole 3D
+// thesis is dead weight nobody executes.
+// Minified identifiers make source matching useless here, so the check is on
+// the module graph instead: some lazy chunk must import the three chunk by
+// name, and the entry must know how to reach that lazy chunk.
+const threeName = threeChunks[0]?.split('/').pop()
+const sceneChunks = threeName
+  ? lazyChunks.filter((f) => readFileSync(f, 'utf8').includes(threeName))
+  : []
+
+if (threeName && sceneChunks.length === 0) {
+  failures.push(`no lazy chunk imports ${threeName} — the 3D layer is built but unreachable`)
+} else if (sceneChunks.length) {
+  const reachable = entryChunks.some((f) =>
+    sceneChunks.some((s) => readFileSync(f, 'utf8').includes(s.split('/').pop())))
+  if (!reachable) {
+    failures.push('the entry never references the scene chunk — nothing will import() it')
+  } else {
+    notes.push(`scene chunk ${sceneChunks.map((f) => f.split('/').pop()).join(', ')} imports ${threeName}`)
+  }
 }
 
 // ── Gate 4: first view ─────────────────────────────────────────────────────
