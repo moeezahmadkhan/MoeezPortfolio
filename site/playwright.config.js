@@ -23,6 +23,21 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:4199/',
     trace: 'retain-on-failure',
+
+    // Headless Chromium rasterises WebGL through SwiftShader, which is a real
+    // GL implementation and enough to prove the render path — but it is not a
+    // driver. `GPU=1 npm test` runs the same suite on whatever hardware is
+    // actually present, which is the only way to catch a driver-specific
+    // failure before a visitor does.
+    launchOptions: process.env.GPU === '1'
+      ? {
+          args: [
+            '--use-angle=vulkan', '--use-gl=angle', '--enable-gpu',
+            '--ignore-gpu-blocklist', '--enable-features=Vulkan,VulkanFromANGLE',
+            '--disable-gpu-sandbox',
+          ],
+        }
+      : {},
   },
 
   projects: [
