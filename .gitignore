@@ -12,3 +12,5 @@ site/dist/
 explore/shots/
 site/test-results/
 site/playwright-report/
+.vercel
+.env*
