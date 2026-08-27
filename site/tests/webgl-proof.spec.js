@@ -103,6 +103,46 @@ test('every bar is the length the prose says it is', async ({ page }) => {
     .toBeCloseTo(num(kept) / num(seen), 3)
 })
 
+test('the whole ring is inside the frame, not cropped by the canvas', async ({ page }) => {
+  await page.goto('/')
+  await stageMounted(page)
+
+  const { width, bounds } = await capture(page)
+
+  // A 30 degree lens at this radius used to put two of the four stations
+  // outside the frustum: the picture read as one panel with a sliver clipped
+  // against each edge, and the ring the whole thesis rests on was only ever
+  // visible mid-rotation. Margin on both sides is the fix, and this is what
+  // stops it drifting back.
+  expect(bounds.left, 'left edge clear of the frame').toBeGreaterThan(0)
+  expect(bounds.right, 'right edge clear of the frame').toBeLessThan(width - 1)
+
+  // And all four stations are actually out there: the ring has to be wider
+  // than the station square to the viewer.
+  const litStation = 0.55 * width
+  expect(bounds.right - bounds.left, 'the ring is wider than one station')
+    .toBeGreaterThan(litStation)
+})
+
+test('the caption never sits on top of a reading', async ({ page }) => {
+  await page.goto('/')
+  await stageMounted(page)
+
+  const overlap = await page.evaluate(() => {
+    const canvas = document.querySelector('[data-stage] canvas')
+    const { bounds, height } = canvas.captureFrame()
+    const cap = document.querySelector('.stage-caption').getBoundingClientRect()
+    const box = canvas.getBoundingClientRect()
+    // Caption top in the same device-pixel space as the bounds.
+    const capTop = ((cap.top - box.top) / box.height) * height
+    return bounds.bottom - capTop
+  })
+
+  // At 390 the caption wraps to three lines. Anything below zero here means
+  // text is being set over the lit frame and the bars it describes.
+  expect(overlap, 'geometry ends above the caption band').toBeLessThanOrEqual(0)
+})
+
 test('exactly one station is in the light path', async ({ page }) => {
   await page.goto('/')
   await stageMounted(page)

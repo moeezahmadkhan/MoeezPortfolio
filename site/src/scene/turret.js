@@ -111,14 +111,28 @@ export function createTurret(stage) {
     let lit = 0
     let checksum = 0
     const tones = new Set()
+    // Bounding box of everything drawn, so the framing can be asserted rather
+    // than eyeballed: geometry touching column 0 or column w-1 is a ring being
+    // cropped by the canvas, not a ring receding into fog.
+    let left = w, right = -1, top = h, bottom = -1
     for (let i = 0; i < px.length; i += 4) {
       if (px[i + 3] < 8) continue
       lit++
+      const p = i / 4
+      const x = p % w
+      const y = h - 1 - Math.floor(p / w)   // readPixels is bottom-up; report top-down
+      if (x < left) left = x
+      if (x > right) right = x
+      if (y < top) top = y
+      if (y > bottom) bottom = y
       const tone = ((px[i] >> 3) << 10) | ((px[i + 1] >> 3) << 5) | (px[i + 2] >> 3)
       tones.add(tone)
       checksum = (checksum + tone * (i + 1)) % 2147483647
     }
-    return { width: w, height: h, lit, coverage: lit / (w * h), tones: tones.size, checksum }
+    return {
+      width: w, height: h, lit, coverage: lit / (w * h), tones: tones.size, checksum,
+      bounds: lit ? { left, right, top, bottom } : null,
+    }
   }
 
   // The scene graph as numbers, so a test can assert that a bar is the length
@@ -147,12 +161,26 @@ export function createTurret(stage) {
   const scene = new Scene()
   // One lamp in the room, and it falls off. Fog does the whole job of "the
   // station in the light path is the one you can read" — the three behind it
-  // sink toward the page ground without needing per-station materials, which
-  // would have cost three extra materials and three extra draw calls.
-  scene.fog = new Fog(INK.ground, 6.2, 12.4)
-  const camera = new PerspectiveCamera(30, 1, 0.1, 40)
-  camera.position.set(0, 0.55, 8.4)
-  camera.lookAt(0, 0, 0)
+  // sink toward the plate without needing per-station materials, which would
+  // have cost three extra materials and three extra draw calls.
+  // Fog colour is the plate the canvas sits on, not the page ground. Fogging
+  // toward #0a0c0b over a #151a18 box made distant stations DARKER than their
+  // own background — they advanced instead of receding, which is the opposite
+  // of the intent. Measured, not guessed: a frame tally showed the far plates
+  // resolving away from the ground rather than into it.
+  scene.fog = new Fog(INK.plate, 7.0, 13.0)
+
+  // A 30° lens at this radius put stations 2 and 4 outside the frustum: the
+  // frame read as one panel with two slivers clipped by the canvas edge, and
+  // the ring the whole thesis rests on was only ever visible mid-rotation.
+  // Wider lens and some elevation, so the ring is a wheel seen slightly from
+  // above and all four instruments are inside the frame at rest.
+  const camera = new PerspectiveCamera(40, 1, 0.1, 40)
+  camera.position.set(0, 1.35, 8.0)
+  // Aimed below the ring, which lifts the whole wheel in frame and leaves the
+  // bottom band to the caption. The caption is opaque, so anything drawn down
+  // there would simply be covered.
+  camera.lookAt(0, -0.42, 0)
 
   const turret = new Group()
   scene.add(turret)

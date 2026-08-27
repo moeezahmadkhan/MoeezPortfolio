@@ -324,7 +324,12 @@
     padding: 0.6rem 0.9rem; margin: 0;
     font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.14em;
     text-transform: uppercase; color: var(--muted);
-    background: linear-gradient(to top, var(--plate) 55%, transparent);
+    /* Solid, not a gradient. At 390 the caption wraps to three lines and the
+       gradient only reached full plate at 55% of its own height, so the top
+       line was set over the lit frame and the bars. A caption that sits on
+       the reading it describes is worse than one that costs a band. */
+    background: var(--plate);
+    border-block-start: 1px solid var(--rule);
   }
 
   .index a[aria-current] { background: color-mix(in srgb, var(--sodium) 10%, transparent); }
