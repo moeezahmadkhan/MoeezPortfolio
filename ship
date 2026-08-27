@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Push main and deploy to production.
+#
+# GitHub Actions and the Vercel GitHub App are both locked by the enterprise
+# that manages this GitHub account, so nothing deploys on push. This is the
+# replacement: one command that pushes and then ships.
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+echo "==> verifying"
+( cd site && npm run build && npm run gates && npx playwright test --reporter=line )
+
+echo "==> pushing"
+git push origin main
+
+echo "==> deploying to production"
+npx -y vercel@latest --prod --yes
+
+echo "==> live check"
+sleep 3
+curl -sS "https://moeezahmadkhan.com/?cachebust=$RANDOM" | grep -oE '/assets/index-[A-Za-z0-9_-]+\.js' | sort -u
