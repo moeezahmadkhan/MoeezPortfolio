@@ -1,0 +1,312 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=e3]:
+    - link "MOEEZ AHMAD KHAN" [ref=e4] [cursor=pointer]:
+      - /url: /
+    - navigation "Primary" [ref=e5]:
+      - list [ref=e6]:
+        - listitem [ref=e7]:
+          - link "Book a 30-minute call" [ref=e8] [cursor=pointer]:
+            - /url: https://cal.com/moeezahmadkhan/30min
+  - main [ref=e9]:
+    - region [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - paragraph [ref=e13]: AI/ML engineer · Lahore · remote
+          - heading "I ship models that get measured, not demoed." [level=1] [ref=e14]
+          - generic [ref=e15]:
+            - paragraph [ref=e16]:
+              - generic [ref=e17]: 74%
+              - generic [ref=e18]: of what the face pipeline saw, it rejected — and it publishes why.
+            - paragraph [ref=e19]:
+              - generic [ref=e20]: "214"
+              - generic [ref=e21]: prompts grading the clinical assistant. 22 criticals still open.
+            - paragraph [ref=e22]:
+              - generic [ref=e23]:
+                - text: 2 min
+                - generic [ref=e24]: (not measured)
+              - generic [ref=e25]: per pitch deck. Approximate — I never instrumented it.
+          - paragraph [ref=e26]:
+            - generic [ref=e27]: Filled — measured
+            - generic [ref=e29]: Hollow — not measured
+          - paragraph [ref=e31]: Remote only · reply within one working day
+          - paragraph [ref=e32]:
+            - link "Book a 30-minute call" [ref=e33] [cursor=pointer]:
+              - /url: https://cal.com/moeezahmadkhan/30min
+            - link "Email me" [ref=e34] [cursor=pointer]:
+              - /url: mailto:kmoeez2018@gmail.com
+        - generic [ref=e35]:
+          - figure "Filled is what survived. The empty track is Nexis, which parsed over a hundred decks and reached nobody." [ref=e37]:
+            - img "Four systems, and how much of their own input each one throws away Vanguard kept 2,676 of 10,291 faces. Sumero passed 133 of 179 regression cases. Pawlyse spends 140 seconds of a 180-second budget on research. Nexis parsed over 100 decks and reached zero real users." [ref=e38]:
+              - generic [ref=e39]: FOUR SYSTEMS — WHAT EACH ONE KEEPS
+              - generic [ref=e40]:
+                - generic [ref=e41]: VANGUARD
+                - generic [ref=e44]: 2,676 kept
+                - generic [ref=e45]: of 10,291 faces seen
+                - generic [ref=e46]: SUMERO
+                - generic [ref=e49]: 133 passed
+                - generic [ref=e50]: of 179 graded cases
+                - generic [ref=e51]: PAWLYSE
+                - generic [ref=e54]: 140s researching
+                - generic [ref=e55]: of a 180s budget
+                - generic [ref=e56]: NEXIS
+                - generic [ref=e58]: 0 reached a user
+                - generic [ref=e59]: of 100+ decks parsed
+          - navigation "The work" [ref=e61]:
+            - paragraph [ref=e62]: Index — four systems
+            - list "Index — four systems" [ref=e63]:
+              - listitem [ref=e64]:
+                - link "0.45 Vanguard — edge vision" [ref=e65] [cursor=pointer]:
+                  - /url: "#vanguard"
+                  - generic [ref=e66]: "0.45"
+                  - generic [ref=e67]: Vanguard — edge vision
+              - listitem [ref=e68]:
+                - link "93.0% Sumero — clinical LLM" [ref=e69] [cursor=pointer]:
+                  - /url: "#sumero"
+                  - generic [ref=e70]: 93.0%
+                  - generic [ref=e71]: Sumero — clinical LLM
+              - listitem [ref=e72]:
+                - link "140s Pawlyse — research agent" [ref=e73] [cursor=pointer]:
+                  - /url: "#pawlyse"
+                  - generic [ref=e74]: 140s
+                  - generic [ref=e75]: Pawlyse — research agent
+              - listitem [ref=e76]:
+                - link "11×w Nexis — LLM scoring" [ref=e77] [cursor=pointer]:
+                  - /url: "#nexis"
+                  - generic [ref=e78]: 11×w
+                  - generic [ref=e79]: Nexis — LLM scoring
+    - region [ref=e80]:
+      - generic [ref=e81]:
+        - heading "Four systems, in the order I would defend them" [level=2] [ref=e82]
+        - article [ref=e83]:
+          - generic:
+            - paragraph [ref=e84]: 0.45 — Vanguard — edge computer vision — solo build
+            - heading "10,291 faces seen. 2,676 good enough to trust." [level=3] [ref=e85]: 10,291 faces seen.2,676 good enough to trust.
+            - generic [ref=e86]:
+              - paragraph [ref=e87]: Cameras watch a workspace. An edge box with no internet detects every face, measures whether that face is good enough to trust, and only then matches it against an enrolled identity. The output is an attendance record nobody had to clock in for.
+              - paragraph [ref=e88]: "Face recognition demos are easy. Face recognition that runs all night on a $200 TPU, on people walking past at an angle, fails constantly. So the product is built around the failure rather than around the match: of 10,291 faces the camera found, 2,676 cleared the quality gate. That 26% survival rate is the main screen, not a footnote. Every rejected face shows the measurement that killed it and the limit it was measured against, and an operator who thinks the system is missing people can move that limit and watch the numbers move."
+              - paragraph [ref=e89]: Four networks run on the device — YOLOv8n, YOLOv8-face, WHENet and ArcFace R50 — chained through Kafka across three processes into one Postgres. A face reaches an identity only by passing every gate, in order.
+            - generic [ref=e90]:
+              - heading "The constraint" [level=4] [ref=e91]
+              - paragraph [ref=e93]:
+                - text: No public ONNX export exists for WHENet or YOLOv8-face. The same code has to run on the device's TPU and on a laptop, so I reproduced the device's preprocessing step for step — including ArcFace's
+                - code [ref=e94]: x / 127.5 − 1.0
+                - text: ", scale-then-offset, not"
+                - code [ref=e95]: (x − 127.5) / 128
+                - text: . Where a substitute model stands in, the config says so and states that thresholds tuned there do not transfer. Naming the TPU without the SDK fails loudly rather than falling back to CPU, because a silent fallback looks like a working TPU running orders of magnitude slower.
+            - generic [ref=e96]:
+              - heading "What went wrong" [level=4] [ref=e97]
+              - generic [ref=e98]:
+                - paragraph [ref=e99]:
+                  - text: Gate state lives in memory and the detector restarts by design. My synthetic track-id counter always started at −1, so the first unnamed visit after a restart got the same −1 as the last one before it. The backend clusters on
+                  - code [ref=e100]: track:<id>:<5-minute bucket>
+                  - text: — so a restart inside one bucket merged two unrelated people into one person.
+                - paragraph [ref=e101]: "I replaced the counter with a random per-process seed counting down from the int32 floor. Before the gate existed, an unnamed detection became its own singleton: noisy, but never a wrong merge. That is the better failure of the two, and the fix chose it deliberately."
+            - generic [ref=e102]:
+              - generic [ref=e103]:
+                - term [ref=e104]: Networks on device
+                - definition [ref=e105]: "4"
+              - generic [ref=e106]:
+                - term [ref=e107]: ArcFace dimension
+                - definition [ref=e108]: "512"
+              - generic [ref=e109]:
+                - term [ref=e110]: Cosine match threshold
+                - definition [ref=e111]: "0.45"
+              - generic [ref=e112]:
+                - term [ref=e113]: Cleared the gate
+                - definition [ref=e114]: 26.0%
+            - generic [ref=e115]:
+              - heading "Said plainly" [level=4] [ref=e116]
+              - paragraph [ref=e118]: 88.8% of survivors matched a known identity. That is the share that cleared the 0.45 threshold, not measured accuracy against a labelled set — I never ran that evaluation. The pipeline carries no timing instrumentation either, so I have no throughput figure to quote. The system also ships with no authentication and serves face crops openly; its own README says so, and it belongs only on a trusted, firewalled network.
+            - group [ref=e119]:
+              - generic "Open the rejection detail" [ref=e120] [cursor=pointer]
+            - paragraph [ref=e121]: "Role: solo. 186 commits across the Python pipeline, the NestJS API and the React console."
+          - figure "The gate, and two of the three readings it measures against. The tick is the limit." [ref=e122]:
+            - img "The quality gate, as a funnel Of 10,291 faces seen, 2,676 were kept, 2,376 matched a known identity and 300 were strangers." [ref=e123]:
+              - generic [ref=e124]: THE GATE
+              - generic [ref=e125]:
+                - generic [ref=e126]: SEEN
+                - generic [ref=e128]: 10,291
+                - generic [ref=e129]: KEPT
+                - generic [ref=e131]: 2,676
+                - generic [ref=e132]: KNOWN
+                - generic [ref=e134]: 2,376
+                - generic [ref=e135]: STRANGER
+                - generic [ref=e137]: "300"
+              - generic [ref=e138]:
+                - generic [ref=e139]: BLUR
+                - generic [ref=e143]: FLOOR 100
+                - generic [ref=e144]: YAW
+                - generic [ref=e148]: MAX 12°
+              - generic [ref=e149]: 26.0% CLEARED
+        - article [ref=e151]:
+          - generic:
+            - paragraph [ref=e152]: 93.0% — Sumero Health — clinical LLM — I own the AI service
+            - heading "214 prompts graded. 22 criticals still open." [level=3] [ref=e153]: 214 prompts graded.22 criticals still open.
+            - generic [ref=e154]:
+              - paragraph [ref=e155]: Ero is the assistant inside Sumero Health. It reads a member's lab panels and wearable data and answers questions about them. The hard part is not the answer. It is deciding, before answering, whether this message is an emergency, whether it needs an intake interview, and whether the record actually contains what the answer is about to claim.
+              - paragraph [ref=e156]: So the first thing I built after the assistant was the thing that grades it. A router sorts every message into emergency, urgent or routine — 174 of 187 test prompts correctly, and the miss that matters, an emergency read as routine, happens in 3 of 103 emergency prompts. A 214-prompt graded set across 20 categories put the assistant at 124 pass, 58 partial and 32 fail in June. A 179-case regression suite in August, written to attack the specific things that broke, put it at 133 pass, 24 fail and 22 critical.
+              - paragraph [ref=e157]: The 22 are still open. They are listed in the repository with the failing prompt, the delivered answer and the assertion it violated.
+            - generic [ref=e158]:
+              - heading "The constraint" [level=4] [ref=e159]
+              - paragraph [ref=e161]: Clinical safety, on a stack where the model is not the last word. The public API and the AI service are separate processes; port 8001 is never exposed, and every call into it carries a shared secret. Answers pass through deterministic scrubbers before a member sees them.
+            - generic [ref=e162]:
+              - heading "What went wrong" [level=4] [ref=e163]
+              - generic [ref=e164]:
+                - paragraph [ref=e165]: The model started authoring its own disclaimers — verbose, redundant footers under every answer. I now strip any non-canonical footer deterministically on both the streaming and non-streaming paths, tell the model in the persona not to write one, and append a single approved line in the application.
+                - paragraph [ref=e166]: Then a boundary bug. By the way i started doing crossfit recently was pulled into a symptom intake, and the assistant asked about discomfort during those sessions. The preference-statement veto covered diet and status but not new-activity disclosures, so they fell through to the coaching catch-all. I extended it to cover exercise. A symptom-paired disclosure — started crossfit and my knee hurts — still interviews, because the veto only fires after every symptom tier.
+                - paragraph [ref=e167]: The third was my harness lying to me. The battery's first run reported 15 leaky disclaimers. All 15 were the approved footer, matched by a detector that required an italics wrapper the model does not write. I fixed the detector before I fixed anything else, then re-ran for a true 31 of 31.
+            - generic [ref=e168]:
+              - generic [ref=e169]:
+                - term [ref=e170]: Triage router accuracy
+                - definition [ref=e171]: 93.0%
+              - generic [ref=e172]:
+                - term [ref=e173]: Emergency read as routine
+                - definition [ref=e174]: 2.9%
+              - generic [ref=e175]:
+                - term [ref=e176]: Prompts in the graded set
+                - definition [ref=e177]: "214"
+              - generic [ref=e178]:
+                - term [ref=e179]: Criticals still open
+                - definition [ref=e180]: "22"
+            - generic [ref=e181]:
+              - heading "Said plainly" [level=4] [ref=e182]
+              - paragraph [ref=e184]: The June and August numbers measure different prompt sets, so they are two measurements, not a 16-point improvement — I will not write it as one. I have not re-measured latency since the stack moved to OpenRouter; the last numbers I trust are May medians between 5 and 12 seconds, and I would rather publish that than an adjective. The NestJS API is shared work — I wrote most of it, not all of it. The AI service and the evaluation harness are mine.
+            - group [ref=e185]:
+              - generic "Read a failing case" [ref=e186] [cursor=pointer]
+            - paragraph [ref=e187]: "Role: 482 of 492 commits in the AI service. All 54 in the evaluation harness. 204 of 327 in the public API, alongside two colleagues."
+          - figure "The August suite by outcome, then the two router numbers that matter most." [ref=e188]:
+            - 'img "The August regression suite, by outcome 179 cases: 133 pass, 24 fail, 22 critical." [ref=e189]':
+              - generic [ref=e190]: 179 CASES — AUG
+              - generic [ref=e219]:
+                - generic [ref=e220]: PASS 133
+                - generic [ref=e221]: FAIL 24
+                - generic [ref=e222]: CRITICAL 22
+              - generic [ref=e223]:
+                - generic [ref=e224]: TRIAGE ROUTER
+                - generic [ref=e227]: 174 / 187
+                - generic [ref=e228]: EMERGENCY → ROUTINE
+                - generic [ref=e231]: 3 / 103
+              - generic [ref=e232]: 22 CRITICALS PUBLISHED, NOT FIXED
+        - article [ref=e234]:
+          - generic:
+            - paragraph [ref=e235]: 140s — Pawlyse — research agent — mlend AI engineer
+            - heading "Ten model calls, 140 seconds, six citations." [level=3] [ref=e236]: Ten model calls,140 seconds, six citations.
+            - generic [ref=e237]:
+              - paragraph [ref=e238]: A normal question to Pawlyse retrieves once and answers. Some questions deserve more than that, so there is a second path that behaves like a researcher instead of a lookup.
+              - paragraph [ref=e239]: It plans six search angles with a cheap helper model, retrieves each from the pet's own record and from the live web, asks the helper what is still missing, retrieves that gap, and only then answers over the union with the main model — reporting what it drew on. Up to ten model calls, thirteen if it asks a clarifying question first.
+              - paragraph [ref=e240]: That cost is why the path is off by default, and why it runs against a clock. The caller times out at 180 seconds, synthesis reserves 30 of those and overhead takes 10, which leaves about 140 seconds of actual research. Every stage is bounded by what remains. When the budget runs out, the answer is written from what was gathered, not extended until something breaks.
+              - paragraph [ref=e241]: Answers carry at most six citations, at most four of them from the web, and nothing is cited past a cosine distance of 0.43. Nothing in this path is logged — not the question, not the sub-queries, not the retrieved record, not the answer. All four carry the owner's words or the animal's medical record.
+            - generic [ref=e242]:
+              - heading "The constraint" [level=4] [ref=e243]
+              - paragraph [ref=e245]: "A fact the owner deletes has to stay deleted. A background extractor reads chat and writes durable facts, which means deleting one only works until the extractor sees the same message again. Deleted facts get a tombstone, so the extractor cannot re-create them and the assistant will not state them as known. The scope is written into the code rather than implied: tombstones govern the memory channel only. The same fact may still sit in chat history or inside a document, and removing a memory does not rewrite those."
+            - generic [ref=e246]:
+              - heading "What went wrong" [level=4] [ref=e247]
+              - paragraph [ref=e249]: I drove the research path live and it broke five ways in one session. Two of the fixes are the ones I would show anybody. The service was serving content-free completions as answers — an empty response from the model became an empty answer to the owner — so it now raises instead. And it would run web searches against a plan that had already degraded, spending budget to enrich something it had no confidence in. It no longer does.
+            - generic [ref=e250]:
+              - generic [ref=e251]:
+                - term [ref=e252]: Model calls per run
+                - definition [ref=e253]: "10"
+              - generic [ref=e254]:
+                - term [ref=e255]: Research budget
+                - definition [ref=e256]: 140s
+              - generic [ref=e257]:
+                - term [ref=e258]: Citation distance cutoff
+                - definition [ref=e259]: "0.43"
+              - generic [ref=e260]:
+                - term [ref=e261]: Citations, max 4 from web
+                - definition [ref=e262]: "6"
+            - generic [ref=e263]:
+              - heading "Said plainly" [level=4] [ref=e264]
+              - paragraph [ref=e266]: The product holds no real pet records I can show, so nothing here is a screenshot of a live account. The marketing site is public at pawlyse.com; the application is not. I own the ML service. The dashboard is a colleague's work.
+            - group [ref=e267]:
+              - generic "Watch a research run spend its budget" [ref=e268] [cursor=pointer]
+            - paragraph [ref=e269]: "Role: all 38 commits in the ML service."
+          - figure "Every stage is bounded by what the clock has left. Nothing runs past the reserve." [ref=e270]:
+            - 'img "A research run against its wall clock 180 seconds total: 10 seconds overhead, about 140 seconds of research across plan, web, critique and gap stages, and 30 seconds reserved for synthesis." [ref=e271]':
+              - generic [ref=e272]: 180s CALLER TIMEOUT
+              - generic [ref=e280]:
+                - generic [ref=e281]: OVER
+                - generic [ref=e282]: PLAN
+                - generic [ref=e283]: WEB ×3
+                - generic [ref=e284]: CRITIQUE
+                - generic [ref=e285]: GAP ×2
+                - generic [ref=e286]: SYNTH
+              - generic [ref=e287]:
+                - generic [ref=e288]: CITATIONS KEPT
+                - generic [ref=e297]: 6 MAX · 4 FROM WEB
+                - generic [ref=e298]: DISTANCE CUTOFF
+                - generic [ref=e302]: "0.43"
+              - generic [ref=e303]: BUDGET SPENT — ANSWER WRITTEN ANYWAY
+        - article [ref=e305]:
+          - generic:
+            - paragraph [ref=e306]: 11×w — Nexis — LLM scoring — built with one other engineer
+            - heading "The composite is arithmetic. Only the parts are learned." [level=3] [ref=e307]: The composite is arithmetic.Only the parts are learned.
+            - generic [ref=e308]:
+              - paragraph [ref=e309]: "Nexis reads a pitch deck and turns it into a scored, comparable deal record. Anyone can ask a model to score a startup; the number that comes back is a vibe. This one is decomposed instead: eleven dimensions, each scored by its own call against its own rubric, then combined by fixed weights written in code. The model never produces the total. Traction is 11%, business model 10.5%, market, team, unit economics and defensibility 10% each, and a quarter of the score is structural — including completeness, so a deck that cannot be read costs itself points."
+              - paragraph [ref=e310]: I did not write those rubrics. I made them portable.
+              - paragraph [ref=e311]: Every model id in the seven-stage pipeline reads from the environment, and the service speaks to any OpenAI-compatible gateway rather than one vendor — so a stage can move from GPT-4.1 to something cheaper without touching a prompt. Cost is tracked per model with a separate rate for cached prompt tokens, which means a scoring run has a known price rather than an estimated one.
+            - generic [ref=e312]:
+              - heading "The constraint" [level=4] [ref=e313]
+              - paragraph [ref=e315]: Cost accounting had to survive models it had never heard of. The moment ids came from the environment, a gateway-namespaced name reached a tokenizer that did not recognise it and took the run down with it. Token counting now degrades instead of raising, so an unknown model costs you a cost figure, not a scoring run.
+            - generic [ref=e316]:
+              - heading "What went wrong, and whose it was" [level=4] [ref=e317]
+              - paragraph [ref=e319]: The scores came back generous. They bunched near the top and stopped separating deals, which is the failure mode of every LLM judge given a rubric and no calibration. The client noticed before we did, and the rubrics were re-cut twice in three days. That work was my colleague's, not mine, and the fix lives in prompts I did not write.
+            - generic [ref=e320]:
+              - generic [ref=e321]:
+                - term [ref=e322]: Weighted dimensions
+                - definition [ref=e323]: "11"
+              - generic [ref=e324]:
+                - term [ref=e325]: Pipeline stages
+                - definition [ref=e326]: "7"
+              - generic [ref=e327]:
+                - term [ref=e328]: Decks parsed
+                - definition [ref=e329]: 100+
+              - generic [ref=e330]:
+                - term [ref=e331]: Production users
+                - definition [ref=e332]: "0"
+            - generic [ref=e333]:
+              - heading "Said plainly" [level=4] [ref=e334]
+              - paragraph [ref=e336]: "This never reached production and no investor or founder used it. A deck takes roughly two minutes end to end — approximately, not measured. I built it with one other engineer: they owned the scoring rubrics and most of the ML service; I owned the model-routing layer, the console and half the API. It sits last on this page for that reason."
+            - group [ref=e337]:
+              - generic "See the weights" [ref=e338] [cursor=pointer]
+            - paragraph [ref=e339]: "Role: 122 of 202 commits. 10 of 51 in the ML service. 70 of 130 in the console."
+          - figure "Eleven weights summing to 100, and the one thing underneath them that can be swapped." [ref=e340]:
+            - img "Eleven weighted dimensions Traction 11 percent, business model 10.5, market 10, team 10, unit economics 10, defensibility 10, signals 7.5, valuation 6, peer matching 9, investor readiness 8, completeness 8." [ref=e341]:
+              - generic [ref=e342]: FIXED WEIGHTS, IN CODE
+              - generic [ref=e356]:
+                - generic [ref=e357]: CORE BUSINESS — 75%
+                - generic [ref=e358]: STRUCTURAL — 25%
+                - generic [ref=e359]: "11.0"
+                - generic [ref=e360]: "6.0"
+              - generic [ref=e361]:
+                - generic [ref=e362]: MODEL ID
+                - generic [ref=e364]: openai/gpt-4o-mini
+                - generic [ref=e365]: SWAPPABLE
+              - generic [ref=e366]: THE MODEL SCORES THE PARTS, NOT THE TOTAL
+    - region [ref=e368]:
+      - generic [ref=e369]:
+        - heading "About" [level=2] [ref=e370]
+        - generic [ref=e371]:
+          - paragraph [ref=e372]: I am an AI/ML engineer in Lahore, working remotely. I build the parts of a system that decide whether a model's output is good enough to act on — quality gates, routers, evaluation harnesses, budgets, and the interfaces that let a non-engineer see why the machine did what it did.
+          - paragraph [ref=e373]: The pattern across everything above is refusal. A face that fails a gate does not reach an identity. A content-free completion raises instead of becoming an answer. A degraded plan does not get a web search. A deleted fact does not come back. A restart mints a new id rather than reusing one, because a noisy singleton is a better failure than a wrong merge.
+          - paragraph [ref=e374]: I have taught this too. At Information Technology University I ran graduate-level Agentic AI sessions twice a week for a cohort of 40+, on multi-agent orchestration and RAG deployment, and reviewed student systems for whether they would survive production rather than whether they demoed well. I studied there too — BSCS, 2021 to 2025.
+          - paragraph [ref=e375]: Currently AI engineer at Ecommerce Steem. Before that, QUIDSol, where Vanguard and Nexis were built.
+    - region [ref=e376]:
+      - generic [ref=e377]:
+        - heading "Book 30 minutes." [level=2] [ref=e378]
+        - paragraph [ref=e380]: If you are hiring for AI/ML work and want to talk through any of the systems above — including the parts that do not work yet — pick a time. Remote only. I reply within one working day.
+        - paragraph [ref=e381]:
+          - link "Book a 30-minute call" [ref=e382] [cursor=pointer]:
+            - /url: https://cal.com/moeezahmadkhan/30min
+          - link "Email kmoeez2018@gmail.com" [ref=e383] [cursor=pointer]:
+            - /url: mailto:kmoeez2018@gmail.com
+          - link "View GitHub" [ref=e384] [cursor=pointer]:
+            - /url: https://github.com/moeezahmadkhan
+          - link "View LinkedIn" [ref=e385] [cursor=pointer]:
+            - /url: https://www.linkedin.com/in/moeez-ahmad-khan-68a403364/
+          - link "Download CV, PDF" [ref=e386] [cursor=pointer]:
+            - /url: /Moeez_Ahmad_Khan_CV.pdf
+  - contentinfo [ref=e387]:
+    - paragraph [ref=e388]: Every number on this page comes from a repository I can show you. Filled figures were measured; hollow ones were not.
