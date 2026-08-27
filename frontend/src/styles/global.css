@@ -1,22 +1,34 @@
 :root {
   /* ── The Wizard's Archive palette ── */
   --ink: #07070d;
-  --ink-2: #0c0c16;
-  --ink-3: #12121f;
   --parchment: #ece2cf;
   --parchment-dim: #b9ad94;
   --gold: #e7c27d;
   --gold-bright: #f6dfa6;
   --gold-deep: #b8893f;
   --ember: #d9743b;
-  --crimson: #8e2436;
   --rune: #7fd0c4;
+
+  /* Channel form of the gold, so every tint is a token with an alpha rather than
+     another literal. The gold appeared at 33 different hand-written alphas before
+     this existed; new tints should read rgb(var(--gold-rgb) / 0.4). */
+  --gold-rgb: 231 194 125;
+  --parchment-rgb: 236 226 207;
 
   --font-display: 'Cinzel', 'Times New Roman', serif;
   --font-body: 'Cormorant Garamond', Georgia, serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-  --shadow-glow: 0 0 40px rgba(231, 194, 125, 0.25);
+  /* Radius scale. There were 14 distinct values in the rendered page — 2px on a tag,
+     3px on a button, 4px on an input, for no reason anyone could name. */
+  --r-sharp: 2px;
+  --r-base: 4px;
+  --r-soft: 10px;
+  --r-pill: 999px;
+
+  /* The sticky nav's real height, hardcoded as 80px in two scroll-offset rules while
+     the bar actually measures ~61px desktop / ~70px mobile. */
+  --nav-h: 62px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -68,7 +80,44 @@ a { color: inherit; text-decoration: none; }
   opacity: 0.85;
 }
 
-/* Thin reduced-motion respect */
+/* Keyboard focus. Only three selectors used to define a ring, so every nav link,
+   rail mark, chip and launcher fell back to the UA default — which on a near-black
+   ground is barely visible, and the wand cursor already removes the pointer
+   affordance. :where() keeps specificity at 0 so components can still override. */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--rune);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Skip link: visually hidden until focused, then pinned top-left. */
+.skip-link {
+  position: fixed;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 10000;
+  padding: 0.7rem 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--gold);
+  border-radius: 3px;
+  transform: translateY(-160%);
+  transition: transform 0.2s ease;
+}
+.skip-link:focus-visible { transform: translateY(0); }
+
+/* Reduced-motion respect.
+   `animation-duration: 0.001ms` alone is a trap: an `infinite` animation keeps
+   iterating, so a 1.6s candle flicker becomes a strobe for exactly the users who
+   asked for less motion (WCAG 2.3.1). The iteration cap is what actually stops it. */
 @media (prefers-reduced-motion: reduce) {
-  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

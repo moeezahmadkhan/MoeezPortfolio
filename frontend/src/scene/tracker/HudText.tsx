@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text } from '@react-three/drei'
 import * as THREE from 'three'
-import { scrollState } from '../../scroll'
+import { scrollState, responsiveState } from '../../scroll'
 import { DATASTORE_POS, localProgress, ramp, metricsAt } from './phases'
 
 export function HudText() {
@@ -15,7 +15,8 @@ export function HudText() {
     // fades in once the live vitals have cleared, then out as the AI cards arrive
     const save = ramp(lp, 0.56, 0.64) * (1 - ramp(lp, 0.72, 0.78))
     if (stats.current) {
-      stats.current.visible = save > 0.02
+      // Hidden on mobile — the HTML vitals readout carries these numbers there.
+      stats.current.visible = save > 0.02 && !responsiveState.isMobile
       stats.current.scale.setScalar(0.85 + save * 0.15)
     }
     if (statText.current) {
@@ -43,7 +44,7 @@ export function HudText() {
       <Text
         ref={statText}
         fontSize={0.12}
-        color="#7cffb0"
+        color="#9fe8dc"
         anchorX="center"
         anchorY="middle"
         lineHeight={1.5}

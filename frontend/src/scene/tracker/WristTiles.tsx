@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Text, Billboard } from '@react-three/drei'
 import * as THREE from 'three'
-import { scrollState } from '../../scroll'
+import { scrollState, responsiveState } from '../../scroll'
 import { WRIST_ANCHOR, localProgress, ramp, metricsAt, type Metrics } from './phases'
 
 interface Tile {
@@ -15,9 +15,9 @@ interface Tile {
 // BPM is owned by the big Heartbeat readout, so the tiles carry the rest —
 // fanned into a tidy, evenly-spaced column to the right of the wrist (no orbit).
 const TILES: Tile[] = [
-  { key: 'cal', color: '#8fe9ff', offset: [1.5, 0.4], format: (m) => `${m.cal} cal` },
-  { key: 'steps', color: '#7cffb0', offset: [1.62, 0.0], format: (m) => `${(m.steps / 1000).toFixed(1)}k` },
-  { key: 'spo2', color: '#8fe9ff', offset: [1.5, -0.4], format: (m) => `SpO2 ${m.spo2}%` },
+  { key: 'cal', color: '#a8e6db', offset: [1.5, 0.4], format: (m) => `${m.cal} cal` },
+  { key: 'steps', color: '#9fe8dc', offset: [1.62, 0.0], format: (m) => `${(m.steps / 1000).toFixed(1)}k` },
+  { key: 'spo2', color: '#a8e6db', offset: [1.5, -0.4], format: (m) => `SpO2 ${m.spo2}%` },
 ]
 
 const ANCHOR = new THREE.Vector3(...WRIST_ANCHOR)
@@ -30,6 +30,12 @@ export function WristTiles() {
   const last = useRef<string[]>([])
 
   useFrame((state) => {
+    // Hidden on the stacked mobile layout — the HTML vitals readout carries the
+    // numbers there without colliding with the copy.
+    if (responsiveState.isMobile) {
+      if (root.current) root.current.visible = false
+      return
+    }
     const lp = localProgress(scrollState.progress)
     // own the live beat, then clear out so the saved-stats summary reads alone
     const vis = ramp(lp, 0.18, 0.4) * (1 - ramp(lp, 0.48, 0.58))

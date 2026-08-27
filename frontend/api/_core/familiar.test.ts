@@ -164,3 +164,39 @@ describe('handleFamiliarRequest', () => {
     expect(res.body.reply).toBe(FALLBACK_REPLY)
   })
 })
+
+describe('model cascade', () => {
+  it('lists only chat-tuned models — no reasoning, code or safety variants', () => {
+    // Reasoning models leak their scratchpad into the reply, code models ignore the
+    // persona, and the content-safety model is a classifier, not a chat partner.
+    for (const id of MODELS) {
+      expect(id).not.toMatch(/reasoning|code|content-safety/)
+    }
+  })
+
+  it('passes an abort signal to every upstream call so one hang cannot stall the cascade', async () => {
+    const seen: (AbortSignal | undefined)[] = []
+    const failing: typeof fetch = async (_url, init) => {
+      seen.push((init as RequestInit | undefined)?.signal ?? undefined)
+      return new Response('nope', { status: 503 })
+    }
+    await handleFamiliarRequest({
+      messages: [{ role: 'user', content: 'hi' }],
+      ip: 'sig', apiKey: 'key', now: 10, rateLimiter: createRateLimiter(), fetchImpl: failing,
+    })
+    expect(seen).toHaveLength(MODELS.length)
+    for (const s of seen) expect(s).toBeInstanceOf(AbortSignal)
+  })
+
+  it('falls through to the next model and returns 502 when every model fails', async () => {
+    let calls = 0
+    const failing: typeof fetch = async () => { calls++; return new Response('nope', { status: 503 }) }
+    const res = await handleFamiliarRequest({
+      messages: [{ role: 'user', content: 'hi' }],
+      ip: 'y', apiKey: 'key', now: 10, rateLimiter: createRateLimiter(), fetchImpl: failing,
+    })
+    expect(calls).toBe(MODELS.length)
+    expect(res.status).toBe(502)
+    expect(res.body.reply).toBe(FALLBACK_REPLY)
+  })
+})

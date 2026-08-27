@@ -60,3 +60,14 @@
   0% { opacity: 0.6; }
   100% { opacity: 1; }
 }
+
+/* The seven candles carry 14 `infinite alternate` animations and were the loudest
+   thing the global reduced-motion rule could not tame on its own. Freeze them at a
+   steady flame instead of flickering. */
+@media (prefers-reduced-motion: reduce) {
+  .candle__flame,
+  .candle__halo {
+    animation: none;
+    opacity: 0.9;
+  }
+}

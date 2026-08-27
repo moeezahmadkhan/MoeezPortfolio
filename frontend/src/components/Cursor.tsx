@@ -9,6 +9,8 @@ export function Cursor() {
   useEffect(() => {
     // Skip on touch / coarse pointers.
     if (window.matchMedia('(pointer: coarse)').matches) return
+    // Reduced motion: keep the static glow, skip the spark trail.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     let mx = window.innerWidth / 2
     let my = window.innerHeight / 2
@@ -48,7 +50,7 @@ export function Cursor() {
         glow.current.classList.toggle('cursor-glow--hover', hovering)
       }
       const moved = Math.hypot(mx - lastX, my - lastY)
-      if (moved > 3 && now - lastSpawn > 22) {
+      if (!reduceMotion && moved > 3 && now - lastSpawn > 22) {
         spawn(gx, gy)
         lastSpawn = now
         lastX = mx

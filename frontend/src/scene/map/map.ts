@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { spanFor } from '../spans'
 
 /** World placement of the whole map station — right of the Tracker [12], so the
  * camera keeps travelling outward before returning for the closing chapters. */
@@ -14,15 +15,14 @@ export const TABLE_Y = -1.2
 export const MAP_TILT = 0.34
 
 /**
- * Scroll fractions spanning the pinned #map section. Recalibrated 2026-06-06 after the
- * Pact chapter was inserted (scripts/measure.mjs): map section ≈ 0.799 → 0.937 at
- * 1440×900. START is padded slightly before the section top (as in the original) so
- * the station is already lit at the entry; the brief overlap with the tracker band is
- * harmless since the two chambers sit far apart (tracker +12, map +22).
- * Keep in sync with the #map CameraRig KEYS.
+ * Map band in GLOBAL scroll fraction, resolved per viewport. See scene/spans.ts.
+ * On phones the old desktop-only span meant LOCK_AT (0.6 of `drive`) was never
+ * reached before the camera left, so the reticle never locked and no passer-by name
+ * ever resolved. Branching the span is what makes the chapter play at all on mobile.
  */
-export const SECTION_START = 0.787
-export const SECTION_END = 0.937
+const [SPAN_START, SPAN_END] = spanFor('map')
+export const SECTION_START = SPAN_START
+export const SECTION_END = SPAN_END
 
 /** Global scroll progress (0→1) → 0→1 local progress within the map section. */
 export function localProgress(progress: number): number {

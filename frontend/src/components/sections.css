@@ -3,6 +3,7 @@
   z-index: 2;
   padding: clamp(6rem, 14vh, 12rem) clamp(1.5rem, 7vw, 9rem);
   border-top: 1px solid rgba(231, 194, 125, 0.07);
+  scroll-margin-top: calc(var(--nav-h) + 1rem); /* keep titles clear of the fixed nav on anchor jumps */
 }
 
 .section__wrap { max-width: 1180px; margin: 0 auto; }
@@ -17,6 +18,32 @@
 }
 .section__title--center { text-align: center; margin-left: auto; margin-right: auto; }
 
+/* ── Chapter eyebrow → solais-style notched tag chip ────────────────────────
+   Borrowed from solais.ai's `LABEL ▌▌` tags; wizard-flavoured with a ✦ rune. */
+.section .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.55rem 0.4rem 0.7rem;
+  border: 1px solid rgba(231, 194, 125, 0.28);
+  border-radius: 2px;
+  background: linear-gradient(120deg, rgba(231, 194, 125, 0.1), rgba(231, 194, 125, 0.02));
+  opacity: 1;
+}
+.section .eyebrow::before {
+  content: '✦';
+  font-size: 0.78em;
+  color: var(--gold);
+  opacity: 0.9;
+}
+.section .eyebrow::after {
+  content: '';
+  width: 9px;
+  height: 1em;
+  background: repeating-linear-gradient(90deg, var(--gold) 0 2.5px, transparent 2.5px 5px);
+  opacity: 0.65;
+}
+
 /* Category marker — tells the visitor whether a block is a shipped PROJECT or an
    offered SERVICE. Plain language + colour-coded so the two never read alike:
    warm gold for projects, rune-teal for services. */
@@ -29,13 +56,38 @@
   border: 1px solid currentColor;
   border-radius: 999px;
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   letter-spacing: 0.26em;
   text-transform: uppercase;
   opacity: 0.9;
 }
 .section__cat--project { color: var(--gold-deep); }
 .section__cat--service { color: var(--rune); }
+
+/* Fact-strip — the mono attribution line under showcase headlines:
+   project name · what it is · where it shipped. Plain facts, archive voice. */
+.fact-strip {
+  text-wrap: balance;
+  hyphens: none;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(231, 194, 125, 0.75);
+  border-left: 2px solid rgba(127, 208, 196, 0.5);
+  padding-left: 0.7rem;
+  margin: -1.2rem 0 0.4rem;
+}
+
+/* Small plain-language gloss under a themed CTA button */
+.cast-gloss {
+  margin-top: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--parchment-dim);
+  opacity: 0.85;
+}
 
 /* Backgrounds: dark scrims that let the candlelight & sparkles bleed through edges */
 .section--about {
@@ -67,21 +119,90 @@
   max-width: 44rem;
   color: var(--parchment-dim);
 }
-.about__stats {
+/* About body: copy beside a "dossier" portrait. The photo is deliberately
+   duotone-treated (gold-on-ink) so it reads as an archive plate and the grain
+   of the source image disappears into the candlelit palette. Swap /moeez.jpeg
+   for a sharper portrait any time — the frame treatment stays. */
+.about__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(220px, 26vw, 300px);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+  margin-top: 0.4rem;
+}
+.about__portrait-wrap { justify-self: end; }
+.about__portrait {
+  position: relative;
+  margin: 0;
+  width: clamp(220px, 26vw, 300px);
+  aspect-ratio: 1 / 1.12;
+  border: 1px solid rgba(231, 194, 125, 0.3);
+  padding: 0.5rem;
+  background:
+    linear-gradient(160deg, rgba(231, 194, 125, 0.08), rgba(231, 194, 125, 0));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+.about__portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Duotone-ish treatment: desaturate, warm, lift contrast so the dark source
+     resolves into gold highlights on an ink ground. */
+  filter: grayscale(1) sepia(0.5) brightness(1.08) contrast(1.12)
+    saturate(1.4) hue-rotate(-12deg);
+  mix-blend-mode: screen;
+}
+/* Gold scrim + inner vignette layered over the plate. */
+.about__portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0.5rem;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 100% at 50% 0%, transparent 40%, rgba(7, 7, 13, 0.55) 100%),
+    linear-gradient(180deg, rgba(231, 194, 125, 0.14), rgba(127, 208, 196, 0.06));
+  mix-blend-mode: overlay;
+}
+.about__portrait-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--gold);
+  opacity: 0.7;
+  z-index: 2;
+}
+.about__portrait-corner--tl { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+.about__portrait-corner--br { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+.about__portrait-cap {
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  z-index: 2;
   display: flex;
-  flex-wrap: wrap;
-  gap: clamp(1.5rem, 5vw, 4rem);
-  margin-top: 3.2rem;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.7rem 0.6rem 0.55rem;
+  background: linear-gradient(0deg, rgba(7, 7, 13, 0.86), transparent);
+  font-family: var(--font-mono);
 }
-.stat { display: flex; flex-direction: column; gap: 0.3rem; }
-.stat__k {
-  font-family: var(--font-display);
-  font-size: clamp(2.2rem, 4vw, 3rem);
-  font-weight: 800;
-  color: var(--gold-bright);
-  text-shadow: 0 0 26px rgba(231, 194, 125, 0.3);
+.about__portrait-id {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: rgba(231, 194, 125, 0.65);
 }
-.stat__v { font-size: 0.95rem; letter-spacing: 0.04em; color: var(--parchment-dim); max-width: 14rem; }
+.about__portrait-name {
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  color: var(--rune);
+}
+
+@media (max-width: 760px) {
+  .about__body { grid-template-columns: 1fr; }
+  .about__portrait-wrap { justify-self: center; }
+  .about__portrait { width: min(260px, 70vw); }
+}
 
 /* ── Spells ── */
 .spell-group {
@@ -91,18 +212,38 @@
   background: linear-gradient(160deg, rgba(231, 194, 125, 0.05), rgba(231, 194, 125, 0));
 }
 .spell-group__title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: clamp(1.05rem, 1.7vw, 1.4rem);
   letter-spacing: 0.04em;
   color: var(--gold);
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid rgba(231, 194, 125, 0.14);
 }
-.spell-group__list { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+.spell-group__count {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rune);
+  opacity: 0.75;
+}
+.spell-group__list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.7rem 1.4rem;
+}
 .spell-chip {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  font-size: 1.05rem;
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
   color: var(--parchment);
 }
 .spell-chip__rune { color: var(--rune); font-size: 0.7rem; opacity: 0.8; }
@@ -150,14 +291,43 @@
   border-color: rgba(231, 194, 125, 0.45);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 40px rgba(231, 194, 125, 0.12);
 }
-.spell-card__glyph { font-size: 2rem; margin-bottom: 0.8rem; filter: drop-shadow(0 0 14px rgba(231, 194, 125, 0.4)); }
-.spell-card__incant {
-  font-family: var(--font-body);
-  font-style: italic;
-  font-size: 1.05rem;
-  color: var(--rune);
-  margin-bottom: 0.3rem;
+/* Dossier header: index callsign + glyph, solais technical-readout style */
+.spell-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.7rem;
 }
+.spell-card__index {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: rgba(231, 194, 125, 0.65);
+}
+.spell-card__glyph { font-size: 2rem; filter: drop-shadow(0 0 14px rgba(231, 194, 125, 0.4)); }
+.spell-card__incant {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: var(--rune);
+  margin-bottom: 0.35rem;
+  opacity: 0.85;
+}
+
+/* Corner crosshair brackets — technical-dossier framing */
+.spell-card__corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(231, 194, 125, 0.35);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 2;
+}
+.spell-card__corner--tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
+.spell-card__corner--bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
+.spell-card:hover .spell-card__corner { opacity: 1; }
 .spell-card__name {
   font-family: var(--font-display);
   font-size: 1.5rem;
@@ -175,7 +345,7 @@
 }
 .spell-card__tags li {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 0.3rem 0.6rem;
@@ -183,6 +353,36 @@
   border-radius: 2px;
   color: var(--rune);
 }
+
+/* Outbound proof — repo / demo / case-study actions in the gold chip voice */
+.spell-card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(231, 194, 125, 0.14);
+}
+.spell-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.42rem 0.8rem;
+  border: 1px solid rgba(231, 194, 125, 0.35);
+  border-radius: 999px;
+  color: var(--gold);
+  transition: color 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.spell-card__link:hover {
+  color: var(--gold-bright);
+  border-color: rgba(231, 194, 125, 0.7);
+  box-shadow: 0 0 18px rgba(231, 194, 125, 0.25);
+}
+.spell-card__link-rune { color: var(--rune); font-size: 0.85em; }
 
 /* ── Chronicles timeline ── */
 .timeline { position: relative; padding-left: 2.4rem; }
@@ -246,6 +446,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
+  min-height: 44px; /* touch target */
+  padding: 0 0.4rem;
   transition: color 0.3s, text-shadow 0.3s;
 }
 .owl__link:hover { color: var(--gold-bright); text-shadow: 0 0 16px rgba(231, 194, 125, 0.5); }
@@ -255,19 +457,16 @@
 .owl__footer {
   margin-top: 4rem;
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: 0.72rem;
   letter-spacing: 0.12em;
   color: var(--parchment-dim);
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
-@media (max-width: 720px) {
-  .about__stats { gap: 1.6rem; }
-}
 
 /* Pinned Spells: tall section (one viewport per step + one) with a sticky stage. */
 .spells--pinned {
-  height: 500vh;            /* 4 steps + 1; tune for pacing */
+  height: 320vh;            /* compressed dwell: ~0.7 viewport per step + release */
   padding: 0;
 }
 .spells__stage {
@@ -284,31 +483,79 @@
 .spells__steps {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr);
   align-items: center;
   gap: clamp(1rem, 5vw, 4rem);
   min-height: 42vh;
 }
 .spells__index {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.2rem, 3vw, 2.4rem);
+}
+.spells__count {
   font-family: 'Cinzel', serif;
-  font-size: clamp(4rem, 14vw, 12rem);
+  font-size: clamp(3.4rem, 10vw, 9rem);
   line-height: 0.9;
   color: var(--gold);
-  opacity: 0.85;
+  opacity: 0.9;
+  text-shadow: 0 0 38px rgba(231, 194, 125, 0.22);
 }
 .spells__index-total {
   display: block;
-  font-size: 0.18em;
+  font-size: 0.2em;
   letter-spacing: 0.3em;
-  opacity: 0.6;
+  opacity: 0.55;
+}
+/* Grimoire table of contents — the schools of magic, active one illuminated */
+.spells__toc {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(231, 194, 125, 0.16);
+}
+.spells__toc-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  padding: 0.5rem 0 0.5rem 1.1rem;
+  margin-left: -1px;
+  border-left: 1px solid transparent;
+  color: var(--parchment-dim);
+  /* Was 0.4 (2.27:1) — an index you cannot read is not an index. Let colour, not
+     opacity alone, carry the active state. */
+  opacity: 0.68;
+  transition: opacity 0.45s ease, color 0.45s ease, border-color 0.45s ease;
+}
+.spells__toc-item.is-past { opacity: 0.82; }
+.spells__toc-item.is-active {
+  opacity: 1;
+  color: var(--gold-bright);
+  border-left-color: var(--gold);
+}
+.spells__toc-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  /* No extra fade: this nests inside .spells__toc-item, whose own opacity already
+     dims idle rows. Compounding the two put the numeral at 3.31:1. */
+  opacity: 1;
+}
+.spells__toc-title {
+  font-family: var(--font-display);
+  font-size: clamp(0.92rem, 1.3vw, 1.15rem);
+  letter-spacing: 0.03em;
 }
 .spells__panel {
   position: relative;
-  min-height: 38vh;
+  min-height: 22rem; /* shared card box so steps don't resize mid-crossfade */
 }
 .spell-group--step {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 /* Reduced motion: drop the pin, restore a normal stacked grid. */
@@ -330,10 +577,68 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 1.2rem;
+  /* Reads from the baseline, against the Pact's centred column and the Map's
+     top-pinned card — the three chapters should not resolve to the same picture. */
+  justify-content: flex-end;
+  gap: 1.1rem;
+  max-width: 42rem;
   padding: clamp(2rem, 6vw, 6rem);
+  padding-bottom: clamp(4rem, 12vh, 9rem);
   box-sizing: border-box;
+}
+/* This chapter had no scrim at all — its siblings each declared one, and the mobile
+   block styled a `.tracker__stage::before` that was never generated, so on a phone
+   the lede sat straight on the cricketer. Same left-dark ramp as the Pact and Map. */
+.tracker__stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(7, 7, 13, 0.92) 0%,
+    rgba(7, 7, 13, 0.78) 40%,
+    rgba(7, 7, 13, 0.4) 70%,
+    rgba(7, 7, 13, 0) 100%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+.tracker__stage > * { position: relative; }
+
+/* Instrument strip: readings side by side, the way they'd sit on a watch face.
+   Deliberately un-numbered — these are simultaneous, and numbering them would
+   assert an order the data doesn't have. */
+.tracker__strip {
+  list-style: none;
+  margin: 0;
+  padding: 0.9rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 clamp(0.8rem, 2vw, 1.6rem);
+  border-top: 1px solid rgb(var(--gold-rgb) / 0.28);
+}
+@media (max-width: 860px) {
+  .tracker__strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem 1.2rem; }
+}
+.tracker__strip-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-block: 0.2rem;
+}
+.tracker__strip-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--gold-bright);
+}
+.tracker__strip-tags {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  color: var(--rune);
+  text-wrap: balance;
 }
 .tracker__lede {
   max-width: 32ch;
@@ -342,6 +647,9 @@
   font-size: clamp(1.1rem, 2.2vw, 1.5rem);
   line-height: 1.5;
 }
+
+/* Desktop shows the live numbers in the 3D HUD; the HTML readout is mobile-only. */
+.tracker__vitals { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .tracker--pinned { height: auto; }
@@ -360,9 +668,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.9rem;
   max-width: 42rem;
   padding: clamp(2rem, 6vw, 6rem);
+  /* keep the eyebrow clear of the fixed nav and the legend inside short viewports */
+  padding-top: calc(var(--nav-h) + 1.5rem);
+  padding-bottom: 2rem;
   box-sizing: border-box;
 }
 /* legibility scrim so the pitch copy reads over the 3D chamber behind it */
@@ -411,11 +722,11 @@
 }
 .cast-btn__rune { color: var(--rune); }
 .conjuring__legend {
-  margin: 1.4rem 0 0;
+  margin: 1rem 0 0;
   list-style: none;
   padding: 0;
   display: grid;
-  gap: 0.45rem;
+  gap: 0.35rem;
   max-width: 30rem;
 }
 .conjuring__legend-item {
@@ -454,11 +765,65 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
-  max-width: 42rem;
+  /* Top-aligned, against the Pact's centre and the Pulse's baseline. The card below
+     carries its own contrast, so the parchment can stay bright underneath it. */
+  justify-content: flex-start;
+  gap: 0.7rem;
+  max-width: 40rem;
   padding: clamp(2rem, 6vw, 6rem);
+  padding-top: clamp(4rem, 11vh, 6.5rem);
   box-sizing: border-box;
+}
+/* The stage copy sits on a solid ground because the Marauder's Map art behind it is
+   the brightest surface on the site — the gradient scrim alone left teal-on-parchment
+   labels well under 4.5:1. */
+.map__stage .map__lede,
+.map__stage .map__stages {
+  max-width: 30rem;
+  background: rgba(7, 7, 13, 0.82);
+  border: 1px solid rgb(var(--gold-rgb) / 0.22);
+  border-radius: var(--r-base);
+  padding: 0.9rem 1.1rem;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.map__stages {
+  counter-reset: map-stage;
+  list-style: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.42rem;
+}
+.map__stages-item {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-left: 1.5rem;
+}
+.map__stages-item::before {
+  counter-increment: map-stage;
+  content: counter(map-stage, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: rgb(var(--gold-rgb) / 0.7);
+}
+.map__stages-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--gold-bright);
+}
+.map__stages-tags {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rune);
+  text-align: right;
 }
 /* legibility scrim so copy reads over the 3D map behind it */
 .map__stage::before {
@@ -467,20 +832,22 @@
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(7, 7, 13, 0.82) 0%,
-    rgba(7, 7, 13, 0.55) 45%,
-    rgba(7, 7, 13, 0) 82%
+    rgba(7, 7, 13, 0.92) 0%,
+    rgba(7, 7, 13, 0.78) 40%,
+    rgba(7, 7, 13, 0.4) 70%,
+    rgba(7, 7, 13, 0) 100%
   );
   pointer-events: none;
   z-index: -1;
 }
 .map__stage > * { position: relative; }
 .map__lede {
-  max-width: 34ch;
-  color: var(--parchment-dim);
+  max-width: 40ch;
+  color: var(--parchment);
   font-family: var(--font-body);
-  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
-  line-height: 1.5;
+  font-size: clamp(1rem, 1.7vw, 1.22rem);
+  line-height: 1.55;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -502,6 +869,7 @@
   flex-direction: column;
   justify-content: center;
   gap: 1.2rem;
+  max-width: 42rem; /* match sibling stages so pill/headline don't strike through the 3D */
   padding: clamp(2rem, 6vw, 6rem);
   box-sizing: border-box;
 }
@@ -513,9 +881,10 @@
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(7, 7, 13, 0.82) 0%,
-    rgba(7, 7, 13, 0.55) 45%,
-    rgba(7, 7, 13, 0) 82%
+    rgba(7, 7, 13, 0.92) 0%,
+    rgba(7, 7, 13, 0.78) 40%,
+    rgba(7, 7, 13, 0.4) 70%,
+    rgba(7, 7, 13, 0) 100%
   );
   pointer-events: none;
   z-index: -1;
@@ -525,27 +894,45 @@
 }
 
 .pact__lede {
-  max-width: 30rem;
-  color: var(--parchment-dim);
-  font-size: 1.15rem;
+  max-width: 34ch;
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
   line-height: 1.6;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
 }
 
 .pact__legend {
+  /* A ledger of terms. Numbering is earned here: deck in → read → matched → bound is
+     an actual order of operations, and the reader needs it. The rule down the left is
+     the binding that the chapter is named for. */
+  counter-reset: pact-term;
   list-style: none;
-  padding: 0;
+  padding: 0 0 0 1.6rem;
   margin: 0;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   max-width: 30rem;
+  border-left: 1px solid rgb(var(--gold-rgb) / 0.35);
 }
 .pact__legend-item {
+  position: relative;
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  border-bottom: 1px solid rgba(231, 194, 125, 0.14);
+  border-bottom: 1px solid rgb(var(--gold-rgb) / 0.14);
   padding-bottom: 0.4rem;
+}
+.pact__legend-item::before {
+  counter-increment: pact-term;
+  content: counter(pact-term);
+  position: absolute;
+  left: -1.6rem;
+  top: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: rgb(var(--gold-rgb) / 0.75);
 }
 .pact__legend-name {
   font-family: var(--font-display);
@@ -562,6 +949,17 @@
 @media (prefers-reduced-motion: reduce) {
   .section--pact.pact--pinned { height: auto; }
   .pact__stage { position: static; min-height: 0; }
+}
+
+/* Align the pinned model-chapter stages to the same 1180px content grid the
+   wrapped chapters use, so the page's left edge stops ping-ponging. */
+@media (min-width: 1025px) {
+  .conjuring__stage,
+  .pact__stage,
+  .tracker__stage,
+  .map__stage {
+    margin-left: max(0px, calc((100vw - 1180px) / 2 - clamp(2rem, 6vw, 6rem)));
+  }
 }
 
 @media (max-width: 1024px) {
@@ -598,6 +996,16 @@
   }
 
   .spells__index {
+    display: block !important;
+  }
+
+  /* The stepping table-of-contents is meaningless on mobile, where the pin is
+     dropped and every school's card is shown stacked. */
+  .spells__toc {
+    display: none !important;
+  }
+
+  .spells__count {
     font-size: 3.5rem !important;
     display: flex !important;
     align-items: baseline !important;
@@ -624,11 +1032,148 @@
     pointer-events: auto !important;
   }
 
-  /* Lighter scrims on mobile so the 3D scene pops through clearly */
+  /* Character stations on mobile: reserve the upper viewport for the 3D model and
+     drop the copy to the bottom — the same "model on top, text below" split the
+     hero uses, since portrait has no room for the desktop left/right split. */
+  .conjuring__stage,
+  .pact__stage,
+  .map__stage,
+  .tracker__stage {
+    min-height: 100svh !important;
+    justify-content: flex-end !important;
+    padding: 50svh clamp(1.2rem, 5vw, 3rem) clamp(3rem, 9vh, 6rem) !important;
+  }
+
+  /* Scrim clears the top (model shows) and darkens toward the bottom (copy reads). */
   .conjuring__stage::before,
   .pact__stage::before,
-  .map__stage::before {
-    background: rgba(7, 7, 13, 0.72) !important;
+  .map__stage::before,
+  .tracker__stage::before {
+    background: linear-gradient(
+      180deg,
+      rgba(7, 7, 13, 0) 0%,
+      rgba(7, 7, 13, 0) 24%,
+      rgba(7, 7, 13, 0.55) 40%,
+      rgba(7, 7, 13, 0.85) 56%,
+      rgba(7, 7, 13, 0.96) 100%
+    ) !important;
+  }
+
+  /* The stacked text chapters that share the central wizard: thin their solid
+     fills to a soft scrim so the candlelit figurine glows through behind them. */
+  .section--about,
+  .section--spells,
+  .section--grimoire,
+  .section--chronicles {
+    background: linear-gradient(
+      180deg,
+      rgba(7, 7, 13, 0.9) 0%,
+      rgba(7, 7, 13, 0.66) 45%,
+      rgba(7, 7, 13, 0.3) 100%
+    ) !important;
+  }
+
+  /* Keep copy legible over the now-visible 3D behind it. */
+  .about__lede,
+  .about__sub,
+  .spell-chip,
+  .chron__deeds li,
+  .map__lede,
+  .pact__lede,
+  .conjuring__lede,
+  .tracker__lede {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 2px 18px rgba(0, 0, 0, 0.85);
+  }
+
+  /* The pipeline/legend lists (Conjuring, Pact, Map) are the canonical step
+     sequence on phones — the wide 3D arc can't fit a portrait frame and its
+     floating labels are hidden here (see PipelineNodes). Promote the list to a
+     self-contained, numbered panel so the chapter reads as complete. */
+  .conjuring__legend,
+  .pact__legend {
+    max-width: 100% !important;
+    margin-top: 1.2rem !important;
+    padding: 0.4rem 1.05rem !important;
+    background: rgba(7, 7, 13, 0.5);
+    border: 1px solid rgba(231, 194, 125, 0.18);
+    border-radius: 14px;
+    backdrop-filter: blur(3px);
+    counter-reset: legendstep;
+  }
+  .conjuring__legend-item,
+  .pact__legend-item {
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2rem 0.9rem;
+    position: relative;
+    padding: 0.7rem 0 0.7rem 2rem;
+    border-top: none;
+    border-bottom: 1px solid rgba(231, 194, 125, 0.12);
+    counter-increment: legendstep;
+  }
+  .conjuring__legend-item:last-child,
+  .pact__legend-item:last-child { border-bottom: none; }
+  .conjuring__legend-item::before,
+  .pact__legend-item::before {
+    content: counter(legendstep, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 0.78rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    color: var(--rune);
+    opacity: 0.65;
+  }
+  .conjuring__legend-name,
+  .pact__legend-name { font-size: 1rem; }
+  .conjuring__legend-tags,
+  .pact__legend-tags { text-align: left; }
+
+  /* Tracker live readout — the mobile stand-in for the floating 3D vitals HUD. */
+  .tracker__vitals {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+    list-style: none;
+    padding: 0;
+    margin: 1.3rem 0 0;
+    max-width: 24rem;
+  }
+  .tracker__vital {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid rgba(127, 208, 196, 0.22);
+    border-radius: 12px;
+    background: rgba(7, 7, 13, 0.5);
+    backdrop-filter: blur(3px);
+  }
+  /* The heartbeat tile spans the row and warms to the ECG's red. */
+  .tracker__vital--hot {
+    grid-column: 1 / -1;
+    border-color: rgba(255, 90, 110, 0.35);
+    background: rgba(40, 10, 16, 0.45);
+  }
+  .tracker__vital-k {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--rune);
+  }
+  .tracker__vital--hot .tracker__vital-k { color: #ff8a96; }
+  .tracker__vital--hot .tracker__vital-k::before {
+    content: '♥ ';
+    font-size: 0.9rem;
+    vertical-align: 0.1em;
+  }
+  .tracker__vital-u {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--parchment-dim);
   }
 }
 

@@ -15,15 +15,55 @@ export function GrimoireChat() {
   const [sending, setSending] = useState(false)
   const bodyRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const returnFocusTo = useRef<HTMLElement | null>(null)
 
   // Auto-scroll to the latest message.
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages, sending])
 
-  // Focus the input when the panel opens.
+  // Focus the input when the panel opens, and hand focus back to whatever opened it
+  // on close. Without the restore, dismissing the panel drops focus to <body> and a
+  // keyboard user restarts from the top of the document.
   useEffect(() => {
-    if (open) inputRef.current?.focus()
+    if (open) {
+      returnFocusTo.current = document.activeElement as HTMLElement | null
+      inputRef.current?.focus()
+    } else {
+      returnFocusTo.current?.focus()
+      returnFocusTo.current = null
+    }
+  }, [open])
+
+  // The panel declares aria-modal="true", which is a promise: Escape dismisses it and
+  // Tab stays inside. Neither was true — and on mobile the header close button is the
+  // only other way out, so a clipped header meant no way out at all.
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        setOpen(false)
+        return
+      }
+      if (e.key !== 'Tab') return
+      const focusables = panelRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      )
+      if (!focusables?.length) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
   }, [open])
 
   async function ask(text: string) {
@@ -55,6 +95,7 @@ export function GrimoireChat() {
         {open && (
           <motion.div
             className="grim-panel"
+            ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label="The Talking Grimoire"
@@ -70,7 +111,14 @@ export function GrimoireChat() {
               </button>
             </header>
 
-            <div className="grim-body" ref={bodyRef}>
+            <div
+              className="grim-body"
+              ref={bodyRef}
+              role="log"
+              aria-live="polite"
+              aria-relevant="additions"
+              aria-busy={sending}
+            >
               {messages.map((m, i) => (
                 <div key={i} className={'grim-msg grim-msg--' + m.role}>
                   {m.role === 'assistant' ? <Markdown text={m.content} /> : m.content}

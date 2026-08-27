@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { spanFor } from '../spans'
 
 /**
  * World-space anchor for the Pact station. Only one station is visible at a time
@@ -10,13 +11,13 @@ import * as THREE from 'three'
 export const STATION: [number, number, number] = [-7, 0, -1]
 
 /**
- * Pact band in GLOBAL scroll fraction (0→1 down the whole page). Calibrated from
- * scripts/measure.mjs (2026-06-06, page with both Pact + Marauder's Map): pact top
- * ≈ 0.546, tracker top ≈ 0.661. START is nudged slightly before the measured section
- * top so the station isn't gated off at the very entry; END meets the tracker band.
+ * Pact band in GLOBAL scroll fraction (0→1 down the whole page), resolved per
+ * viewport. See scene/spans.ts — the band ends at the camera's HOLD key, not at the
+ * next section, so the bond finishes forming while the camera is still watching it.
  */
-export const SECTION_START = 0.534
-export const SECTION_END = 0.661
+const [SPAN_START, SPAN_END] = spanFor('pact')
+export const SECTION_START = SPAN_START
+export const SECTION_END = SPAN_END
 
 /** Global progress → local 0→1 within the Pact band. */
 export function localProgress(progress: number): number {

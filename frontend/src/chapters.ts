@@ -7,19 +7,30 @@ export interface Chapter {
 }
 
 /**
- * Single source of truth for the page's chapters. `at` is an approximate measured
- * fraction kept in hand-sync with CameraRig KEYS, used ONLY for rail dot placement.
+ * Single source of truth for the page's chapters. `at` is a measured fraction
+ * (scripts/measure.mjs) kept in sync with CameraRig KEYS and scene/spans.ts —
+ * spans.test.ts fails if they drift apart, used ONLY for rail dot placement.
  * Settle/cue logic measures live DOM offsets and never relies on `at`.
  */
 export const chapters: Chapter[] = [
-  { id: 'top',        numeral: 'I',    theme: 'The Conjuring',         plain: 'intro',         at: 0.0 },
-  { id: 'wizard',     numeral: 'II',   theme: 'The Mind',              plain: 'about me',      at: 0.092 },
-  { id: 'spells',     numeral: 'III',  theme: 'Spells',                plain: 'skills',        at: 0.140 },
-  { id: 'conjuring',  numeral: 'IV',   theme: 'The Conjuring of Apps', plain: 'service · full-stack AI', at: 0.370 },
-  { id: 'grimoire',   numeral: 'V',    theme: 'The Grimoire',          plain: 'projects',               at: 0.486 },
-  { id: 'pact',       numeral: 'VI',   theme: 'The Pact',              plain: 'AI matchmaking',         at: 0.546 },
-  { id: 'tracker',    numeral: 'VII',  theme: 'The Pulse',             plain: 'live AI demo',           at: 0.661 },
-  { id: 'map',        numeral: 'VIII', theme: "The Marauder's Map",    plain: 'edge AI · on-device',    at: 0.799 },
-  { id: 'chronicles', numeral: 'IX',   theme: 'The Path',              plain: 'experience',             at: 0.937 },
-  { id: 'owlpost',    numeral: 'X',    theme: 'Owl Post',              plain: 'contact',                at: 0.984 },
+  { id: 'top',        numeral: 'I',    theme: 'The Conjuring',      plain: 'intro',                at: 0.0   },
+  { id: 'wizard',     numeral: 'II',   theme: 'The Mind',           plain: 'about me',             at: 0.118 },
+  { id: 'spells',     numeral: 'III',  theme: 'Spells',             plain: 'skills',               at: 0.170 },
+  { id: 'pact',       numeral: 'IV',   theme: 'The Pact',           plain: 'AI matchmaking',       at: 0.359 },
+  { id: 'tracker',    numeral: 'V',    theme: 'The Pulse',          plain: 'live AI demo',         at: 0.507 },
+  { id: 'map',        numeral: 'VI',   theme: "The Marauder's Map", plain: 'edge AI · on-device',  at: 0.684 },
+  { id: 'chronicles', numeral: 'VII',  theme: 'The Path',           plain: 'experience',           at: 0.861 },
+  { id: 'grimoire',   numeral: 'VIII', theme: 'The Grimoire',       plain: 'projects',             at: 0.923 },
+  { id: 'owlpost',    numeral: 'IX',   theme: 'Owl Post',           plain: 'contact',              at: 0.974 },
 ]
+
+/**
+ * Roman numeral for a chapter id. Section eyebrows used to hardcode their own numeral,
+ * so removing a chapter left every later one displaying the wrong number while the
+ * rail beside it showed the right one. Derive instead.
+ */
+export function numeralFor(id: string): string {
+  const c = chapters.find((ch) => ch.id === id)
+  if (!c) throw new Error(`unknown chapter id: ${id}`)
+  return c.numeral
+}

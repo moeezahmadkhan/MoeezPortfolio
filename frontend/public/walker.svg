@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Marauder's Map — "the subject who passes."
+  A hooded traveller in mid-stride, walking to the right (+X), drawn as a flat
+  teal silhouette so the gold detection reticle reading over it looks like a
+  vision-model bounding box on a camera frame. Single solid colour, transparent
+  background. Rasterised to a texture via useSvgTexture and billboarded onto the
+  Walker patrol path.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="340" viewBox="0 0 200 340" fill="none">
+  <g stroke="#7fd0c4" stroke-width="19" stroke-linecap="round" stroke-linejoin="round">
+    <!-- spine (leaning forward into the walk) -->
+    <path d="M104 92 L96 184" stroke-width="24" />
+    <!-- forward (leading) arm -->
+    <path d="M102 104 L126 128 L132 158" stroke-width="17" />
+    <!-- trailing arm -->
+    <path d="M102 104 L82 120 L72 148" stroke-width="17" />
+    <!-- forward (leading) leg, planted ahead -->
+    <path d="M96 182 L120 236 L138 300" />
+    <!-- trailing leg, pushing off behind -->
+    <path d="M96 182 L78 238 L60 300" />
+  </g>
+  <!-- pointed hood, tipped forward -->
+  <path
+    d="M126 26 C136 40 142 56 140 72 C138 86 128 92 116 90 C104 88 94 84 94 68 C94 48 108 30 126 26 Z"
+    fill="#7fd0c4"
+  />
+</svg>

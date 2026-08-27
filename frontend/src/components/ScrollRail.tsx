@@ -16,7 +16,7 @@ export function ScrollRail() {
   const fill = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 })
 
   return (
-    <nav className="rail" aria-label="Chapters">
+    <nav className="rail" aria-label="Chapter rail">
       <div className="rail__track">
         <motion.div className="rail__fill" style={{ scaleY: fill }} />
       </div>

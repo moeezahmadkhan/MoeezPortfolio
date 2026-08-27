@@ -29,7 +29,7 @@ export function ScanRings() {
       {Array.from({ length: COUNT }).map((_, i) => (
         <mesh key={i} ref={(el) => { if (el) rings.current[i] = el }}>
           <ringGeometry args={[0.95, 1.0, 64]} />
-          <meshBasicMaterial color="#35e0ff" transparent opacity={0} side={THREE.DoubleSide} depthWrite={false} />
+          <meshBasicMaterial color="#86d9cc" transparent opacity={0} side={THREE.DoubleSide} depthWrite={false} />
         </mesh>
       ))}
     </group>

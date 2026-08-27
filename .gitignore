@@ -5,3 +5,12 @@ dist/
 
 # brainstorming visual companion
 .superpowers/
+
+# verification screenshots (scratch)
+.shots/
+
+# raw 3D source models (Tripo exports, ~15MB each) — kept on disk as the
+# source of truth for the Blender pipeline, but not committed. The optimized,
+# web-shipped versions live in frontend/public/models/.
+/*.glb
+frontend/tools/wizard.original.glb

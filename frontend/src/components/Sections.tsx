@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react'
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
+import { numeralFor } from '../chapters'
 import { Reveal, IgniteHeading, MaskReveal } from './Reveal'
 import { OwlPostForm } from './OwlPostForm'
 import { Tilt } from './Tilt'
-import { projects, spellbook, chronicles, pactSteps } from '../data'
-import { spellState, NODES } from '../scene/spell/spell'
+import { projects, spellbook, chronicles, pactSteps, trackerSteps } from '../data'
 import { revealState, PIPELINE_BEATS, EDGE_STACK } from '../scene/map/map'
 import { useParallax } from './useParallax'
 import './sections.css'
@@ -14,37 +14,42 @@ export function About() {
     <section id="wizard" className="section section--about">
       <div className="section__wrap about">
         <MaskReveal className="about__eyebrow">
-          <span className="eyebrow">Chapter II — The Wizard</span>
+          <span className="eyebrow">Chapter {numeralFor('wizard')} — The Wizard</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="The mind behind the wand" />
-        <Reveal delay={0.1}>
-          <p className="about__lede">
-            I’m <strong>Moeez Ahmad Khan</strong> — an AI/ML engineer who treats models like spells:
-            precise incantations that turn raw data into something that <em>acts</em>. I architect
-            autonomous agents, high-performance computer-vision pipelines, and generative systems,
-            then carry them from research into production-ready software.
-          </p>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <p className="about__sub">
-            Trained at Information Technology University, Lahore (BSCS — specializing in Agentic AI,
-            Computer Vision &amp; Reinforcement Learning), I live in the space between a research
-            paper and a deploy button.
-          </p>
-        </Reveal>
 
-        <div className="about__stats">
-          {[
-            { k: '15+', v: 'production AI deployments' },
-            { k: '3', v: 'houses served — Steem · QUIDSol · ITU' },
-            { k: '∞', v: 'agents conjured' },
-          ].map((s, i) => (
-            <Reveal key={s.v} delay={0.1 * i} className="stat">
-              <span className="stat__k">{s.k}</span>
-              <span className="stat__v">{s.v}</span>
+        <div className="about__body">
+          <div className="about__copy">
+            <Reveal delay={0.1}>
+              <p className="about__lede">
+                I’m <strong>Moeez Ahmad Khan</strong> — an AI/ML engineer who treats models like spells:
+                precise incantations that turn raw data into something that <em>acts</em>. I architect
+                autonomous agents, high-performance computer-vision pipelines, and generative systems,
+                then carry them from research into production-ready software.
+              </p>
             </Reveal>
-          ))}
+            <Reveal delay={0.2}>
+              <p className="about__sub">
+                Trained at Information Technology University, Lahore (BSCS — specializing in Agentic AI,
+                Computer Vision &amp; Reinforcement Learning), I live in the space between a research
+                paper and a deploy button.
+              </p>
+            </Reveal>
+          </div>
+
+          <Reveal delay={0.15} className="about__portrait-wrap">
+            <figure className="about__portrait">
+              <span className="about__portrait-corner about__portrait-corner--tl" aria-hidden />
+              <span className="about__portrait-corner about__portrait-corner--br" aria-hidden />
+              <img src="/moeez.jpeg" alt="Moeez Ahmad Khan" loading="lazy" width={400} height={400} />
+              <figcaption className="about__portrait-cap">
+                <span className="about__portrait-id">SUBJECT Nº MAK·01</span>
+                <span className="about__portrait-name">// engineer of spells</span>
+              </figcaption>
+            </figure>
+          </Reveal>
         </div>
+
       </div>
     </section>
   )
@@ -67,14 +72,30 @@ export function Spells() {
     <section id="spells" ref={ref} className="section section--spells spells--pinned">
       <div className="spells__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter III — The Arsenal</span>
+          <span className="eyebrow">Chapter {numeralFor('spells')} — The Arsenal</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="Spells & Incantations" />
 
         <div className="spells__steps">
-          <div className="spells__index" aria-hidden>
-            {String(step + 1).padStart(2, '0')}
-            <span className="spells__index-total">/ {String(spellbook.length).padStart(2, '0')}</span>
+          <div className="spells__index">
+            <div className="spells__count" aria-hidden>
+              {String(step + 1).padStart(2, '0')}
+              <span className="spells__index-total">/ {String(spellbook.length).padStart(2, '0')}</span>
+            </div>
+            <ol className="spells__toc" aria-label="Schools of magic">
+              {spellbook.map((group, i) => (
+                <li
+                  key={group.title}
+                  className={`spells__toc-item${i === step ? ' is-active' : ''}${
+                    i < step ? ' is-past' : ''
+                  }`}
+                  aria-current={i === step ? 'true' : undefined}
+                >
+                  <span className="spells__toc-num">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="spells__toc-title">{group.title}</span>
+                </li>
+              ))}
+            </ol>
           </div>
 
           <div className="spells__panel">
@@ -86,7 +107,10 @@ export function Spells() {
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 style={{ pointerEvents: i === step ? 'auto' : 'none' }}
               >
-                <h3 className="spell-group__title">{group.title}</h3>
+                <h3 className="spell-group__title">
+                  {group.title}
+                  <span className="spell-group__count">{group.spells.length} incantations</span>
+                </h3>
                 <ul className="spell-group__list">
                   {group.spells.map((s) => (
                     <li key={s} className="spell-chip">
@@ -110,8 +134,13 @@ function GrimoireCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
     <motion.div ref={ref as React.RefObject<HTMLDivElement>} style={{ y }}>
       <Reveal delay={0.06 * i}>
         <Tilt className="spell-card">
-          <div className="spell-card__glyph">{p.glyph}</div>
-          <p className="spell-card__incant">“{p.incantation}”</p>
+          <span className="spell-card__corner spell-card__corner--tr" aria-hidden />
+          <span className="spell-card__corner spell-card__corner--bl" aria-hidden />
+          <div className="spell-card__head">
+            <span className="spell-card__index">Nº{String(i + 1).padStart(2, '0')}</span>
+            <span className="spell-card__glyph">{p.glyph}</span>
+          </div>
+          <p className="spell-card__incant">// {p.incantation}</p>
           <h3 className="spell-card__name">{p.name}</h3>
           <p className="spell-card__blurb">{p.blurb}</p>
           <ul className="spell-card__tags">
@@ -119,6 +148,25 @@ function GrimoireCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
               <li key={t}>{t}</li>
             ))}
           </ul>
+          {p.links && (
+            <div className="spell-card__links">
+              {p.links.demo && (
+                <a className="spell-card__link" href={p.links.demo} target="_blank" rel="noreferrer">
+                  <span className="spell-card__link-rune">✦</span> Live demo
+                </a>
+              )}
+              {p.links.repo && (
+                <a className="spell-card__link" href={p.links.repo} target="_blank" rel="noreferrer">
+                  <span className="spell-card__link-rune">⌥</span> View code
+                </a>
+              )}
+              {p.links.caseStudy && (
+                <a className="spell-card__link" href={p.links.caseStudy} target="_blank" rel="noreferrer">
+                  <span className="spell-card__link-rune">❧</span> Case study
+                </a>
+              )}
+            </div>
+          )}
         </Tilt>
       </Reveal>
     </motion.div>
@@ -130,7 +178,7 @@ export function Grimoire() {
     <section id="grimoire" className="section section--grimoire">
       <div className="section__wrap">
         <MaskReveal>
-          <span className="eyebrow">Chapter V — The Grimoire</span>
+          <span className="eyebrow">Chapter {numeralFor('grimoire')} — The Grimoire</span>
         </MaskReveal>
         <span className="section__cat section__cat--project">✦ Projects · shipped work</span>
         <IgniteHeading className="section__title" text="Built & shipped" />
@@ -144,66 +192,24 @@ export function Grimoire() {
   )
 }
 
-export function Conjuring() {
-  const [cast, setCast] = useState(false)
-
-  const onCast = () => {
-    spellState.requested = true
-    setCast(true) // local flag only drives the button label; canvas reads the singleton
-  }
-
-  return (
-    <section id="conjuring" className="section section--conjuring conjuring--pinned">
-      <div className="conjuring__stage">
-        <MaskReveal>
-          <span className="eyebrow">Chapter IV — The Conjuring of Apps</span>
-        </MaskReveal>
-        <span className="section__cat section__cat--service">✦ Service · AI systems, brief to deploy</span>
-        <IgniteHeading className="section__title" text="One spell, end to end" />
-        <Reveal delay={0.1}>
-          <p className="conjuring__lede">
-            From a brief to a deployed AI system — embeddings &amp; retrieval, agentic
-            reasoning, fine-tuned models served behind a FastAPI spine, containerized and
-            summoned onto AWS&nbsp;Bedrock or GCP. Cast the spell and watch a full-stack
-            AI app assemble itself, A&nbsp;→&nbsp;Z.
-          </p>
-        </Reveal>
-        <Reveal delay={0.18}>
-          <button type="button" className="cast-btn" onClick={onCast}>
-            <span className="cast-btn__rune">✦</span>
-            {cast ? 'Recast the spell' : 'Cast the spell'}
-          </button>
-        </Reveal>
-        <Reveal delay={0.24}>
-          <ol className="conjuring__legend">
-            {NODES.map((n) => (
-              <li key={n.name} className="conjuring__legend-item">
-                <span className="conjuring__legend-name">{n.name}</span>
-                <span className="conjuring__legend-tags">{n.tags.join(' · ')}</span>
-              </li>
-            ))}
-          </ol>
-        </Reveal>
-      </div>
-    </section>
-  )
-}
-
 export function Pact() {
   return (
     <section id="pact" className="section section--pact pact--pinned">
       <div className="pact__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter VI — The Pact</span>
+          <span className="eyebrow">Chapter {numeralFor('pact')} — The Pact</span>
         </MaskReveal>
         <span className="section__cat section__cat--project">
           ✦ Project · AI founder–investor matchmaking
         </span>
         <IgniteHeading className="section__title" text="The deck, read. The deal, bound." />
+        <Reveal delay={0.06}>
+          <p className="fact-strip">Silmaril AI · founder–investor matching · QUIDSol</p>
+        </Reveal>
         <Reveal delay={0.1}>
           <p className="pact__lede">
-            A founder uploads a pitch deck. An LLM reads it, scores it, and surfaces it to the
-            investors who actually fit — then binds the two together to carry the deal forward.
+            A founder uploads a pitch deck. An LLM reads it, scores it, and surfaces the
+            investors who actually fit — then binds founder to backer to carry the deal forward.
           </p>
         </Reveal>
         <Reveal delay={0.18}>
@@ -226,15 +232,47 @@ export function Tracker() {
     <section id="tracker" className="section section--tracker tracker--pinned">
       <div className="tracker__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter VI — The Tracker</span>
+          <span className="eyebrow">Chapter {numeralFor('tracker')} — The Tracker</span>
         </MaskReveal>
         <span className="section__cat section__cat--project">✦ Project · live demo</span>
         <IgniteHeading className="section__title" text="It reads the pulse" />
+        <Reveal delay={0.06}>
+          <p className="fact-strip">Whoop wearable AI chat · Ecommerce Steem · in production</p>
+        </Reveal>
         <Reveal delay={0.1}>
           <p className="tracker__lede">
             A wrist. A heartbeat climbing under effort. The signal is caught,
             saved, and read — an intelligence that answers for the body in motion.
           </p>
+        </Reveal>
+        {/* Mobile-only readout — on desktop the live numbers float in the 3D HUD,
+            but that collides with the copy in a portrait frame, so it carries
+            here instead (see Heartbeat/WristTiles/HudText/InsightCards). */}
+        <Reveal delay={0.18}>
+          <ul className="tracker__vitals" aria-label="Live readout">
+            {[
+              { k: '158', u: 'bpm · peak', hot: true },
+              { k: '2.4k', u: 'steps' },
+              { k: '310', u: 'cal' },
+              { k: '96%', u: 'SpO₂' },
+              { k: '~4 min', u: 'recovery' },
+            ].map((v) => (
+              <li key={v.u} className={`tracker__vital${v.hot ? ' tracker__vital--hot' : ''}`}>
+                <span className="tracker__vital-k">{v.k}</span>
+                <span className="tracker__vital-u">{v.u}</span>
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+        <Reveal delay={0.24}>
+          <ul className="tracker__strip">
+            {trackerSteps.map((s) => (
+              <li key={s.name} className="tracker__strip-item">
+                <span className="tracker__strip-name">{s.name}</span>
+                <span className="tracker__strip-tags">{s.tags.join(' · ')}</span>
+              </li>
+            ))}
+          </ul>
         </Reveal>
       </div>
     </section>
@@ -258,16 +296,18 @@ export function Marauders() {
     <section id="map" className="section section--map map--pinned">
       <div className="map__stage">
         <MaskReveal>
-          <span className="eyebrow">Chapter VII — The Marauder's Map</span>
+          <span className="eyebrow">Chapter {numeralFor('map')} — The Marauder's Map</span>
         </MaskReveal>
         <span className="section__cat section__cat--project">✦ Project · live demo · on-device</span>
-        <IgniteHeading className="section__title" text="It sees who passes" />
+        <IgniteHeading className="section__title" text="It knows who passes" />
+        <Reveal delay={0.06}>
+          <p className="fact-strip">Project Horus · on-device identity · QUIDSol</p>
+        </Reveal>
         <Reveal delay={0.1}>
           <p className="map__lede">
-            A camera at the threshold. Motion stirs and a palm-sized edge device — an NPU
-            with no cloud behind it — wakes, captures the figure, follows the footsteps,
-            and names who just passed. Detection, tracking, and re-identification all run
-            on the device itself; no footage ever leaves the room.
+            A camera watches the threshold. A palm-sized NPU — no cloud behind it — wakes
+            on motion, follows the footsteps, and names who just passed. Detection, tracking,
+            and re-identification run entirely on the device; no footage ever leaves the room.
           </p>
         </Reveal>
         <Reveal delay={0.18}>
@@ -275,13 +315,14 @@ export function Marauders() {
             <span className="cast-btn__rune">✦</span>
             {sworn ? 'Mischief managed' : 'I solemnly swear that I am up to no good'}
           </button>
+          <p className="cast-gloss">— runs the live detection demo</p>
         </Reveal>
         <Reveal delay={0.24}>
-          <ol className="conjuring__legend">
+          <ol className="map__stages">
             {PIPELINE_BEATS.map((beat, i) => (
-              <li key={beat} className="conjuring__legend-item">
-                <span className="conjuring__legend-name">{beat}</span>
-                <span className="conjuring__legend-tags">{EDGE_STACK[i] ?? ''}</span>
+              <li key={beat} className="map__stages-item">
+                <span className="map__stages-name">{beat}</span>
+                <span className="map__stages-tags">{EDGE_STACK[i] ?? ''}</span>
               </li>
             ))}
           </ol>
@@ -296,7 +337,7 @@ export function Chronicles() {
     <section id="chronicles" className="section section--chronicles">
       <div className="section__wrap">
         <MaskReveal>
-          <span className="eyebrow">Chapter VIII — Chronicles</span>
+          <span className="eyebrow">Chapter {numeralFor('chronicles')} — Chronicles</span>
         </MaskReveal>
         <IgniteHeading className="section__title" text="The path so far" />
         <div className="timeline">
@@ -332,7 +373,7 @@ export function OwlPost() {
     <section id="owlpost" className="section section--owl">
       <div className="section__wrap owl">
         <MaskReveal>
-          <span className="eyebrow">Chapter IX — Owl Post</span>
+          <span className="eyebrow">Chapter {numeralFor('owlpost')} — Owl Post</span>
         </MaskReveal>
         <IgniteHeading className="section__title section__title--center" text="Send an owl" />
         <Reveal delay={0.1}>

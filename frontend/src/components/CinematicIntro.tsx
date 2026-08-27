@@ -8,6 +8,8 @@ const EASE = [0.16, 1, 0.3, 1] as const
 const CARD_SWAP = 3000   // card 1 → card 2
 const FINISH = 6500      // dissolve into the hero
 const REDUCED_FINISH = 2000 // shortened path under prefers-reduced-motion
+const RETURN_FINISH = 1500  // condensed dissolve for a returning visitor (same session)
+const SEEN_KEY = 'mak-intro-seen'
 
 const CARDS = [
   { eyebrow: '✦  ✦  ✦', title: 'Welcome To The Archive' },
@@ -46,31 +48,42 @@ export function CinematicIntro({ onDone }: { onDone: () => void }) {
     () => typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
+  // Once per session: the full sequence on first arrival, a short dissolve after.
+  const [seen] = useState(() => {
+    try { return sessionStorage.getItem(SEEN_KEY) === '1' } catch { return false }
+  })
 
   const finish = () => {
     if (done.current) return
     done.current = true
+    try { sessionStorage.setItem(SEEN_KEY, '1') } catch { /* private mode */ }
     onDoneRef.current()
   }
 
   useEffect(() => {
     const timers: number[] = []
-    if (reduced) {
+    if (reduced || seen) {
       setStep(1)
-      timers.push(window.setTimeout(finish, REDUCED_FINISH))
+      timers.push(window.setTimeout(finish, reduced ? REDUCED_FINISH : RETURN_FINISH))
     } else {
       timers.push(window.setTimeout(() => setStep(1), CARD_SWAP))
       timers.push(window.setTimeout(finish, FINISH))
     }
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') finish() }
+    // Scrolling against a locked overlay is the user asking out — let them out.
+    const onGesture = () => finish()
     window.addEventListener('keydown', onKey)
+    window.addEventListener('wheel', onGesture, { passive: true })
+    window.addEventListener('touchmove', onGesture, { passive: true })
     return () => {
       timers.forEach((t) => clearTimeout(t))
       window.removeEventListener('keydown', onKey)
+      window.removeEventListener('wheel', onGesture)
+      window.removeEventListener('touchmove', onGesture)
     }
     // finish is stable for the life of the component (guarded by done ref).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced])
+  }, [reduced, seen])
 
   const card = CARDS[step]
 
@@ -181,7 +194,7 @@ export function CinematicIntro({ onDone }: { onDone: () => void }) {
         className="intro__skip"
         onClick={(e) => { e.stopPropagation(); finish() }}
       >
-        Enter {'✦'}
+        Enter {'✦'} <span className="intro__skip-hint">(skip)</span>
       </button>
     </motion.div>
   )
