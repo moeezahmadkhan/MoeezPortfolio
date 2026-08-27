@@ -37,40 +37,42 @@ test('the GPU actually rasterises the scene', async ({ page }) => {
   expect(frame.tones, 'distinct tones in the frame').toBeGreaterThanOrEqual(3)
 })
 
-test('scroll position drives the rotation, and the rotation changes the frame', async ({ page }) => {
+test('the station being read is the station in the light path', async ({ page }) => {
   await page.goto('/')
   await stageMounted(page)
 
-  const atRest = await capture(page)
-  const firstCaption = await page.locator('.stage-caption').textContent()
+  // This used to be driven by scroll progress across the whole document, and
+  // it could not work: the loop pauses when the stage leaves the viewport, at
+  // scrollY 699 on desktop, while the second detent needed 1038. Every visitor
+  // saw Vanguard and nothing else. Four distinct frames is the proof that the
+  // other three instruments now exist for somebody.
+  const frames = new Map()
 
-  // Bottom of the document seats the fourth station. The stage is off screen
-  // there and the loop is paused by design, so the observable moment is the
-  // return trip: the turret is mid-rotation when it resumes and settled a
-  // second later, and those two frames must not be the same picture.
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
-  await page.waitForTimeout(800)
+  for (const id of ['vanguard', 'sumero', 'pawlyse', 'nexis']) {
+    await page.evaluate((station) => document.getElementById(station).scrollIntoView(), id)
+    await page.waitForTimeout(700)
 
-  await page.evaluate(() => window.scrollTo(0, 0))
-  await page.waitForTimeout(120)
-  const midRotation = await capture(page)
+    const seat = await page.evaluate(() => {
+      const canvas = document.querySelector('[data-stage] canvas')
+      const frame = canvas.captureFrame()
+      return {
+        lit: canvas.readInstrument().find((s) => s.lit)?.id,
+        checksum: frame.checksum,
+        lit_pixels: frame.lit,
+      }
+    })
 
-  await page.waitForTimeout(2000)
-  const settled = await capture(page)
+    expect(seat.lit, `reading ${id} seats ${id}`).toBe(id)
+    expect(seat.lit_pixels, `${id} draws geometry`).toBeGreaterThan(1000)
+    frames.set(id, seat.checksum)
+  }
 
-  expect(midRotation.checksum, 'mid-rotation differs from settled').not.toBe(settled.checksum)
-  expect(midRotation.lit, 'geometry is on screen mid-rotation').toBeGreaterThan(1000)
+  expect(new Set(frames.values()).size, 'four stations, four different pictures').toBe(4)
 
-  // Coverage, not a checksum. The approach is damped rather than keyframed, so
-  // it converges on the detent without ever landing exactly on it — a frame
-  // one ten-thousandth of a radian off is the correct behaviour and a
-  // different picture. The silhouette returning to its old size is the real
-  // claim: the same station is square to the viewer again.
-  expect(settled.lit, 'the starting station is back in the light path')
-    .toBeGreaterThan(atRest.lit * 0.9)
-  expect(settled.lit).toBeLessThan(atRest.lit * 1.1)
-
-  await expect(page.locator('.stage-caption')).toHaveText(firstCaption)
+  // The caption and the index follow the ring rather than the scroll, so they
+  // agree with it at the far end of the page too.
+  await expect(page.locator('.stage-caption')).toContainText(/nexis/i)
+  await expect(page.locator('.index a[aria-current="true"]')).toHaveAttribute('href', '#nexis')
 })
 
 test('every bar is the length the prose says it is', async ({ page }) => {

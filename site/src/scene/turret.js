@@ -291,21 +291,54 @@ export function createTurret(stage) {
   // Scroll position across the document maps to a station index. The turret
   // seats into one of four positions like a filter wheel rather than drifting
   // continuously, so at rest exactly one instrument is square to the viewer.
+  const TAU = Math.PI * 2
   let targetIndex = 0
   let current = 0
   let lastCaption = ''
+  let dirty = true
 
-  function detentFromScroll() {
-    const max = document.documentElement.scrollHeight - window.innerHeight
-    const progress = max > 0 ? window.scrollY / max : 0
-    return Math.min(STATIONS.length - 1, Math.round(progress * (STATIONS.length - 1)))
-  }
+  // The detent follows the station being read, not raw scroll progress across
+  // the document.
+  //
+  // Progress was measured and it did not work: on desktop the loop pauses at
+  // scrollY 699 when the stage leaves the viewport, while the second detent
+  // needed 1038. The ring could not reach station two, let alone four — every
+  // visitor saw Vanguard and nothing else, and three of the four instruments
+  // were built for nobody. An observer on the articles has no such ceiling,
+  // costs no layout read, and answers the question the ring is actually
+  // asking: which system is this person looking at.
+  const articles = STATIONS.map((s) => document.getElementById(s.id)).filter(Boolean)
+  const seen = new Map()
+  const reading = new IntersectionObserver((entries) => {
+    let best = null
+    for (const entry of entries) {
+      seen.set(entry.target, entry.intersectionRatio)
+    }
+    for (const [el, ratio] of seen) {
+      if (ratio > 0 && (!best || ratio > best.ratio)) best = { el, ratio }
+    }
+    if (!best) return
+    const index = articles.indexOf(best.el)
+    if (index < 0 || index === targetIndex) return
+    targetIndex = index
+    // Off screen there is no transit to watch, so the ring is simply already
+    // right when it comes back. Animating a rotation nobody can see would be
+    // battery spent on a secret.
+    if (!running()) {
+      current = -(targetIndex / STATIONS.length) * TAU
+      turret.rotation.y = current
+      syncIndex(targetIndex)
+      dirty = true
+    }
+  }, { threshold: [0, 0.25, 0.5, 0.75] })
+  for (const el of articles) reading.observe(el)
 
   function syncIndex(index) {
     const station = STATIONS[index]
     if (station.caption === lastCaption) return
     lastCaption = station.caption
     caption.textContent = station.caption
+    dirty = true
 
     for (const link of document.querySelectorAll('.index a')) {
       const isCurrent = link.getAttribute('href') === `#${station.id}`
@@ -365,6 +398,7 @@ export function createTurret(stage) {
     renderer.setSize(width, height, false)
     camera.aspect = width / height
     camera.updateProjectionMatrix()
+    dirty = true
   })
   resize.observe(stage)
 
@@ -376,23 +410,53 @@ export function createTurret(stage) {
 
   function running() { return onScreen && visible && !disposed }
 
+  // Time constant, not a per-frame fraction. 7.7 reproduces the old 0.12-per-
+  // frame feel at 60Hz and now holds that feel everywhere: the previous
+  // constant settled twice as fast on a 120Hz phone as on a 60Hz laptop, which
+  // is the kind of difference nobody can name but everybody feels.
+  const APPROACH = 7.7
+  let last = 0
+
   function tick(now) {
     frame = requestAnimationFrame(tick)
-    targetIndex = detentFromScroll()
+    const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60
+    last = now
 
-    const goal = -(targetIndex / STATIONS.length) * Math.PI * 2
+    // Unwrapped to the nearest equivalent angle, so the turret always takes
+    // the short way round. Coming back from the fourth station used to mean
+    // three quarters of a turn backwards past every other instrument; it is a
+    // quarter turn forwards.
+    let goal = -(targetIndex / STATIONS.length) * TAU
+    goal += Math.round((current - goal) / TAU) * TAU
+
     if (REDUCED.matches) {
+      if (current !== goal) dirty = true
       current = goal
     } else {
-      // Critically-damped-ish approach. Settles into the detent instead of
-      // easing forever, and is frame-rate independent enough for 30 and 60.
-      current += (goal - current) * 0.12
+      const remaining = goal - current
+      if (Math.abs(remaining) < 0.0004) {
+        // Snap rather than approach forever. An asymptote costs a redraw a
+        // frame for a rotation nobody can see.
+        if (current !== goal) dirty = true
+        current = goal
+      } else {
+        current += remaining * (1 - Math.exp(-APPROACH * dt))
+        dirty = true
+      }
     }
     turret.rotation.y = current
 
     syncIndex(targetIndex)
     pick(now)
-    renderer.render(scene, camera)
+
+    // Seated and unchanged means the last frame is still correct. The loop
+    // keeps running so a scroll or a hover is picked up immediately, but the
+    // GPU is left alone — which on a phone is the difference between warm and
+    // throttled while somebody reads the case studies.
+    if (dirty) {
+      renderer.render(scene, camera)
+      dirty = false
+    }
 
     if (!running()) {
       cancelAnimationFrame(frame)
@@ -402,6 +466,10 @@ export function createTurret(stage) {
 
   function play() {
     if (frame || !running()) return
+    // A pause of any length would otherwise arrive as one enormous dt and jump
+    // the turret across the transit it was meant to animate.
+    last = 0
+    dirty = true
     frame = requestAnimationFrame(tick)
   }
 
@@ -433,6 +501,7 @@ export function createTurret(stage) {
       frame = 0
 
       resize.disconnect()
+      reading.disconnect()
       viewport.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('scroll', onScroll)
