@@ -143,6 +143,28 @@ test('the caption never sits on top of a reading', async ({ page }) => {
   expect(overlap, 'geometry ends above the caption band').toBeLessThanOrEqual(0)
 })
 
+test('the scene paints in the stylesheet\'s inks, not its own', async ({ page }) => {
+  await page.goto('/')
+  await stageMounted(page)
+
+  const { ink, tokens } = await page.evaluate(() => {
+    const style = getComputedStyle(document.documentElement)
+    const read = (name) => style.getPropertyValue(name).trim().toLowerCase()
+    return {
+      ink: document.querySelector('[data-stage] canvas').readInk(),
+      tokens: {
+        cyanotype: read('--cyanotype'), brass: read('--brass'), sodium: read('--sodium'),
+        oxide: read('--oxide'), plate: read('--plate'), ground: read('--lampblack'),
+      },
+    }
+  })
+
+  // Two files each holding their own copy of six hexes is how the scene's
+  // oxide and --oxide drifted apart. The scene reads the tokens now, and a
+  // drift inside a canvas is invisible to everything except this.
+  expect(ink).toEqual(tokens)
+})
+
 test('exactly one station is in the light path', async ({ page }) => {
   await page.goto('/')
   await stageMounted(page)

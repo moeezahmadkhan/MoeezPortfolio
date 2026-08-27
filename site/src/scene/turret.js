@@ -16,13 +16,26 @@ import {
   MeshBasicMaterial, LineBasicMaterial, LineSegments, Mesh, Color,
 } from 'three'
 
+/**
+ * The palette is read from the stylesheet, not restated here. Both files
+ * carrying their own copy of six hexes is how `--oxide` and the scene's oxide
+ * drifted apart in the first place, and a drift inside a canvas is invisible
+ * to every tool that would otherwise catch it. The fallbacks exist only for
+ * the case where the module somehow runs before the tokens are parsed; they
+ * are not a second source of truth.
+ */
+const token = (name, fallback) => {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  return new Color(value || fallback)
+}
+
 const INK = {
-  cyanotype: new Color('#2f6e8f'),
-  brass: new Color('#8a6e3e'),
-  sodium: new Color('#f2c14e'),
-  oxide: new Color('#c04a34'),
-  plate: new Color('#151a18'),
-  ground: new Color('#0a0c0b'),
+  cyanotype: token('--cyanotype', '#2f6e8f'),
+  brass: token('--brass', '#8a6e3e'),
+  sodium: token('--sodium', '#f2c14e'),
+  oxide: token('--oxide', '#c04a34'),
+  plate: token('--plate', '#151a18'),
+  ground: token('--lampblack', '#0a0c0b'),
 }
 
 /**
@@ -134,6 +147,12 @@ export function createTurret(stage) {
       bounds: lit ? { left, right, top, bottom } : null,
     }
   }
+
+  // The palette actually in use, so the tokens-to-canvas link can be asserted
+  // rather than trusted. Hex out, because that is what the stylesheet holds.
+  canvas.readInk = () => Object.fromEntries(
+    Object.entries(INK).map(([name, colour]) => [name, `#${colour.getHexString()}`]),
+  )
 
   // The scene graph as numbers, so a test can assert that a bar is the length
   // the prose says it is. This is the site's one real claim about itself — the

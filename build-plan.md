@@ -284,6 +284,13 @@ only in a document is not a budget.**
 
 ## 5. Stack — React Three Fiber + drei
 
+> **What shipped: vanilla three, no React.** The reasoning below assumed a DOM app with
+> real state — an argument plane, an index rail, exposure bars, a text route. That app
+> never materialised: the page is static HTML and the only stateful thing on it is the
+> turret itself. React would have been a dependency serving one component. The entry
+> chunk is 1.5KB against the 150KB gate, which is the size the decision bought. The
+> section is kept because the constraints it sets out are still the ones being held.
+
 **Verdict: keep it. Justified, with three hard constraints attached.**
 
 ### Why it survives the 150KB gate

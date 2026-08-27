@@ -24,7 +24,19 @@ Six values. Each has one job and is used for nothing else.
 | **Cyanotype** | `#2F6E8F` | **The only data ink.** Every measured value, bar track, axis, and retrieval rank. Its *density* is the reading — see Signature. |
 | **Brass** | `#8A6E3E` | Fixtures only. Bezels, hairline rules, the turret ring, the detent marks. Structure that holds instruments; never information. |
 | **Sodium** | `#F2C14E` | The single light source. Focus ring, the station currently in the light path, and the booking control. One lamp in the room. |
-| **Iron oxide** | `#A63D2A` | A value outside its limit. Nothing else, ever. Not a brand colour, not a hover, not an underline. |
+| **Iron oxide** | `#C04A34` | A value outside its limit. Nothing else, ever. Not a brand colour, not a hover, not an underline. |
+
+**Why `#C04A34` and not the `#A63D2A` this table first carried.** Oxide is only ever a
+bar fill, so it is judged against the 3:1 floor for non-text, not 4.5:1. `#A63D2A`
+reaches 3.10:1 on Lampblack but only **2.79:1 on Plate** — and every bar is drawn on
+plate, never on the page ground. It failed the floor exactly where it is used. `#C04A34`
+is the same mineral one step lighter: 3.99:1 on Lampblack, 3.58:1 on Plate.
+
+**One source, not two.** `site/src/scene/turret.js` reads all six values off the custom
+properties at runtime rather than restating them. A hex that appears in both a
+stylesheet and a canvas will drift, and a drift inside a canvas is invisible to every
+tool that would otherwise catch it. `tests/webgl-proof.spec.js` asserts the scene's
+palette equals the tokens.
 
 **Why not the obvious alert red.** Iron oxide is what brass and steel actually do
 when they fail — oxidation, not a warning sticker. It sits in the same mineral
