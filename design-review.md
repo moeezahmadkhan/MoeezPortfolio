@@ -218,6 +218,9 @@ A blank box is a fail.
 - [ ] The admissions survive: not measured against a labelled set, no throughput figure,
       approximate, never reached production
 - [ ] No number rounded into a claim it cannot support
+- [ ] The avatar row is still the *only* decorative element, still below the
+      booking control, and still labelled as not a measurement. A second
+      decorative thing anywhere on the page is a finding
 
 ### STRUCTURE
 - [ ] Section spacing encodes hierarchy — the four stations read heavier than the contact block
@@ -306,3 +309,6 @@ Content source: `content/copy.md` · Figures: `content/evidence-ledger.md`
 Markup: `site/index.html` · Tokens: `site/src/styles/main.css`
 Enhancement: `site/src/enhance.js` · Scene: `site/src/scene/turret.js`
 Gates: `site/scripts/gates.mjs` · Tests: `site/tests/`
+Figures: `site/tools/` — `npm run figures` re-renders the portraits and the
+social card from `site/tools/models/*.glb`. The models and their Draco and
+Basis decoders never reach the build; only the images do.

@@ -14,3 +14,8 @@ site/test-results/
 site/playwright-report/
 .vercel
 .env*
+
+# rendered from tools/models by `npm run figures`; the decoders are copied
+# in for that render and are never part of the site
+site/tools/decoders/
+site/tools/fonts/

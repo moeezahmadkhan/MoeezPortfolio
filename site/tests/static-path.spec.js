@@ -25,6 +25,39 @@ test.describe('the page with no JavaScript', () => {
     }
   })
 
+  test('the avatars are images, not a script that draws them', async ({ page }) => {
+    await page.goto('/')
+
+    // The figures are the one decorative thing on the page, so they have to
+    // cost the least: stills, in the document, present with JavaScript off.
+    const avatars = page.locator('.avatars img')
+    await expect(avatars).toHaveCount(4)
+
+    for (const img of await avatars.all()) {
+      await expect(img).toHaveAttribute('alt', /\S/)
+      await expect(img).toHaveAttribute('width', /\d+/)
+      await expect(img).toHaveAttribute('height', /\d+/)
+      await expect(img).toHaveAttribute('loading', 'lazy')
+    }
+
+    // And nothing here reaches for a model or a decoder at runtime.
+    const html = await page.content()
+    expect(html).not.toContain('.glb')
+    expect(html).not.toContain('draco')
+  })
+
+  test('the social card is declared and is a large image', async ({ page }) => {
+    await page.goto('/')
+
+    const meta = (selector) => page.locator(selector).getAttribute('content')
+    expect(await meta('meta[property="og:image"]')).toBe('https://moeezahmadkhan.com/figures/og.jpg')
+    expect(await meta('meta[property="og:image:width"]')).toBe('1200')
+    expect(await meta('meta[property="og:image:height"]')).toBe('630')
+    expect(await meta('meta[property="og:image:alt"]')).toMatch(/\S/)
+    // Without this the card renders as a small square in every share.
+    expect(await meta('meta[name="twitter:card"]')).toBe('summary_large_image')
+  })
+
   test('states what was not measured', async ({ page }) => {
     await page.goto('/')
 

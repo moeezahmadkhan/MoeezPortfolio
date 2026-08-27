@@ -154,6 +154,27 @@ test('a scene that never arrives leaves the page whole', async ({ page }) => {
   expect(failures, 'the failed upgrade is handled, not thrown').toEqual([])
 })
 
+test('every figure the page references is actually served', async ({ page }) => {
+  const missing = []
+  page.on('response', (r) => { if (r.status() >= 400) missing.push(`${r.status()} ${r.url()}`) })
+
+  await page.goto('/')
+  await page.locator('.avatars').scrollIntoViewIfNeeded()
+  await page.waitForTimeout(1200)
+
+  for (const img of await page.locator('.avatars img').all()) {
+    const ok = await img.evaluate((el) => el.complete && el.naturalWidth > 0)
+    expect(ok, `${await img.getAttribute('src')} decoded`).toBe(true)
+  }
+
+  const card = await page.locator('meta[property="og:image"]').getAttribute('content')
+  const res = await page.request.get(new URL(card).pathname)
+  expect(res.status(), 'the social card is served').toBe(200)
+  expect(res.headers()['content-type']).toContain('image/jpeg')
+
+  expect(missing).toEqual([])
+})
+
 test('device pixel ratio is capped', async ({ page }, testInfo) => {
   await page.goto('/')
   await stageMounted(page)
