@@ -44,12 +44,11 @@ const RAD = Math.PI / 180
 // Portraits are transparent WebP at 2x. The social card is opaque JPEG,
 // because WebP is still not read by every crawler that matters.
 const JOBS = [
-  // Yaws chosen off a contact sheet (tools/sweep.mjs), not guessed: every one
-  // of these models faces a different way in its own local space.
+  // The page uses one portrait. The other three models are still in
+  // tools/models and can be added back as a line here — the yaws that framed
+  // them were: spellcaster 105, cricket 60, pact 95, all at pitch 5-6 and
+  // zoom 0.92, taken off the contact sheet in tools/sweep.mjs.
   { file: 'wizard', model: 'wizard_improved', width: 720, height: 900, yaw: 75 * RAD, pitch: 5 * RAD, zoom: 0.92 },
-  { file: 'spellcaster', model: 'spellcaster', width: 720, height: 900, yaw: 105 * RAD, pitch: 6 * RAD, zoom: 0.92 },
-  { file: 'cricket', model: 'cricket_improved', width: 720, height: 900, yaw: 60 * RAD, pitch: 5 * RAD, zoom: 0.92 },
-  { file: 'pact', model: 'pact_pair', width: 720, height: 900, yaw: 95 * RAD, pitch: 5 * RAD, zoom: 0.92 },
 ]
 
 const CARD = { file: 'og', model: 'wizard_improved', yaw: 75 * RAD, pitch: 5 * RAD }
@@ -71,13 +70,18 @@ await page.goto(url)
 await page.waitForFunction(() => !!window.renderFigure)
 
 for (const { file, model, ...opts } of JOBS) {
-  const data = await page.evaluate(
+  const shot = await page.evaluate(
     ([name, o]) => window.renderFigure(name, o), [model, opts],
   )
   const ext = opts.type === 'image/jpeg' ? 'jpg' : 'webp'
   const path = `${OUT}/${file}.${ext}`
-  writeFileSync(path, Buffer.from(data.split(',')[1], 'base64'))
-  console.log(`  ${file.padEnd(12)} ${(statSync(path).size / 1024).toFixed(1)}KB  ${opts.width}x${opts.height}  ${ext}`)
+  writeFileSync(path, Buffer.from(shot.data.split(',')[1], 'base64'))
+  // The cropped size is printed because it is what the <img> width and height
+  // attributes have to say, and a wrong pair there is a layout shift.
+  console.log(
+    `  ${file.padEnd(12)} ${(statSync(path).size / 1024).toFixed(1)}KB` +
+    `  ${shot.width}x${shot.height}  ${ext}   <-- width/height for the markup`,
+  )
 }
 
 const cardData = await page.evaluate(

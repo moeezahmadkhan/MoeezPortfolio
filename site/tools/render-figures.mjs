@@ -135,9 +135,49 @@ window.renderCard = async (name, opts) => {
   return card.toDataURL('image/jpeg', 0.9)
 }
 
+/**
+ * Cropped to what was actually drawn. Framing by bounding *sphere* leaves a
+ * standing figure with a wide band of nothing down each side, and that band
+ * then has to be paid for twice — once in bytes, and again in CSS, where the
+ * element is much larger than the thing anybody can see.
+ */
 window.renderFigure = async (name, opts) => {
   const canvas = await frame(name, opts)
-  return canvas.toDataURL(opts.type || 'image/webp', opts.quality ?? 0.86)
+  const gl = canvas.getContext('webgl2')
+  const w = canvas.width
+  const h = canvas.height
+  const px = new Uint8Array(w * h * 4)
+  gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px)
+
+  let left = w, right = -1, top = h, bottom = -1
+  for (let i = 3; i < px.length; i += 4) {
+    if (px[i] < 6) continue
+    const p = (i - 3) / 4
+    const x = p % w
+    const y = h - 1 - Math.floor(p / w)
+    if (x < left) left = x
+    if (x > right) right = x
+    if (y < top) top = y
+    if (y > bottom) bottom = y
+  }
+  if (right < 0) throw new Error(`renderFigure: ${name} drew nothing`)
+
+  const pad = Math.round(Math.max(right - left, bottom - top) * 0.03)
+  const sx = Math.max(0, left - pad)
+  const sy = Math.max(0, top - pad)
+  const sw = Math.min(w - sx, right - left + 1 + pad * 2)
+  const sh = Math.min(h - sy, bottom - top + 1 + pad * 2)
+
+  const cropped = document.createElement('canvas')
+  cropped.width = sw
+  cropped.height = sh
+  cropped.getContext('2d').drawImage(canvas, sx, sy, sw, sh, 0, 0, sw, sh)
+
+  return {
+    data: cropped.toDataURL(opts.type || 'image/webp', opts.quality ?? 0.9),
+    width: sw,
+    height: sh,
+  }
 }
 
 // A contact sheet of eight yaws, so the camera angle for each figure is chosen

@@ -172,24 +172,22 @@
   /* Sized by height so four models with different bounding boxes still sit on
      one baseline. Width and height are on the elements themselves, so the row
      reserves its space before the images arrive and nothing shifts. */
-  /* Grid, not flex. `flex-basis: 100%` on the caption did not force its own
-     row once `max-inline-size` clamped it back under the remaining space, so
-     it sat beside the figures on desktop and below them on mobile. A row that
-     spans every column cannot disagree with itself. */
-  .avatars {
-    margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, auto));
-    justify-content: start; align-items: end;
-    column-gap: clamp(0.5rem, 2vw, 1.5rem);
+  /* The portrait sits beside the paragraph it belongs to, and falls above it
+     when there is no room for a column. Explicit width and height on the
+     element itself, so the row is reserved before the image arrives. */
+  .about-grid {
+    display: grid; gap: clamp(1rem, 3vw, 2.5rem);
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
   }
-  .avatars img {
-    block-size: clamp(5.5rem, 11vw, 8.5rem); inline-size: auto;
-    max-inline-size: 100%; opacity: 0.92;
+  .about-portrait {
+    inline-size: clamp(6rem, 17vw, 9rem); block-size: auto;
+    justify-self: start; opacity: 0.94;
   }
-  .avatars figcaption {
-    grid-column: 1 / -1; margin-block-start: 0.9rem;
-    font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.14em;
-    text-transform: uppercase; color: var(--muted); max-inline-size: 52ch;
-    line-height: 1.7;
+  @media (min-width: 44rem) {
+    .about-grid { grid-template-columns: auto minmax(0, 1fr); }
+    /* Optically aligned to the first line of prose rather than its box. */
+    .about-portrait { margin-block-start: -0.35rem; }
   }
 
   .page-footer {

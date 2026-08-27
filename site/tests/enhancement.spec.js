@@ -159,13 +159,22 @@ test('every figure the page references is actually served', async ({ page }) => 
   page.on('response', (r) => { if (r.status() >= 400) missing.push(`${r.status()} ${r.url()}`) })
 
   await page.goto('/')
-  await page.locator('.avatars').scrollIntoViewIfNeeded()
+  await page.locator('#about').scrollIntoViewIfNeeded()
   await page.waitForTimeout(1200)
 
-  for (const img of await page.locator('.avatars img').all()) {
-    const ok = await img.evaluate((el) => el.complete && el.naturalWidth > 0)
-    expect(ok, `${await img.getAttribute('src')} decoded`).toBe(true)
-  }
+  const portrait = page.locator('.about-portrait')
+  const decoded = await portrait.evaluate((el) => el.complete && el.naturalWidth > 0)
+  expect(decoded, 'the portrait decoded').toBe(true)
+
+  // Beside the prose on a wide viewport, above it on a narrow one — either
+  // way it must not overlap the text it illustrates.
+  const [figure, prose] = await Promise.all([
+    portrait.boundingBox(),
+    page.locator('#about .prose').boundingBox(),
+  ])
+  const overlaps = figure.x < prose.x + prose.width && prose.x < figure.x + figure.width
+    && figure.y < prose.y + prose.height && prose.y < figure.y + figure.height
+  expect(overlaps, 'portrait and prose do not collide').toBe(false)
 
   const card = await page.locator('meta[property="og:image"]').getAttribute('content')
   const res = await page.request.get(new URL(card).pathname)

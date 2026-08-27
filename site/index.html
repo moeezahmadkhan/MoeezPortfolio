@@ -518,11 +518,19 @@
 <section class="section" id="about" aria-labelledby="about-head">
   <div class="stack gap-md">
     <h2 class="section-head" id="about-head">About</h2>
-    <div class="prose">
+    <div class="about-grid">
+      <!-- One figure, next to the paragraph it belongs to. Rendered offline by
+           `npm run figures`, so it costs 24KB and no JavaScript — the models
+           behind it would have been ~1.8MB of geometry and decoders. -->
+      <img class="about-portrait" src="/figures/wizard.webp" width="405" height="680"
+           loading="lazy" decoding="async"
+           alt="Chibi 3D render of Moeez: dark robe, round glasses, curly hair.">
+      <div class="prose">
       <p>I am an AI/ML engineer in Lahore, working remotely. I build the parts of a system that decide whether a model's output is good enough to act on — quality gates, routers, evaluation harnesses, budgets, and the interfaces that let a non-engineer see why the machine did what it did.</p>
       <p>The pattern across everything above is refusal. A face that fails a gate does not reach an identity. A content-free completion raises instead of becoming an answer. A degraded plan does not get a web search. A deleted fact does not come back. A restart mints a new id rather than reusing one, because a noisy singleton is a better failure than a wrong merge.</p>
       <p>I have taught this too. At Information Technology University I ran graduate-level Agentic AI sessions twice a week for a cohort of 40+, on multi-agent orchestration and RAG deployment, and reviewed student systems for whether they would survive production rather than whether they demoed well. I studied there too — BSCS, 2021 to 2025.</p>
       <p>Currently AI engineer at Ecommerce Steem. Before that, QUIDSol, where Vanguard and Nexis were built.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -542,22 +550,6 @@
       <a class="ret" href="/Moeez_Ahmad_Khan_CV.pdf">Download CV, PDF</a>
     </p>
 
-    <!-- Below the booking control on purpose: it is the one thing here that is
-         not evidence, so it does not get to stand in front of the thing that
-         is. Rendered offline from the source models by `npm run figures` —
-         a still costs 25KB, where the models behind it would have been ~1.8MB
-         of geometry and decoders for a figure that never moves. -->
-    <figure class="avatars">
-      <img src="/figures/wizard.webp" width="720" height="900" loading="lazy" decoding="async"
-           alt="Chibi render of a figure in a dark robe with round glasses, holding a wand">
-      <img src="/figures/spellcaster.webp" width="720" height="900" loading="lazy" decoding="async"
-           alt="The same figure mid-stride, cloak flying, wand extended">
-      <img src="/figures/cricket.webp" width="720" height="900" loading="lazy" decoding="async"
-           alt="The same figure in cricket whites, bat raised, ball in the air">
-      <img src="/figures/pact.webp" width="720" height="900" loading="lazy" decoding="async"
-           alt="Two robed figures passing a chalice between them">
-      <figcaption>Renders of the same avatar, kept from the previous version of this site. The only thing on this page that is not a measurement.</figcaption>
-    </figure>
   </div>
 </section>
 

@@ -25,20 +25,22 @@ test.describe('the page with no JavaScript', () => {
     }
   })
 
-  test('the avatars are images, not a script that draws them', async ({ page }) => {
+  test('the portrait is an image, not a script that draws one', async ({ page }) => {
     await page.goto('/')
 
-    // The figures are the one decorative thing on the page, so they have to
-    // cost the least: stills, in the document, present with JavaScript off.
-    const avatars = page.locator('.avatars img')
-    await expect(avatars).toHaveCount(4)
+    // The figure is the one decorative thing on the page, so it costs the
+    // least it can: a still, in the document, present with JavaScript off and
+    // sitting inside the section whose text it illustrates.
+    const portrait = page.locator('#about .about-portrait')
+    await expect(portrait).toHaveCount(1)
+    await expect(portrait).toHaveAttribute('alt', /\S/)
+    await expect(portrait).toHaveAttribute('width', /\d+/)
+    await expect(portrait).toHaveAttribute('height', /\d+/)
+    await expect(portrait).toHaveAttribute('loading', 'lazy')
 
-    for (const img of await avatars.all()) {
-      await expect(img).toHaveAttribute('alt', /\S/)
-      await expect(img).toHaveAttribute('width', /\d+/)
-      await expect(img).toHaveAttribute('height', /\d+/)
-      await expect(img).toHaveAttribute('loading', 'lazy')
-    }
+    // One figure, not a row of them, and none left behind in the CTA.
+    await expect(page.locator('img[src^="/figures/"]')).toHaveCount(1)
+    await expect(page.locator('#contact img')).toHaveCount(0)
 
     // And nothing here reaches for a model or a decoder at runtime.
     const html = await page.content()

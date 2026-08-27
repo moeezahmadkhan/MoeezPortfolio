@@ -218,9 +218,8 @@ A blank box is a fail.
 - [ ] The admissions survive: not measured against a labelled set, no throughput figure,
       approximate, never reached production
 - [ ] No number rounded into a claim it cannot support
-- [ ] The avatar row is still the *only* decorative element, still below the
-      booking control, and still labelled as not a measurement. A second
-      decorative thing anywhere on the page is a finding
+- [ ] The About portrait is still the *only* decorative element on the page.
+      A second decorative thing anywhere is a finding
 
 ### STRUCTURE
 - [ ] Section spacing encodes hierarchy — the four stations read heavier than the contact block
