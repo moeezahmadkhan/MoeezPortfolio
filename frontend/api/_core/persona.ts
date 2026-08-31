@@ -46,7 +46,21 @@ export const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completion
 
 // Per-model deadline. Without it one hung upstream stalls the whole cascade and the
 // visitor watches a typing indicator until the platform kills the function.
-export const MODEL_TIMEOUT_MS = 12_000
+export const MODEL_TIMEOUT_MS = 8_000
+
+/**
+ * The whole cascade's budget, not one model's.
+ *
+ * Four models at MODEL_TIMEOUT_MS each is 32 seconds of a visitor watching a
+ * typing indicator before the fallback appears — and on Vercel the platform may
+ * kill the function before that, turning a graceful fallback into a 504 with no
+ * reply at all. So the loop stops trying once this is spent and returns the
+ * fallback itself, while it still can.
+ *
+ * Kept comfortably under the function's own `maxDuration` in vercel.json, so
+ * ours is always the limit that fires.
+ */
+export const CASCADE_BUDGET_MS = 20_000
 
 // --- Caps (bound token spend) ---
 export const MAX_MESSAGE_CHARS = 1000 // single user message; longer is truncated

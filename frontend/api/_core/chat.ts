@@ -7,6 +7,7 @@ import {
   MAX_MESSAGE_CHARS,
   MAX_OUTPUT_TOKENS,
   MAX_TURNS,
+  CASCADE_BUDGET_MS,
   MODEL_TIMEOUT_MS,
   MODELS,
   OPENROUTER_ENDPOINT,
@@ -121,6 +122,13 @@ export type HandleArgs = {
   signal?: AbortSignal
   /** Tests pass their own notes; production uses the corpus built at build time. */
   corpus?: Chunk[]
+  /**
+   * Reads the wall clock while the cascade runs. `now` above is a single stamp
+   * for rate limiting; this one has to ADVANCE, or a budget measured against it
+   * could never expire — and an unfalsifiable budget is not a budget. Tests
+   * inject a clock they control.
+   */
+  clock?: () => number
 }
 
 export async function handleChatRequest(args: HandleArgs): Promise<ChatResult> {
@@ -160,11 +168,24 @@ export async function handleChatRequest(args: HandleArgs): Promise<ChatResult> {
 
   const system = buildSystemPrompt(chunks)
 
+  // The cascade's own wall clock. Without it, four models timing out in turn is
+  // half a minute of a visitor watching a typing indicator — and long enough
+  // that the platform may kill the function first, replacing a graceful
+  // fallback with a 504 and no reply at all.
+  const clock = args.clock ?? (() => Date.now())
+  const deadline = clock() + CASCADE_BUDGET_MS
+
   for (const model of MODELS) {
-    // Each model gets its own deadline so one hung upstream can't consume the whole
-    // cascade's budget. AbortSignal.timeout rejects the fetch, which the catch below
-    // treats like any other failure and falls through to the next model.
-    const signal = args.signal ?? AbortSignal.timeout(MODEL_TIMEOUT_MS)
+    // Stop before starting a call that cannot finish inside the budget. Better to
+    // hand over the fallback now than to spend the remaining seconds and have the
+    // platform decide the ending.
+    if (clock() >= deadline) break
+
+    // Each model also gets its own deadline, so one hung upstream cannot consume
+    // what is left for the others. AbortSignal.timeout rejects the fetch, which
+    // the catch below treats like any other failure and falls through.
+    const remaining = deadline - clock()
+    const signal = args.signal ?? AbortSignal.timeout(Math.min(MODEL_TIMEOUT_MS, remaining))
     try {
       const res = await doFetch(OPENROUTER_ENDPOINT, {
         method: 'POST',

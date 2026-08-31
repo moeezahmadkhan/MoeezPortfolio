@@ -8,11 +8,13 @@ import {
   type ChatMessage,
 } from './chat'
 import {
+  CASCADE_BUDGET_MS,
   CONTACT_EMAIL,
   fence,
   FALLBACK_REPLY,
   MAX_MESSAGE_CHARS,
   MAX_TURNS,
+  MODEL_TIMEOUT_MS,
   MODELS,
   NOTES_CLOSE,
   NOTES_OPEN,
@@ -428,5 +430,44 @@ describe('a visitor cannot forge the notes block', () => {
       fetchImpl: fetchImpl as unknown as typeof fetch,
     })
     expect(fetchImpl).not.toHaveBeenCalled()
+  })
+})
+
+describe('the cascade has a wall clock, not just per-model timeouts', () => {
+  // Four models at MODEL_TIMEOUT_MS each is over half a minute of a visitor
+  // watching a typing indicator — and long enough that Vercel may kill the
+  // function first, replacing the graceful fallback with a 504 and no reply.
+  it('stops trying models once the budget is spent, and still answers', async () => {
+    let t = 1_000
+    let calls = 0
+    const slowFailing: typeof fetch = async () => {
+      calls++
+      t += MODEL_TIMEOUT_MS // each attempt burns its whole per-model deadline
+      return new Response('nope', { status: 503 })
+    }
+    const res = await ask({ fetchImpl: slowFailing, clock: () => t })
+
+    // 20s of budget against 8s per attempt: three attempts fit, the fourth does not.
+    expect(calls).toBeLessThan(MODELS.length)
+    expect(calls).toBe(Math.ceil(CASCADE_BUDGET_MS / MODEL_TIMEOUT_MS))
+    // The visitor still gets an answer rather than a hung request.
+    expect(res.body.reply).toBe(FALLBACK_REPLY)
+  })
+
+  it('tries every model when they fail fast, since the budget is untouched', async () => {
+    let calls = 0
+    const fastFailing: typeof fetch = async () => {
+      calls++
+      return new Response('nope', { status: 503 })
+    }
+    await ask({ fetchImpl: fastFailing, clock: () => 1_000 })
+    expect(calls).toBe(MODELS.length)
+  })
+
+  it('keeps the budget under the platform limit it is meant to beat', () => {
+    // vercel.json gives the function maxDuration 30s. Ours must fire first, or
+    // the platform decides the ending and the visitor gets a 504.
+    expect(CASCADE_BUDGET_MS).toBeLessThan(30_000)
+    expect(MODEL_TIMEOUT_MS).toBeLessThan(CASCADE_BUDGET_MS)
   })
 })
