@@ -42,9 +42,17 @@ export type RigSpec = {
  */
 export const PINNED_SECTION_ID = 'experience'
 
+/**
+ * The one rig with a continuous "how much of me is still on screen" measure:
+ * the hero slides off under the rest of the page rather than being handed over
+ * by SceneDirector. Named here, beside the table that defines it, because
+ * `motion.ts` and `CharacterRig` both have to agree on which rig that is.
+ */
+export const HERO_RIG_ID = 'hero'
+
 export const RIGS: Record<string, RigSpec> = {
   '': {
-    id: 'hero',
+    id: HERO_RIG_ID,
     model: '/models/wizard_improved.glb',
     position: [1.4, -0.21, 0],
     scale: 1.3,
@@ -56,7 +64,7 @@ export const RIGS: Record<string, RigSpec> = {
     model: '/models/spellcaster.glb',
     position: [1.9, 0.72, -0.95],
     scale: 0.78,
-    mobilePosition: [0.85, 1.55, -2.6],
+    mobilePosition: [0.45, 1.15, -2.6],
     mobileScale: 0.2,
   },
   experience: {
@@ -64,7 +72,7 @@ export const RIGS: Record<string, RigSpec> = {
     model: '/models/pact_pair.glb',
     position: [1.55, -0.75, -0.9],
     scale: 0.95,
-    mobilePosition: [0.85, 1.55, -2.6],
+    mobilePosition: [0.45, 1.15, -2.6],
     mobileScale: 0.2,
   },
 }
