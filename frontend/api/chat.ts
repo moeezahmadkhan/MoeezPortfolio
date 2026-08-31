@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { handleFamiliarRequest } from './_core/familiar.js'
+import { handleChatRequest } from './_core/chat.js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -9,7 +9,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const fwd = req.headers['x-forwarded-for']
   const ip = (Array.isArray(fwd) ? fwd[0] : fwd?.split(',')[0]?.trim()) || 'unknown'
 
-  const result = await handleFamiliarRequest({
+  const result = await handleChatRequest({
     messages: req.body?.messages,
     ip,
     apiKey: process.env.OPENROUTER_API_KEY,

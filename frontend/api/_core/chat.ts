@@ -1,4 +1,7 @@
+import defaultCorpus from './corpus.generated.json' with { type: 'json' }
 import {
+  buildRefusalReply,
+  buildSystemPrompt,
   FALLBACK_REPLY,
   MAX_MESSAGE_CHARS,
   MAX_OUTPUT_TOKENS,
@@ -8,8 +11,8 @@ import {
   OPENROUTER_ENDPOINT,
   RATE_PER_HOUR,
   RATE_PER_MIN,
-  SYSTEM_PROMPT,
 } from './persona.js'
+import { retrieve, type Chunk } from './retrieval.js'
 
 export type ChatRole = 'user' | 'assistant'
 export type ChatMessage = { role: ChatRole; content: string }
@@ -30,11 +33,17 @@ export type OpenRouterBody = {
   max_tokens: number
 }
 
-// Builds the OpenRouter payload for one model. Caller caps messages first (see capMessages).
-export function buildRequestBody(messages: ChatMessage[], model: string): OpenRouterBody {
+// Builds the OpenRouter payload for one model. The system prompt is passed in rather
+// than imported: it is built per request from the chunks retrieval returned, and a
+// visitor's turns stay in their own messages, outside it.
+export function buildRequestBody(
+  messages: ChatMessage[],
+  model: string,
+  system: string,
+): OpenRouterBody {
   return {
     model,
-    messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+    messages: [{ role: 'system', content: system }, ...messages],
     max_tokens: MAX_OUTPUT_TOKENS,
   }
 }
@@ -62,7 +71,7 @@ export function createRateLimiter(): RateLimiter {
 // Module singleton used by the live adapters (tests pass their own limiter).
 const defaultLimiter = createRateLimiter()
 
-export type FamiliarResult = { status: number; body: { reply: string } }
+export type ChatResult = { status: number; body: { reply: string } }
 
 export type HandleArgs = {
   messages: ChatMessage[]
@@ -73,15 +82,17 @@ export type HandleArgs = {
   fetchImpl?: typeof fetch
   /** Tests pass their own signal; production leaves this unset for a per-model timeout. */
   signal?: AbortSignal
+  /** Tests pass their own notes; production uses the corpus built at build time. */
+  corpus?: Chunk[]
 }
 
-export async function handleFamiliarRequest(args: HandleArgs): Promise<FamiliarResult> {
+export async function handleChatRequest(args: HandleArgs): Promise<ChatResult> {
   const now = args.now ?? Date.now()
   const rl = args.rateLimiter ?? defaultLimiter
   const doFetch = args.fetchImpl ?? fetch
 
   if (!args.apiKey) {
-    console.warn('[familiar] OPENROUTER_API_KEY is not set')
+    console.warn('[chat] OPENROUTER_API_KEY is not set')
     return { status: 500, body: { reply: FALLBACK_REPLY } }
   }
   if (!rl.check(args.ip, now).allowed) {
@@ -92,6 +103,25 @@ export async function handleFamiliarRequest(args: HandleArgs): Promise<FamiliarR
   if (capped.length === 0) {
     return { status: 400, body: { reply: FALLBACK_REPLY } }
   }
+
+  // Retrieve against the LAST user message: that is the question being asked, and
+  // scoring the whole transcript lets an earlier topic outvote the current one.
+  const corpus = args.corpus ?? (defaultCorpus as Chunk[])
+  const lastUser = [...capped].reverse().find((m) => m.role === 'user')
+  const chunks = retrieve(lastUser?.content ?? '', corpus)
+
+  // Nothing in the notes covers this. `retrieve` already applied COVERAGE_FLOOR, so
+  // this is not "the best chunk was weak" — it is "he never wrote this down".
+  //
+  // The model is not called at all. A model handed no notes and asked a question is
+  // a model with only its own general knowledge to answer from, and no wording of a
+  // system prompt makes that reliably safe. Not asking is the only guarantee — and
+  // it is also the cheapest and the fastest path through this function.
+  if (chunks.length === 0) {
+    return { status: 200, body: { reply: buildRefusalReply(corpus) } }
+  }
+
+  const system = buildSystemPrompt(chunks)
 
   for (const model of MODELS) {
     // Each model gets its own deadline so one hung upstream can't consume the whole
@@ -105,9 +135,9 @@ export async function handleFamiliarRequest(args: HandleArgs): Promise<FamiliarR
         headers: {
           Authorization: `Bearer ${args.apiKey}`,
           'Content-Type': 'application/json',
-          'X-Title': 'Moeez Portfolio - Familiar',
+          'X-Title': 'Moeez Portfolio - Chat',
         },
-        body: JSON.stringify(buildRequestBody(capped, model)),
+        body: JSON.stringify(buildRequestBody(capped, model, system)),
       })
       if (!res.ok) continue
       const data = (await res.json()) as { choices?: { message?: { content?: string } }[] }
