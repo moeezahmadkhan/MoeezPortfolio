@@ -29,12 +29,92 @@ const STOPWORDS = new Set([
 ])
 
 /**
+ * Ordinary English, beyond the stopwords. Roughly the words a person reaches for
+ * without thinking about the subject — verbs of asking and doing, plain adjectives,
+ * generic nouns, connectives.
+ *
+ * This list only ever applies to a word the corpus does NOT contain, and it draws
+ * the line the coverage score turns on. His notes are about a thousand words long,
+ * so almost every ordinary English word is missing from them; charging every
+ * missing word against the question means the only questions that survive are the
+ * keyword-shaped ones. "What is Project Horus, in plain terms?" scored 0.24 and was
+ * refused, while "What is Silmaril AI?" scored 1.00 — the difference was phrasing,
+ * not substance.
+ *
+ * So a missing ORDINARY word ("plain", "terms", "actually", "hard", "touch") says
+ * nothing and is ignored. A missing SALIENT word ("Kubernetes", "Terraform",
+ * "Google", "MIT", "binary", "PyTorch") is the evidence that matters and still
+ * counts at full weight. Everything not listed here is treated as salient, so the
+ * failure mode of an incomplete list is a refusal, which is the safe direction.
+ */
+const COMMON_WORDS = [
+  // asking, telling, thinking
+  'ask', 'answer', 'call', 'describe', 'explain', 'mean', 'meant', 'meaning',
+  'talk', 'speak', 'spoke', 'hear', 'heard', 'listen', 'read', 'write', 'wrote',
+  'written', 'share', 'show', 'discuss', 'mention', 'suggest', 'wonder', 'guess',
+  'remember', 'forget', 'imagine', 'consider', 'believe', 'feel', 'felt', 'seem',
+  // doing
+  'go', 'goes', 'went', 'gone', 'come', 'came', 'make', 'made', 'take', 'took',
+  'taken', 'put', 'keep', 'kept', 'find', 'found', 'look', 'see', 'saw', 'seen',
+  'become', 'became', 'leave', 'left', 'bring', 'brought', 'begin', 'began',
+  'start', 'stop', 'try', 'help', 'learn', 'teach', 'taught', 'study', 'hire',
+  'join', 'prefer', 'choose', 'chose', 'pick', 'decide', 'spend', 'spent', 'plan',
+  'hope', 'wish', 'love', 'hate', 'enjoy', 'care', 'mind', 'matter', 'happen',
+  'change', 'move', 'grow', 'grew', 'break', 'broke', 'broken', 'fix', 'solve',
+  'handle', 'approach', 'deal', 'meet', 'met', 'watch', 'live', 'lived', 'stay',
+  'follow', 'reach', 'turn', 'hold', 'held', 'carry', 'send', 'sent', 'walk',
+  'run', 'ran', 'sit', 'stand', 'open', 'close', 'add', 'remove', 'compare',
+  'happened', 'wanted', 'liked', 'tried', 'worked',
+  // plain adjectives
+  'good', 'bad', 'best', 'worst', 'better', 'worse', 'big', 'small', 'large',
+  'little', 'long', 'short', 'high', 'low', 'new', 'old', 'young', 'early', 'late',
+  'easy', 'easier', 'easiest', 'hard', 'harder', 'hardest', 'difficult', 'simple',
+  'complex', 'important', 'main', 'major', 'minor', 'real', 'true', 'right',
+  'wrong', 'clear', 'common', 'different', 'same', 'similar', 'other', 'another',
+  'next', 'last', 'first', 'second', 'third', 'few', 'several', 'whole', 'full',
+  'empty', 'free', 'busy', 'available', 'ready', 'able', 'likely', 'possible',
+  'actual', 'current', 'recent', 'past', 'future', 'present', 'usual', 'normal',
+  'typical', 'favourite', 'favorite', 'interesting', 'strong', 'stronger',
+  'strongest', 'weak', 'weaker', 'weakest', 'proud', 'happy', 'quick', 'nice',
+  'cool', 'great', 'awesome', 'amazing', 'terrible', 'boring', 'plain', 'general',
+  'specific', 'overall', 'personal', 'professional', 'daily', 'weekly',
+  // generic nouns
+  'thing', 'way', 'time', 'day', 'week', 'month', 'year', 'people', 'person',
+  'someone', 'something', 'anything', 'nothing', 'everything', 'everyone',
+  'anyone', 'nobody', 'somebody', 'place', 'area', 'part', 'point', 'side', 'end',
+  'top', 'bottom', 'level', 'kind', 'sort', 'type', 'case', 'example', 'reason',
+  'idea', 'question', 'problem', 'issue', 'story', 'life', 'home', 'house',
+  'city', 'town', 'country', 'world', 'school', 'college', 'job', 'career',
+  'company', 'business', 'office', 'week', 'hour', 'minute', 'moment', 'stage',
+  'step', 'piece', 'bit', 'lot', 'number', 'amount', 'group', 'list', 'set',
+  'name', 'word', 'term', 'note', 'detail', 'fact', 'sense', 'view', 'opinion',
+  'advice', 'goal', 'aim', 'habit', 'routine', 'background', 'history', 'title',
+  'shipping', 'ship', 'touch', 'head', 'hand', 'eye', 'face', 'body', 'mind',
+  // connectives, quantifiers, time words
+  'over', 'under', 'after', 'before', 'during', 'between', 'among', 'through',
+  'across', 'around', 'without', 'within', 'into', 'onto', 'upon', 'since',
+  'until', 'while', 'because', 'though', 'although', 'unless', 'either',
+  'neither', 'both', 'each', 'every', 'whether', 'perhaps', 'maybe', 'instead',
+  'rather', 'quite', 'almost', 'enough', 'always', 'never', 'often', 'sometimes',
+  'usually', 'ago', 'soon', 'now', 'today', 'tomorrow', 'yesterday', 'once',
+  'twice', 'together', 'alone', 'only', 'even', 'else', 'far', 'near', 'back',
+  'down', 'away', 'along', 'behind', 'beyond', 'per', 'via', 'etc',
+]
+
+/** Membership is checked against the folded form, so the list can be written plainly. */
+const COMMON = new Set<string>()
+
+/**
  * The smallest suffix folding that closes the gaps this corpus actually has:
  * the notes say "Matches" and "faces", a visitor types "match" and "face". One
  * rule fires at most, and every rule refuses to run when it would leave a stub —
  * that is what keeps "FAISS" out of "fais" and "string" out of "str".
  */
 function stem(word: string): string {
+  // "node.js", "c++", "c#" are identifiers, not English. English suffix rules on
+  // them produce "node.j", which is not wrong so much as meaningless.
+  if (/[.+#]/.test(word)) return word
+
   const drop = (suffix: string, min: number, add = '') =>
     word.endsWith(suffix) && word.length - suffix.length >= min
       ? word.slice(0, -suffix.length) + add
@@ -43,6 +123,7 @@ function stem(word: string): string {
   return (
     drop('ing', 4) ??
     drop('ed', 4) ??
+    drop('ly', 4) ??
     (word.length > 4 ? drop('ies', 3, 'y') : null) ??
     (/(?:s|x|z|ch|sh)es$/.test(word) ? drop('es', 3) : null) ??
     (/(?:ss|us|is)$/.test(word) ? null : drop('s', 3)) ??
@@ -50,10 +131,19 @@ function stem(word: string): string {
   )
 }
 
+for (const word of COMMON_WORDS) {
+  COMMON.add(word)
+  COMMON.add(stem(word))
+}
+
 export function tokenize(text: string): string[] {
   return text
     .toLowerCase()
     .split(/[^a-z0-9+#.]+/)
+    // A dot is kept inside a token so "node.js" survives, which means a token can
+    // also arrive wearing the sentence's full stop: "in production." never matched
+    // "production". Trailing "+" and "#" are left alone — they are C++ and C#.
+    .map((t) => t.replace(/^\.+|\.+$/g, ''))
     .filter((t) => t.length > 1 && !STOPWORDS.has(t))
     .map(stem)
     .filter((t) => t.length > 1 && !STOPWORDS.has(t))
@@ -66,19 +156,21 @@ const HEADING_BOOST = 2.2 // a term in the heading is worth more than one in the
 /**
  * How much of the question must exist in the notes before the bot answers at all.
  *
- * Measured over the real 12-chunk corpus, not chosen by feel. Every answerable
- * question in `retrieval.test.ts` scores exactly 1.00 — coverage is the share of
- * the question that exists at all, and a question about his own work uses his own
- * words. The highest-scoring *un*answerable one is 0.57 ("Is the Whoop chat
- * deployed to production?": three of four terms are his, but the notes never say
- * whether it shipped). Every other unanswerable question — near misses like "Did
- * you work at Google?" and off-topic ones like "write me a binary search in
- * Python" — lands at 0.40 or below, and six of them at 0.00. The band between 0.57
- * and 1.00 is empty, so the floor goes inside it, clear of the top of the refusals
- * rather than adjacent to it.
+ * Measured over the real 12-chunk corpus, not chosen by feel. Across 55 questions —
+ * all 20 headings of qa.md, plus off-topic, near-miss and partially-covered sets —
+ * every answerable one scores 1.00. Once the phrasing is discounted, a question
+ * about his work is made of his words, so it either covers or it does not.
  *
- * Erring high is the safe direction. A refused question costs a visitor one email;
- * an answered one the notes do not support is the bot inventing an employer.
+ * The refusals top out at 0.57 and the band above them is empty:
+ *   0.570  "write me a binary search in Python"   (search and Python are his; binary is not)
+ *   0.567  "Is the Whoop chat deployed to production?"  (3 of 4 terms his; the notes never say it shipped)
+ *   0.399  "Did you work at Google?"
+ *   0.389  "How does Project Horus scale?"
+ *   0.34 and below: everything else, and 0.00 for eleven of them
+ *
+ * 0.7 sits inside that gap, clear of the top of the refusals rather than adjacent
+ * to it. Erring high is the safe direction: a refused question costs a visitor one
+ * email, an answered one the notes do not support is the bot inventing an employer.
  */
 export const COVERAGE_FLOOR = 0.7
 
@@ -128,9 +220,16 @@ export function scoreCorpus(
   let asked = 0
   let answered = 0
   for (const term of unique) {
-    const weight = idf(df.get(term) ?? 0, docs.length)
-    asked += weight
-    if ((df.get(term) ?? 0) > 0) answered += weight
+    const n = df.get(term) ?? 0
+    if (n > 0) {
+      const weight = idf(n, docs.length)
+      asked += weight
+      answered += weight
+    } else if (!COMMON.has(term)) {
+      // Absent and salient: the question is reaching for something he never wrote
+      // down. Absent and ordinary: it is just how the sentence was phrased.
+      asked += idf(0, docs.length)
+    }
   }
 
   const ranked = docs
