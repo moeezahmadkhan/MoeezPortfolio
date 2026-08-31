@@ -1,5 +1,16 @@
-import { describe, expect, it } from 'vitest'
-import { heroVisibility, sectionProgress, scrollState } from './scrollState'
+import { renderHook } from '@testing-library/react'
+import { act } from 'react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import {
+  MAX_FRAME_DT,
+  SCROLL_LAMBDA,
+  advanceSmooth,
+  heroVisibility,
+  registerPinnedSection,
+  scrollState,
+  sectionProgress,
+  useScrollTracker,
+} from './scrollState'
 
 describe('heroVisibility', () => {
   it('is 1 while the hero still fills the viewport', () => {
