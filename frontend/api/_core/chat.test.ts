@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   buildRequestBody,
   capMessages,
+  withContactBlock,
   createRateLimiter,
   handleChatRequest,
   type ChatMessage,
@@ -348,63 +349,35 @@ describe('the contact chunk always travels with the notes', () => {
   // him — moeez@khan.pro, hey@moeezahmadkhan.com, and a truncated
   // linkedin.com/in/moeez-ahmad-khan that points at nobody. The prompt forbids
   // it twice and is disobeyed, because the same prompt ORDERS the model to
-  // point at LinkedIn and email while retrieval hands it the skills chunk and
+  // point at LinkedIn and email while retrieval hands over the skills chunk and
   // not the contact one. An instruction the context cannot satisfy is an
-  // invitation to improvise. So the contact block ships with every answer.
-  const contactChunkId = 'facts#how-to-reach-me-and-where-to-find-me-online#1'
+  // invitation to improvise, so the contact block ships with every answer.
+  const contact = corpus.find((c) => /linkedin\.com\/in\//i.test(c.text))!
 
-  function promptFor(question: string): string {
-    let system = ''
-    const fetchSpy = vi.fn(async (_url: string, init: RequestInit) => {
-      const body = JSON.parse(String(init.body))
-      system = body.messages.find((m: ChatMessage) => m.role === 'system')?.content ?? ''
-      return new Response(
-        JSON.stringify({ choices: [{ message: { content: 'ok' } }] }),
-        { status: 200 },
-      )
-    })
-    vi.stubGlobal('fetch', fetchSpy)
-    return system
-  }
-
-  it('appends the contact block to a question that did not retrieve it', async () => {
-    let system = ''
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (_url: string, init: RequestInit) => {
-        const body = JSON.parse(String(init.body))
-        system = body.messages.find((m: { role: string }) => m.role === 'system')?.content ?? ''
-        return new Response(JSON.stringify({ choices: [{ message: { content: 'ok' } }] }), {
-          status: 200,
-        })
-      }),
-    )
-    await handleChatRequest({
-      messages: [{ role: 'user', content: 'What is your experience with LLM serving?' }],
-      apiKey: 'test-key',
-    })
-    expect(system).toContain('linkedin.com/in/')
+  it('appends the contact block when the question did not retrieve it', () => {
+    const retrieved = [corpus[0]]
+    const withContact = withContactBlock(retrieved, corpus)
+    expect(withContact).toHaveLength(2)
+    expect(withContact[withContact.length - 1].id).toBe(contact.id)
   })
 
-  it('does not duplicate it when the question retrieved it already', async () => {
-    let system = ''
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (_url: string, init: RequestInit) => {
-        const body = JSON.parse(String(init.body))
-        system = body.messages.find((m: { role: string }) => m.role === 'system')?.content ?? ''
-        return new Response(JSON.stringify({ choices: [{ message: { content: 'ok' } }] }), {
-          status: 200,
-        })
-      }),
-    )
-    await handleChatRequest({
-      messages: [{ role: 'user', content: 'How do I get in touch?' }],
-      apiKey: 'test-key',
-    })
-    const occurrences = system.split('linkedin.com/in/').length - 1
-    expect(occurrences).toBe(1)
-    expect(contactChunkId).toBeTruthy()
+  it('does not duplicate it when the question retrieved it already', () => {
+    expect(withContactBlock([contact], corpus)).toEqual([contact])
+  })
+
+  it('adds nothing to a refusal — an empty answer stays empty', () => {
+    expect(withContactBlock([], corpus)).toEqual([])
+  })
+
+  it('conjures no link when the corpus carries none', () => {
+    const linkless = corpus.filter((c) => c.id !== contact.id)
+    expect(withContactBlock([linkless[0]], linkless)).toEqual([linkless[0]])
+  })
+
+  it('puts his real link in front of the model on an ordinary question', async () => {
+    const fetchImpl = okFetch('answer')
+    await ask({ fetchImpl: fetchImpl as unknown as typeof fetch })
+    expect(systemOf(fetchImpl)).toContain('linkedin.com/in/')
   })
 })
 
