@@ -1,9 +1,11 @@
 import { Canvas } from '@react-three/fiber'
-import { AdaptiveDpr, PerformanceMonitor } from '@react-three/drei'
+import { AdaptiveDpr, PerformanceMonitor, Preload } from '@react-three/drei'
 import { Suspense, useMemo, useState } from 'react'
 import { NAV_ITEMS } from '../components/layout/Nav'
 import { useSectionObserver } from '../lib/useSectionObserver'
 import { Backdrop } from './Backdrop'
+import { HeroLights } from './lights'
+import { HeroWizard } from './HeroWizard'
 
 export function Stage() {
   const ids = useMemo(() => NAV_ITEMS.map((i) => i.id), [])
@@ -23,7 +25,11 @@ export function Stage() {
         />
         <AdaptiveDpr pixelated />
         <Backdrop activeId={activeId} />
-        <Suspense fallback={null}>{/* HeroStage arrives in Task 5 */}</Suspense>
+        <Suspense fallback={null}>
+          <HeroLights />
+          <HeroWizard />
+          <Preload all />
+        </Suspense>
       </Canvas>
     </div>
   )
