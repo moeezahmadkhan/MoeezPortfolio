@@ -43,3 +43,17 @@ if (!window.IntersectionObserver) {
   }
   window.IntersectionObserver = NoopObserver as unknown as typeof window.IntersectionObserver
 }
+
+// jsdom's canvas getContext() exists but has no WebGL backend: requesting 'webgl' or
+// 'webgl2' logs a noisy "Not implemented" to stderr and returns undefined. Stub it to
+// a clean `null` so capability probes like hasWebGL() behave (return false) without
+// polluting test output. Individual tests can still vi.spyOn(...) over this.
+const originalGetContext = HTMLCanvasElement.prototype.getContext
+HTMLCanvasElement.prototype.getContext = function (
+  this: HTMLCanvasElement,
+  contextId: string,
+  ...rest: unknown[]
+) {
+  if (contextId === 'webgl' || contextId === 'webgl2') return null
+  return (originalGetContext as (...a: unknown[]) => unknown).call(this, contextId, ...rest)
+} as typeof HTMLCanvasElement.prototype.getContext

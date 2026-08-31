@@ -14,6 +14,13 @@ html {
   color-scheme: dark;
 }
 
+.nav,
+main,
+.footer {
+  position: relative;
+  z-index: 2;
+}
+
 body {
   background: var(--ink);
   color: var(--text);

@@ -1,0 +1,32 @@
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.stage canvas {
+  display: block;
+}
+
+.stage--static {
+  display: grid;
+  place-items: center end;
+  padding-right: 6vw;
+}
+
+.stage--static img {
+  max-height: 70svh;
+  width: auto;
+  opacity: 0.9;
+}
+
+@media (max-width: 899px) {
+  .stage--static {
+    place-items: start center;
+    padding: calc(var(--nav-h) + var(--s-5)) 0 0;
+  }
+  .stage--static img {
+    max-height: 40svh;
+  }
+}
