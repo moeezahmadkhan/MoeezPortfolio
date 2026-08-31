@@ -21,7 +21,8 @@ const FRAG = /* glsl */ `
   uniform vec3  uTint;
   uniform vec2  uResolution;
 
-  // Value noise + 4-octave fbm. Cheap enough to run fullscreen every frame.
+  // Value noise + 3-octave fbm (dropped from 4 to stay inside the mobile perf
+  // budget — see task-6-7-report.md). Cheap enough to run fullscreen every frame.
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
   float noise(vec2 p) {
@@ -33,7 +34,7 @@ const FRAG = /* glsl */ `
 
   float fbm(vec2 p) {
     float v = 0.0, a = 0.5;
-    for (int i = 0; i < 4; i++) { v += a * noise(p); p *= 2.02; a *= 0.5; }
+    for (int i = 0; i < 3; i++) { v += a * noise(p); p *= 2.02; a *= 0.5; }
     return v;
   }
 
@@ -58,7 +59,12 @@ const FRAG = /* glsl */ `
 
 export function Backdrop({ activeId }: { activeId: string }) {
   const { size } = useThree()
-  const target = useRef(new Color())
+  // Lazily construct once and cache on the ref — `useRef(new Color())` would
+  // build (and discard) a Color on every re-render since the argument is
+  // evaluated eagerly even though only the first value is ever kept.
+  const targetRef = useRef<Color | null>(null)
+  if (!targetRef.current) targetRef.current = new Color()
+  const target = targetRef.current
   const material = useMemo(
     () =>
       new ShaderMaterial({
@@ -82,11 +88,11 @@ export function Backdrop({ activeId }: { activeId: string }) {
     u.uScroll.value = damp(u.uScroll.value, scrollState.progress, 3, dt)
     u.uResolution.value.set(size.width, size.height)
 
-    target.current.setRGB(...sectionTint(activeId))
+    target.setRGB(...sectionTint(activeId))
     const tint = u.uTint.value as Color
-    tint.r = damp(tint.r, target.current.r, 2, dt)
-    tint.g = damp(tint.g, target.current.g, 2, dt)
-    tint.b = damp(tint.b, target.current.b, 2, dt)
+    tint.r = damp(tint.r, target.r, 2, dt)
+    tint.g = damp(tint.g, target.g, 2, dt)
+    tint.b = damp(tint.b, target.b, 2, dt)
   })
 
   // A fullscreen quad in clip space: two triangles, four corner vertices, no

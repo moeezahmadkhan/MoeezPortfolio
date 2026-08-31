@@ -48,6 +48,20 @@ export default defineConfig(({ mode }) => {
     // from other devices); cors:true sends Access-Control-Allow-Origin so cross-origin
     // requests aren't blocked.
     server: { host: true, cors: true },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            // react/react-dom are shared between the eager entry and the lazily-loaded
+            // 3D stage — pin them to their own chunk so Rollup doesn't fold them into
+            // the "three" chunk, which would give the eager entry a static import edge
+            // into the very code the reduced-motion gate is supposed to keep lazy.
+            if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'react-vendor'
+            if (/node_modules\/(three|@react-three)\//.test(id)) return 'three'
+          },
+        },
+      },
+    },
     test: {
       environment: 'jsdom',
       globals: false,

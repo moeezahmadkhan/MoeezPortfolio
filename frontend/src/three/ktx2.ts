@@ -1,5 +1,8 @@
 import { useThree } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
+// From the concrete file, not the `@react-three/drei` barrel — see the comment on
+// the drei imports in Stage.tsx for why: the barrel drags in modules with their own
+// internal dynamic `import()`, which corrupts the eager/lazy chunk split.
+import { useGLTF } from '@react-three/drei/core/Gltf'
 import { KTX2Loader } from 'three-stdlib'
 import type { GLTFLoader } from 'three-stdlib'
 import type { WebGLRenderer } from 'three'

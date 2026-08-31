@@ -1,6 +1,8 @@
 import { useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Sparkles } from '@react-three/drei'
+// From the concrete file, not the `@react-three/drei` barrel — see the comment on
+// the drei imports in Stage.tsx for why.
+import { Sparkles } from '@react-three/drei/core/Sparkles'
 import type { Group, Mesh, MeshStandardMaterial, PointLight } from 'three'
 import { damp } from '../lib/frame'
 import { scrollState } from '../lib/scrollState'
@@ -120,7 +122,7 @@ export function HeroWizard() {
           roughly 3x this one's scale and bathed the whole figure instead of the wand. */}
       <pointLight ref={glow} position={WAND_TIP} color="#ffd79a" distance={1.1} decay={2} />
       <Sparkles
-        count={26}
+        count={16}
         scale={[0.14, 0.18, 0.14]}
         position={WAND_TIP}
         size={2.4}
