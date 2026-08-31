@@ -61,6 +61,18 @@ const FOCUS_YAW_BIAS: ReadonlyMap<string, number> = (() => {
   return bias
 })()
 
+// The one section where the model holds the centre and turns through the
+// visitor's own scroll (Task 5) — must match the id `Experience.tsx` passes to
+// `registerPinnedSection` and the `id` on that rig's entry in `rigs.ts`.
+const PINNED_SECTION_ID = 'experience'
+
+// Roughly a half-turn across the section: enough to read as a deliberate,
+// scroll-driven turn rather than the pointer-parallax wobble every other rig
+// gets, but short of a full rotation, which starts to look like a turntable
+// demo. Applied on top of the same damped yaw as everything else, so it
+// inherits the usual settle speed rather than snapping.
+const PINNED_TURN = Math.PI * 0.85
+
 // How bright the wand gets while a project card holds focus — brighter than
 // idle or attentive, shy of full "casting" so this reads as "attentive to the
 // visitor" without fighting the chat UI's own mood signal.
@@ -199,9 +211,15 @@ export function CharacterRig({
         : (orbitState.offset = damp(orbitState.offset, 0, 1.4, dt))
       : 0
 
+    // Only the pinned section's own rig turns with scroll — every other rig
+    // never reads `scrollState.pinnedProgress` at all, so a stale value left
+    // over after `registerPinnedSection(null)` can't leak into its pose.
+    const pinnedTurn =
+      spec.id === PINNED_SECTION_ID ? scrollState.pinnedProgress * PINNED_TURN : 0
+
     g.rotation.y = damp(
       g.rotation.y,
-      BASE_YAW + pose.yaw + orbit + Math.sin(t * 0.18) * 0.06,
+      BASE_YAW + pose.yaw + orbit + pinnedTurn + Math.sin(t * 0.18) * 0.06,
       2.6,
       dt,
     )
