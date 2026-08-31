@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "shoot": "node tools/shoot.mjs",
-    "shoot:hero": "node tools/shoot_hero.mjs && (cwebp -q 82 public/shots/hero-wizard.png -o public/shots/hero-wizard.webp && rm public/shots/hero-wizard.png || echo 'cwebp not installed (sudo apt install webp) — keeping public/shots/hero-wizard.png as the fallback asset')"
+    "shoot:hero": "node tools/shoot_hero.mjs && (cwebp -q 82 public/shots/hero-wizard.png -o public/shots/hero-wizard.webp && rm public/shots/hero-wizard.png || echo 'cwebp not installed (sudo apt install webp) \u2014 keeping public/shots/hero-wizard.png as the fallback asset')",
+    "check:models": "node tools/check_models.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.0",
