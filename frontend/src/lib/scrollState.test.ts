@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { heroVisibility, scrollState } from './scrollState'
+import { heroVisibility, sectionProgress, scrollState } from './scrollState'
 
 describe('heroVisibility', () => {
   it('is 1 while the hero still fills the viewport', () => {
@@ -16,6 +16,30 @@ describe('heroVisibility', () => {
   })
 })
 
+describe('sectionProgress', () => {
+  it('is 0 when section is entirely below the viewport', () => {
+    expect(sectionProgress({ top: 1000, height: 100 }, 900)).toBe(0)
+  })
+
+  it('is 1 when section is entirely above the viewport', () => {
+    expect(sectionProgress({ top: -500, height: 100 }, 900)).toBe(1)
+  })
+
+  it('is between 0 and 1 when section top sits at viewport midpoint', () => {
+    const progress = sectionProgress({ top: 450, height: 100 }, 900)
+    expect(progress).toBeGreaterThan(0)
+    expect(progress).toBeLessThan(1)
+  })
+
+  it('returns 0 when viewportHeight is 0', () => {
+    expect(sectionProgress({ top: 100, height: 100 }, 0)).toBe(0)
+  })
+
+  it('returns 0 when viewportHeight is negative', () => {
+    expect(sectionProgress({ top: 100, height: 100 }, -100)).toBe(0)
+  })
+})
+
 describe('scrollState', () => {
   it('starts at a neutral pose', () => {
     expect(scrollState).toMatchObject({
@@ -23,6 +47,7 @@ describe('scrollState', () => {
       pointerX: 0,
       pointerY: 0,
       heroVisible: 1,
+      pinnedProgress: 0,
     })
   })
 })
