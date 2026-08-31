@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { handleFamiliarRequest } from './api/_core/familiar'
@@ -47,5 +48,11 @@ export default defineConfig(({ mode }) => {
     // from other devices); cors:true sends Access-Control-Allow-Origin so cross-origin
     // requests aren't blocked.
     server: { host: true, cors: true },
+    test: {
+      environment: 'jsdom',
+      globals: false,
+      setupFiles: ['./src/test/setup.ts'],
+      include: ['src/**/*.test.{ts,tsx}', 'api/**/*.test.ts'],
+    },
   }
 })
