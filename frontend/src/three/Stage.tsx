@@ -10,12 +10,17 @@ import { AdaptiveDpr } from '@react-three/drei/core/AdaptiveDpr'
 import { PerformanceMonitor } from '@react-three/drei/core/PerformanceMonitor'
 import { Preload } from '@react-three/drei/core/Preload'
 import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
-import { Suspense, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { NAV_ITEMS } from '../components/layout/Nav'
 import { useSectionObserver } from '../lib/useSectionObserver'
 import { Backdrop } from './Backdrop'
 import { HeroLights } from './lights'
-import { HeroWizard } from './HeroWizard'
+import { SceneDirector } from './SceneDirector'
+// Cursor affordance for the hero's drag-to-orbit — split out of Stage.css (which
+// StageMount imports eagerly for the static-art fallback) so a reduced-motion or
+// no-WebGL visitor, who never gets useDragOrbit's listeners, never gets this
+// cursor either. See StageCursor.css for the full rationale.
+import './StageCursor.css'
 
 export function Stage() {
   const ids = useMemo(() => NAV_ITEMS.map((i) => i.id), [])
@@ -37,11 +42,9 @@ export function Stage() {
         />
         <AdaptiveDpr pixelated />
         <Backdrop activeId={activeId} />
-        <Suspense fallback={null}>
-          <HeroLights />
-          <HeroWizard />
-          <Preload all />
-        </Suspense>
+        <HeroLights />
+        <SceneDirector activeId={activeId} />
+        <Preload all />
         {/* This installed version of @react-three/postprocessing (2.19.1) replaced the
             brief's `disableNormalPass` prop with `enableNormalPass`, which already
             defaults to off — the normal pass is only needed for SSGI, which nothing

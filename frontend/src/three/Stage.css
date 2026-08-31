@@ -21,18 +21,10 @@
   opacity: 0.9;
 }
 
-#top {
-  cursor: grab;
-}
-
-#top.is-dragging {
-  cursor: grabbing;
-}
-
-#top a,
-#top button {
-  cursor: pointer;
-}
+/* Drag-to-orbit cursor affordance lives in StageCursor.css, imported by Stage.tsx
+   itself (not here) — this file is imported by StageMount even when the canvas
+   never mounts (reduced motion / no WebGL), and those visitors must not see a
+   grab cursor for a drag that was never installed. */
 
 @media (max-width: 899px) {
   .stage--static {
