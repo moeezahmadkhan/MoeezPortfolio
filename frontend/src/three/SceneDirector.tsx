@@ -76,25 +76,11 @@ export function SceneDirector({ activeId }: { activeId: string }) {
   // on genId so an entry that was already scheduled (from an earlier
   // transition) never gets a second timer.
   useEffect(() => {
-    // TEMP DEBUG — Finding 1 verification only, removed before commit.
-    const w = window as unknown as { __sdLog?: unknown[] }
-    w.__sdLog ??= []
-    w.__sdLog.push({
-      t: Math.round(performance.now()),
-      rigs: rigs.map((r) => ({ genId: r.genId, id: r.spec.id, fadeIn: r.fadeIn })),
-    })
     for (const entry of rigs) {
       if (entry.fadeIn || unmountTimers.current.has(entry.genId)) continue
       const genId = entry.genId
-      const scheduledAt = performance.now()
       const id = window.setTimeout(() => {
         unmountTimers.current.delete(genId)
-        w.__sdLog!.push({
-          t: Math.round(performance.now()),
-          removedGenId: genId,
-          removedSpecId: entry.spec.id,
-          msSinceScheduled: Math.round(performance.now() - scheduledAt),
-        })
         setRigs((prev) => prev.filter((r) => r.genId !== genId))
       }, OUTGOING_UNMOUNT_MS)
       unmountTimers.current.set(genId, id)
