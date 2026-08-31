@@ -18,7 +18,6 @@ frontend/
   vite.config.ts
   api/
     chat.ts                      # POST /api/chat        (renamed from familiar.ts)
-    contact.ts                   # POST /api/contact     (owl-post handler, renamed)
     _core/
       chat.ts                    # provider cascade, caps, rate limit  (salvaged)
       persona.ts                 # system prompt, models, knobs        (rewritten)
@@ -51,6 +50,7 @@ frontend/
       useSectionObserver.ts      # active section id -> nav + backdrop tint
       useReveal.ts               # scroll-reveal primitive
       media.ts                   # prefersReducedMotion(), hasWebGL(), isCoarse()
+      contactForm.ts             # validate + Web3Forms payload (salvaged owlPost.ts)
       cx.ts
     styles/
       tokens.css                 # design tokens (colors, space, type scale)
