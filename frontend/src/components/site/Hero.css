@@ -57,7 +57,10 @@
   justify-content: center;
   color: var(--muted);
   font-size: var(--t-small);
-  animation: cue 2.4s var(--ease) infinite;
+  /* --ease-loop, not --ease: this one repeats forever, so it needs a curve
+     that eases out of the bottom as willingly as it eases into it. On --ease
+     the arrow dropped in the first half-second and then sat still. */
+  animation: cue 2.4s var(--ease-loop) infinite;
 }
 
 @keyframes cue {

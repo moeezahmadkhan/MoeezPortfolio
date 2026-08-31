@@ -10,9 +10,15 @@ describe('design tokens', () => {
     expect(tokens).toContain('--teal: #5fd3c6')
   })
 
-  it('defines one easing curve', () => {
+  // Two curves, and only two: `--ease` for anything arriving and settling,
+  // `--ease-loop` for anything that repeats (an out-curve on a loop snaps to
+  // each extreme and hangs there). A third curve here would be curve sprawl,
+  // which is the thing this test has always existed to prevent — and
+  // src/test/motion-language.test.ts stops any stylesheet declaring its own.
+  it('defines exactly two easing curves', () => {
     expect(tokens).toContain('--ease: cubic-bezier(0.16, 1, 0.3, 1)')
-    expect(tokens.match(/cubic-bezier/g)?.length).toBe(1)
+    expect(tokens).toContain('--ease-loop: cubic-bezier(0.65, 0, 0.35, 1)')
+    expect(tokens.match(/cubic-bezier/g)?.length).toBe(2)
   })
 
   it('defines an 8px-derived spacing scale', () => {

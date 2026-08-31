@@ -60,8 +60,18 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
 **Motion — the rules that keep being rediscovered:**
 - Anything driven by time in JS uses `damp` from `src/lib/frame.ts`, never `v += (t - v) * 0.1`. A 144Hz monitor and a 60Hz one must show the same motion.
 - Anything driven by scroll reads the **smoothed** channel, not the raw scroll position — raw scroll steps with the mouse wheel.
-- CSS transitions use the shared `--ease` token from `styles/tokens.css`. Nothing hardcodes its own curve.
-- Animate `transform` and `opacity` only.
+- CSS transitions use a shared easing token from `styles/tokens.css`. Nothing hardcodes its own curve.
+  There are exactly two: `--ease` for anything arriving and settling, `--ease-loop` for anything
+  `infinite` (an out-curve on a loop snaps to each extreme and hangs there). A third needs a reason.
+- Never animate a layout-triggering property — `top`, `left`, `width`, `height`, `margin`, `padding`,
+  `gap`, `font-size`. Prefer `transform` and `opacity`; a paint-only change (a colour, a border tint)
+  on a discrete hover or focus is fine, but nothing on the scroll path may re-flow the document.
+  One recorded exception, `base.css`'s `.skip-link` sliding down on `top`: it is positioned off-screen
+  by `top`, it runs at most once a visit, and it is nowhere near the scroll path.
+- Every damping rate is a named constant in `three/motion.ts` (or `lib/scrollState.ts` for the scroll
+  signal itself). A bare numeric lambda in a `damp(...)` call is a number nobody can re-tune.
+- `src/test/motion-language.test.ts` asserts all of the above against the source. If a rule is wrong,
+  change it there and here together; do not special-case a change through it.
 - Per-frame state lives in mutable module singletons (`scrollState`, `wizardState`, `focusState`, `orbitState`) read inside the frame loop. **Never** React state in a per-frame or per-pointer-event path.
 - Never key motion to hard-coded scroll fractions. Section membership comes from `useSectionObserver`; a scroll-fraction table is what got v1 deleted.
 - **Still screenshots cannot verify motion.** `tools/shoot.mjs` waits for `window.__modelReady`, which latches only once a rig has settled — so it is blind by construction to anything visible only mid-transition. Verify time-varying work by sampling state deliberately or asserting on it in a test.

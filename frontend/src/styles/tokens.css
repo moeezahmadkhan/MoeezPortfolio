@@ -47,7 +47,18 @@
   --r-soft: 12px;
   --r-pill: 999px;
 
+  /* The site has exactly two curves, and nothing may declare a third inline
+     (src/test/motion-language.test.ts enforces this).
+
+     --ease is an out-curve: it covers most of its distance immediately and
+     settles. That is what a thing ARRIVING should do — a reveal, a hover, a
+     focus ring — so it is the default and almost everything uses it.
+
+     --ease-loop is symmetric. A repeating animation has no arrival: it leaves
+     and comes back forever, and an out-curve on a loop snaps to each extreme
+     and hangs there. Use it only for `infinite`. */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-loop: cubic-bezier(0.65, 0, 0.35, 1);
   --nav-h: 64px;
   --maxw: 1120px;
 }

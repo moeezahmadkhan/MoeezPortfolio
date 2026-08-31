@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Color, ShaderMaterial, Vector2 } from 'three'
 import { damp } from '../lib/frame'
 import { scrollState } from '../lib/scrollState'
+import { BACKDROP_SCROLL_LAMBDA, BACKDROP_TINT_LAMBDA } from './motion'
 import { sectionTint } from './tint'
 
 const VERT = /* glsl */ `
@@ -85,14 +86,23 @@ export function Backdrop({ activeId }: { activeId: string }) {
   useFrame((_, dt) => {
     const u = material.uniforms
     u.uTime.value += dt
-    u.uScroll.value = damp(u.uScroll.value, scrollState.progress, 3, dt)
+    // The SMOOTHED progress, not the raw one. This drift was already damped
+    // here, but damping a value that steps only spreads the step out — the
+    // input has to be continuous first, and `scrollState.smooth` is where it
+    // becomes so (Task 1). Same reason the hero's fade reads `smooth`.
+    u.uScroll.value = damp(
+      u.uScroll.value,
+      scrollState.smooth.progress,
+      BACKDROP_SCROLL_LAMBDA,
+      dt,
+    )
     u.uResolution.value.set(size.width, size.height)
 
     target.setRGB(...sectionTint(activeId))
     const tint = u.uTint.value as Color
-    tint.r = damp(tint.r, target.r, 2, dt)
-    tint.g = damp(tint.g, target.g, 2, dt)
-    tint.b = damp(tint.b, target.b, 2, dt)
+    tint.r = damp(tint.r, target.r, BACKDROP_TINT_LAMBDA, dt)
+    tint.g = damp(tint.g, target.g, BACKDROP_TINT_LAMBDA, dt)
+    tint.b = damp(tint.b, target.b, BACKDROP_TINT_LAMBDA, dt)
   })
 
   // A fullscreen quad in clip space: two triangles, four corner vertices, no

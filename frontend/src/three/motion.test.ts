@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { advanceSmooth } from '../lib/scrollState'
 import {
+  BACKDROP_SCROLL_LAMBDA,
+  BACKDROP_TINT_LAMBDA,
   FADE_LAMBDA,
   INTENSITY_LAMBDA,
   LIFT_LAMBDA,
@@ -37,6 +39,15 @@ describe('the motion signature', () => {
     expect(LIFT_LAMBDA).toBe(2.2)
     expect(ORBIT_RETURN_LAMBDA).toBe(1.4)
     expect(INTENSITY_LAMBDA).toBe(3)
+    expect(BACKDROP_SCROLL_LAMBDA).toBe(3)
+    expect(BACKDROP_TINT_LAMBDA).toBe(2)
+  })
+
+  // The backdrop sits behind the figure, so if it settled faster than the
+  // figure did the ground would arrive before the thing standing on it.
+  it('never lets the backdrop settle faster than the figure it stands behind', () => {
+    expect(BACKDROP_SCROLL_LAMBDA).toBeLessThanOrEqual(TURN_LAMBDA + 0.4)
+    expect(BACKDROP_TINT_LAMBDA).toBeLessThan(LIFT_LAMBDA)
   })
 })
 

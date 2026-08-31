@@ -31,6 +31,19 @@ export const ORBIT_RETURN_LAMBDA = 1.4
 export const INTENSITY_LAMBDA = 3
 
 /**
+ * How fast the backdrop's noise field drifts toward the page's scroll position.
+ * Slower than the scroll channel that feeds it (SCROLL_LAMBDA = 6) on purpose:
+ * the ground behind the figure should read as weather that the page disturbs,
+ * not as a second scrollbar tracking it.
+ */
+export const BACKDROP_SCROLL_LAMBDA = 3
+
+/** How fast the backdrop crosses from one section's tint to the next. Slowest
+ *  thing on the site — a colour that changes at a rate you can name reads as a
+ *  transition rather than as a mood. */
+export const BACKDROP_TINT_LAMBDA = 2
+
+/**
  * The shape of `scrollState` that motion is allowed to read: both the raw
  * channel and the smoothed one, so this module — not each call site — decides
  * which of the two anything animated is entitled to look at.

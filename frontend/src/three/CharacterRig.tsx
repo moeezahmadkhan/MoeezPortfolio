@@ -206,7 +206,12 @@ export function CharacterRig({
     // `registerPinnedSection(null)` can't leak into another section's pose.
     // Added into the same damped yaw as everything else, so the turn inherits
     // the usual settle speed rather than stepping with the wheel.
-    const pinnedTurn = pinnedYaw(spec.id, scrollState.pinnedProgress)
+    // The SMOOTHED pinnedProgress. The damp below would absorb a wheel notch
+    // eventually, but it would absorb it as a shove: the target jumps, the yaw
+    // lurches after it, and the turn reads as the model being dragged rather
+    // than as the model turning. Feeding it a continuous target instead means
+    // the only lag left is the one we chose (TURN_LAMBDA).
+    const pinnedTurn = pinnedYaw(spec.id, scrollState.smooth.pinnedProgress)
 
     g.rotation.y = damp(
       g.rotation.y,
