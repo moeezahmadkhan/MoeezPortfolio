@@ -10,6 +10,7 @@ import { isCoarsePointer } from '../lib/media'
 import { useMatchMedia } from '../lib/useMatchMedia'
 import { applyWizardingMaterials, cloneMaterials, disposeMaterials } from './characterMaterial'
 import { useKtx2Gltf } from './ktx2'
+import { markModelReady } from './modelReadiness'
 import { rigPose } from './rigPose'
 import { targetIntensity, wizardState } from './wizardState'
 import { orbitState, useDragOrbit } from './useDragOrbit'
@@ -37,6 +38,12 @@ const BASE_YAW = Math.PI
 // window.
 const FADE_LAMBDA = 4
 
+// How far into its fade-in a rig counts as "visibly settled" for
+// `markModelReady` — high enough that a screenshot taken right after isn't
+// noticeably dimmer than the fully-settled model, low enough to fire before
+// `FADE_LAMBDA` has asymptotically crept the last few percent forever.
+const READY_FADE_THRESHOLD = 0.95
+
 /**
  * One rig, wearing whichever model `spec` names. Absorbs everything the
  * predecessor plan's `HeroWizard` did — pointer parallax, drag-to-orbit, the
@@ -56,6 +63,9 @@ export function CharacterRig({ spec, fadeIn }: { spec: RigSpec; fadeIn: boolean 
   // This rig's own cross-fade progress, independent of the hero's scroll-driven
   // heroVisible fraction (see the frame loop below).
   const fade = useRef(0)
+  // Latches once this rig's `markModelReady` fires, so the check is a single
+  // property write on the settling frame rather than every frame after.
+  const reportedReady = useRef(false)
 
   // Reactive: `Hero.css` reserves the right column live, on resize, via its own
   // `@media (min-width: 900px)` — this rig's placement has to follow it live
@@ -108,6 +118,12 @@ export function CharacterRig({ spec, fadeIn }: { spec: RigSpec; fadeIn: boolean 
     // advances — including while invisible — so an incoming rig actually ramps
     // 0 → 1 rather than freezing at 0 behind the early return below.
     fade.current = damp(fade.current, fadeIn ? 1 : 0, FADE_LAMBDA, dt)
+    // Only the incoming rig ever reports ready — an outgoing one's fade only
+    // ever heads toward 0, so it would never cross the threshold anyway.
+    if (fadeIn && !reportedReady.current && fade.current > READY_FADE_THRESHOLD) {
+      reportedReady.current = true
+      markModelReady(spec.id)
+    }
     // The hero additionally tracks how much of it is still on screen as the
     // visitor scrolls past — scrollState.heroVisible, exactly as HeroWizard did.
     // Other rigs have no such continuous measure (their section either owns the
