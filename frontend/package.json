@@ -8,8 +8,9 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "persona": "node tools/build_persona_index.mjs",
     "shoot": "node tools/shoot.mjs",
-    "shoot:hero": "node tools/shoot_hero.mjs && (cwebp -q 82 public/shots/hero-wizard.png -o public/shots/hero-wizard.webp && rm public/shots/hero-wizard.png || echo 'cwebp not installed (sudo apt install webp) \u2014 keeping public/shots/hero-wizard.png as the fallback asset')",
+    "shoot:hero": "node tools/shoot_hero.mjs && (cwebp -q 82 public/shots/hero-wizard.png -o public/shots/hero-wizard.webp && rm public/shots/hero-wizard.png || echo 'cwebp not installed (sudo apt install webp) — keeping public/shots/hero-wizard.png as the fallback asset')",
     "check:models": "node tools/check_models.mjs"
   },
   "dependencies": {
@@ -31,6 +32,7 @@
     "@types/three": "^0.169.0",
     "@vercel/node": "^5.8.12",
     "@vitejs/plugin-react": "^4.3.3",
+    "esbuild": "^0.21.5",
     "jsdom": "^30.0.1",
     "puppeteer-core": "^23.11.1",
     "typescript": "^5.6.3",

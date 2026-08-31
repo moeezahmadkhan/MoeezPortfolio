@@ -1,0 +1,86 @@
+[
+  {
+    "id": "facts#who-i-am#0",
+    "source": "src/content/index.ts",
+    "heading": "Who I am",
+    "text": "Moeez Ahmad Khan, AI/ML Developer. I design low-latency backend APIs, autonomous multi-agent systems, and real-time computer vision pipelines, and take them from model orchestration through containerized cloud deployment. Based in Lahore, Pakistan. Contact: kmoeez2018@gmail.com. I'm currently an AI Engineer at Ecommerce Steem, where I'm building AI chat software for Whoop wearables, a computer vision platform that tracks humans and animals in real time, and automation pipelines that connect LLMs to external tools using the Model Context Protocol. Before that, I worked as an AI & Computer Vision Developer at QUIDSol, building face-identification and pitch-deck-analysis pipelines, and as a Teacher's Assistant at Information Technology University, mentoring graduate students in agentic AI. I hold a BSCS from ITU (2021–2025), specializing in agentic AI, computer vision, and reinforcement learning.",
+    "tokens": 171
+  },
+  {
+    "id": "facts#project:-project-horus#1",
+    "source": "src/content/index.ts",
+    "heading": "Project: Project Horus",
+    "text": "An automated pipeline that identifies students from live video, matching faces against an enrolled index in real time. Detects faces in real time with YOLO and SCRFD, then generates ArcFace embeddings for each detection. Matches those embeddings against a FAISS vector index to assign identity. Tuned for reliability across varied edge-case environments and high-throughput processing. Built with YOLO, SCRFD, ArcFace, FAISS.",
+    "tokens": 83
+  },
+  {
+    "id": "facts#project:-silmaril-ai#2",
+    "source": "src/content/index.ts",
+    "heading": "Project: Silmaril AI",
+    "text": "A strategic platform for venture capital that extracts financial metrics from pitch decks and turns them into structured insight. Parses pitch decks with an AI-driven engine that extracts financial metrics automatically. Delivers automated growth recommendations alongside Company Scores and Founder insights. Built with AI-driven parsing engine, Financial metric extraction.",
+    "tokens": 67
+  },
+  {
+    "id": "facts#project:-wearable-ai-chat#3",
+    "source": "src/content/index.ts",
+    "heading": "Project: Wearable AI chat",
+    "text": "AI chat software for high-end wearables (Whoop), built for ultra-low-latency, lightweight inference at the edge. Focused on ultra-low-latency responses so the chat experience keeps pace with live wearable data. Runs lightweight edge inference suited to wearable hardware constraints. Built with Edge inference, Low-latency AI chat.",
+    "tokens": 61
+  },
+  {
+    "id": "facts#project:-cv-intelligence-platform#4",
+    "source": "src/content/index.ts",
+    "heading": "Project: CV intelligence platform",
+    "text": "A full-stack computer vision platform that tracks humans and animals in real time and turns the feed into dashboard analytics. Delivers context-aware AI insights drawn from the live video feed. Surfaces results through real-time dashboard analytics. Built with Computer vision, Real-time dashboards.",
+    "tokens": 57
+  },
+  {
+    "id": "facts#project:-query-sphere#5",
+    "source": "src/content/index.ts",
+    "heading": "Project: Query Sphere",
+    "text": "A Flutter-based AI community app with real-time messaging and smart search, backed by Firebase. Real-time messaging layer synced across devices. Smart search querying across the community content. Built with Flutter, Firebase. Source: https://github.com/moeezahmadkhan/querysphere",
+    "tokens": 45
+  },
+  {
+    "id": "facts#project:-stay-booking-platform#6",
+    "source": "src/content/index.ts",
+    "heading": "Project: Stay-booking platform",
+    "text": "A full MERN-stack booking application with property listing, dashboard management, and secure session authentication. Dynamic property booking pipelines from listing through checkout. Dashboard management layers for hosts, secured with JWT session authentication. Built with MongoDB, Express, React, Node.js, JWT.",
+    "tokens": 53
+  },
+  {
+    "id": "facts#project:-interactive-3d-portfolio#7",
+    "source": "src/content/index.ts",
+    "heading": "Project: Interactive 3D Portfolio",
+    "text": "A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender.",
+    "tokens": 59
+  },
+  {
+    "id": "facts#role:-ai-engineer-at-ecommerce-steem#8",
+    "source": "src/content/index.ts",
+    "heading": "Role: AI Engineer at Ecommerce Steem",
+    "text": "May 2026 – Present. Architecting core AI chat software for high-end wearables (Whoop), focused on ultra-low-latency and lightweight edge inference. Engineering a full-stack computer vision platform that tracks humans and animals in real time, with context-aware AI insights and real-time dashboard analytics. Designing interactive full-stack application modules integrated with custom RAG frameworks. Building automation pipelines with the Model Context Protocol (MCP) to bridge LLMs with external developer tools.",
+    "tokens": 92
+  },
+  {
+    "id": "facts#role:-ai-&-computer-vision-developer-at-quidsol#9",
+    "source": "src/content/index.ts",
+    "heading": "Role: AI & Computer Vision Developer at QUIDSol",
+    "text": "Nov 2025 – June 2026. Project Horus (student identification): built an automated CV pipeline using YOLO/SCRFD for real-time face detection and ArcFace for identity assignment via FAISS vector matching. Silmaril AI: built a platform for venture capital with an AI-driven parsing engine that extracts financial metrics from pitch decks and delivers growth recommendations, Company Scores, and Founder insights. Improved pipeline reliability by optimizing asynchronous data flows across varied edge-case environments. Managed database logging and results triage for high-speed processing.",
+    "tokens": 107
+  },
+  {
+    "id": "facts#role:-teacher's-assistant-at-information-technology-university#10",
+    "source": "src/content/index.ts",
+    "heading": "Role: Teacher's Assistant at Information Technology University",
+    "text": "Nov 2025 – Feb 2026. Mentored graduate-level students in agentic AI, including autonomous multi-agent systems and RAG deployment. Facilitated technical workshops on agent orchestration and evaluated student-led workflows for production-level scalability.",
+    "tokens": 42
+  },
+  {
+    "id": "facts#skills#11",
+    "source": "src/content/index.ts",
+    "heading": "Skills",
+    "text": "AI/ML & Orchestration: Agentic AI, RAG Pipelines, Model Context Protocol (MCP), LLM Fine-Tuning (QLoRA), Workflow Automation (n8n), LLM Serving & Quantization, FAISS Vector DB. Backend Development: Node.js, Express, NestJS, TypeScript, Python, FastAPI, C++, SQL, RESTful APIs, WebSocket. Cloud & Deployment: AWS (EC2, Bedrock), GCP, Docker, Kafka, Nginx, CI/CD Pipelines, Linux/Ubuntu System Administration. Frontend & Graphics: React, Next.js, Flutter, Three.js, Blender, UI/UX Micro-Interactions, State Management.",
+    "tokens": 87
+  }
+]
