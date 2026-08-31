@@ -26,16 +26,17 @@ The v1 architecture (Harry Potter–themed 3D scroll gallery with station camera
 **Directories that exist today:**
 
 - `src/content/` — all portfolio data: `profile.ts`, `projects.ts`, `skills.ts`, `experience.ts`, `index.ts`. Each is a typed module; this is the single source of truth for visible strings on the site and for the chatbot.
-- `src/lib/` — utilities: `media.ts` (reduced-motion / coarse-pointer / WebGL probes), `contactForm.ts` (validation + Web3Forms payload), and their tests. `scrollState.ts` (the mutable scroll/pointer singleton) arrives with the 3D stage.
-- `src/styles/` — the design tokens and base styles. Currently still `global.css`; it becomes `tokens.css` + `base.css` in the shell plan's Task 5.
-- `src/three/` — salvaged 3D pieces: `ktx2.ts` (useKtx2Gltf loader), `characterMaterial.ts` (apply wizard material tint + glow passthrough).
+- `src/lib/` — utilities: `media.ts` (reduced-motion / coarse-pointer / WebGL probes), `contactForm.ts` (validation + Web3Forms payload), `useSectionObserver.ts` (IntersectionObserver-driven active-section tracking), and their tests. `scrollState.ts` (the mutable scroll/pointer singleton) arrives with the 3D stage.
+- `src/styles/` — `tokens.css` (design tokens as CSS custom properties) and `base.css` (reset + element defaults).
+- `src/components/` — the built shell: `layout/` (Nav, Section, Footer), `site/` (Hero, About, Work, ProjectCard, Skills, Experience, Contact), `ui/` (Button, Tag, StatStrip, Reveal, Timeline), each paired with a `.css` file and most with a `.test.tsx`.
+- `src/three/` — salvaged 3D pieces: `ktx2.ts` (useKtx2Gltf loader), `characterMaterial.ts` (apply wizard material tint + glow passthrough). Not wired into the page yet — no canvas mounts today.
 - `src/test/` — `copy-voice.test.ts` (enforces no wizard vocabulary in src/); `setup.ts`; other tests.
 - `api/` — serverless functions (Vercel). Currently `familiar.ts` + `_core/` (to be renamed to `chat.ts` in upcoming work).
 
 **What is still being built:**
 
-- `src/components/` — does not exist yet. Needs layout (Nav, Section, Footer), site (Hero, About, Work, Skills, Experience, Contact, ProjectCard), ui (Button, Tag, Reveal, Timeline), and chat (ChatDock, ChatPanel, useChat).
-- `src/three/Stage.tsx`, `Backdrop.tsx`, `HeroWizard.tsx`, `WandFX.tsx`, `lights.ts`, `wizardState.ts` — the 3D canvas tree (partially described in `docs/redesign/ARCHITECTURE.md`).
+- The 3D hero stage — `src/three/Stage.tsx`, `Backdrop.tsx`, `HeroWizard.tsx`, `WandFX.tsx`, `lights.ts`, `wizardState.ts` (partially described in `docs/redesign/ARCHITECTURE.md`). Today the hero is plain HTML with no canvas.
+- The chat dock — `src/components/chat/` (ChatDock, ChatPanel, useChat) does not exist yet.
 - Chat retrieval and persona (`api/_core/retrieval.ts`, corpus generation, persona system prompt refinement).
 
 See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
