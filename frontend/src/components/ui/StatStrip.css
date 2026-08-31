@@ -1,0 +1,19 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--s-4);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--line);
+}
+
+.stats__value {
+  font-family: var(--font-mono);
+  font-size: var(--t-h3);
+  color: var(--gold);
+}
+
+.stats__label {
+  font-size: var(--t-small);
+  color: var(--muted);
+  margin-top: var(--s-1);
+}

@@ -1,0 +1,27 @@
+.about {
+  display: grid;
+  gap: var(--s-6);
+}
+
+.about__copy p + p {
+  margin-top: var(--s-3);
+}
+
+.about__copy p {
+  color: var(--muted);
+  max-width: 62ch;
+}
+
+.about__portrait img {
+  border-radius: var(--r-soft);
+  border: 1px solid var(--line);
+  filter: grayscale(0.25) contrast(1.05);
+}
+
+@media (min-width: 900px) {
+  .about {
+    grid-template-columns: 1.6fr 1fr;
+    align-items: start;
+    gap: var(--s-7);
+  }
+}
