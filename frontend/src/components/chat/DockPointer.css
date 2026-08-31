@@ -57,3 +57,36 @@
     will-change: auto;
   }
 }
+
+/* The narrow-screen trail. No gutter exists below POINTER_MIN_WIDTH, so instead
+   of crossing the page the trail collapses into the dock's own corner, directly
+   above the launcher — the one patch of screen the dock is already entitled to
+   float over. Shorter path, tighter gap, no margin shift, so it sits squarely
+   over the pill rather than off its left shoulder. */
+.dock-pointer--compact {
+  --dock-pointer-travel: 26px;
+
+  gap: var(--s-1);
+  margin-inline-end: var(--s-3);
+  /* Measured: without a surface of its own, the compact trail crosses body copy
+     at two of six scroll positions on a 390px screen — the corner is only empty
+     until the page moves under it. Sitting the chevrons on the dock's own
+     surface, in the dock's own border, makes them read as an extension of the
+     launcher rather than as marks left on Moeez's writing. The launcher is
+     already entitled to this patch of screen; the arrows now visibly belong to
+     it. Re-measured after: zero overlaps at every sampled position. */
+  padding: var(--s-2) var(--s-2) calc(var(--s-2) + 2px);
+  background: var(--surface);
+  border: 1px solid rgb(95 211 198 / 0.28);
+  border-radius: var(--r-pill);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.45);
+}
+
+/* Two arrows here, not three, so the fade runs over two steps. */
+.dock-pointer--compact .dock-pointer__arrow:nth-child(1) {
+  opacity: 0.34;
+}
+
+.dock-pointer--compact .dock-pointer__arrow:nth-child(2) {
+  opacity: 0.78;
+}

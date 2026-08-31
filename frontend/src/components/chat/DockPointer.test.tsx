@@ -13,6 +13,7 @@ import {
   TRAIL_LENGTH,
   arrowProgress,
   forgetDockOpened,
+  COMPACT_TRAIL_LENGTH,
 } from './DockPointer'
 
 /**
@@ -189,28 +190,62 @@ describe('DockPointer', () => {
     expect(order).toEqual(['2', '1', '0'])
   })
 
-  it('says nothing at all on a screen with no gutter to say it in', () => {
-    // Below POINTER_MIN_WIDTH the copy runs to the edge and the trail would come
-    // down on a paragraph. Nothing renders and no frame loop starts — the
-    // launcher is already a labelled 44px control in the corner.
-    vi.stubGlobal(
-      'matchMedia',
-      (query: string) =>
-        ({
-          matches: false,
-          media: query,
-          onchange: null,
-          addEventListener: () => {},
-          removeEventListener: () => {},
-          addListener: () => {},
-          removeListener: () => {},
-          dispatchEvent: () => false,
-        }) as unknown as MediaQueryList,
-    )
+  /** Every media query false: a narrow viewport, motion allowed. */
+  const narrowScreen = (query: string) =>
+    ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    }) as unknown as MediaQueryList
+
+  it('falls back to the compact trail on a screen with no gutter', () => {
+    // Below POINTER_MIN_WIDTH the copy runs to the edge, so the full trail would
+    // come down on a paragraph — measured: at 390 all three land on body text.
+    // It does not follow that a narrow screen should get nothing: that is where
+    // the launcher competes hardest for attention. So the trail shrinks into the
+    // dock's own corner, above the launcher, where the dock already floats over
+    // the content and no paragraph is disturbed.
+    vi.stubGlobal('matchMedia', narrowScreen)
     const frames = stubFrames()
     const { container } = render(<DockPointer visible />)
+    const arrows = container.querySelectorAll('[data-arrow]')
+    expect(arrows).toHaveLength(COMPACT_TRAIL_LENGTH)
+    expect(container.querySelector('.dock-pointer--compact')).not.toBeNull()
+    // Still decorative, still animated, still never a hit target.
+    expect(container.querySelector('.dock-pointer')).toHaveAttribute('aria-hidden', 'true')
+    expect(frames.requests).toBeGreaterThan(0)
+  })
+
+  it('keeps the compact trail shorter than the full one, and still ordered', () => {
+    // The corner has room for a hint, not for a parade.
+    expect(COMPACT_TRAIL_LENGTH).toBeLessThan(TRAIL_LENGTH)
+    expect(COMPACT_TRAIL_LENGTH).toBeGreaterThanOrEqual(1)
+    for (const progress of [0, 0.25, 0.5, 0.75, 1]) {
+      for (let i = 1; i < COMPACT_TRAIL_LENGTH; i++) {
+        const ahead = arrowProgress(progress, i - 1, COMPACT_TRAIL_LENGTH)
+        const behind = arrowProgress(progress, i, COMPACT_TRAIL_LENGTH)
+        expect(ahead, `arrow ${i} must never lead arrow ${i - 1}`).toBeGreaterThanOrEqual(behind)
+      }
+    }
+  })
+
+  it('parks the compact trail at the launcher by the foot of the page', () => {
+    // Whatever the trail length, the last arrow must still arrive — a hint that
+    // never lands reads as broken rather than as travel.
+    const lastIndex = COMPACT_TRAIL_LENGTH - 1
+    expect(arrowProgress(1, lastIndex, COMPACT_TRAIL_LENGTH)).toBe(1)
+    expect(arrowProgress(0, 0, COMPACT_TRAIL_LENGTH)).toBe(0)
+  })
+
+  it('still retires on a narrow screen once the dock has been opened', () => {
+    vi.stubGlobal('matchMedia', narrowScreen)
+    const { container } = render(<DockPointer visible={false} />)
     expect(container.firstChild).toBeNull()
-    expect(frames.requests).toBe(0)
   })
 
   it('asks for a viewport wide enough to clear the content column', () => {

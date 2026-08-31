@@ -10,6 +10,19 @@ import './DockPointer.css'
 export const TRAIL_LENGTH = 3
 
 /**
+ * How many arrows the narrow-screen trail carries.
+ *
+ * Below POINTER_MIN_WIDTH the full trail has no gutter to stand in — measured,
+ * it comes down on body copy. But a narrow screen is exactly where the launcher
+ * competes hardest for attention, so saying nothing there is the wrong trade.
+ * Instead the trail shrinks into the dock's own corner, directly above the
+ * launcher: fewer arrows, a shorter path, and entirely inside the footprint the
+ * dock already floats over. Two, not three — the corner has room for a hint,
+ * not a parade.
+ */
+export const COMPACT_TRAIL_LENGTH = 2
+
+/**
  * How far behind its predecessor each arrow sits, measured in scroll progress.
  * The lag is what makes the trail stretch as the leader pulls toward the dock —
  * without it three arrows would move as one rigid stick.
@@ -92,14 +105,20 @@ export function forgetDockOpened(): void {
  *  - clamped to [0, 1], so no arrow overshoots past the launcher;
  *  - ordered, so arrow i is never ahead of arrow i-1.
  */
-export function arrowProgress(progress: number, index: number): number {
-  const span = 1 - TRAIL_LAG * (TRAIL_LENGTH - 1)
+export function arrowProgress(
+  progress: number,
+  index: number,
+  length: number = TRAIL_LENGTH,
+): number {
+  const span = 1 - TRAIL_LAG * (length - 1)
   const value = (progress - TRAIL_LAG * index) / span
   return value < 0 ? 0 : value > 1 ? 1 : value
 }
 
 /** DOM order runs top-of-trail first, so the leader sits last — nearest the dock. */
-const ARROWS = Array.from({ length: TRAIL_LENGTH }, (_, i) => TRAIL_LENGTH - 1 - i)
+function arrowsFor(length: number): number[] {
+  return Array.from({ length }, (_, i) => length - 1 - i)
+}
 
 /**
  * A short trail of arrows that travels toward the chat launcher as the visitor
@@ -132,7 +151,7 @@ export function DockPointer({ visible }: { visible: boolean }) {
     const last = arrows.map(() => Number.NaN)
     const write = () => {
       for (let i = 0; i < arrows.length; i++) {
-        const p = arrowProgress(scrollState.smooth.progress, indices[i])
+        const p = arrowProgress(scrollState.smooth.progress, indices[i], arrows.length)
         if (Math.abs(p - last[i]) < WRITE_EPSILON) continue
         last[i] = p
         arrows[i].style.setProperty(POINTER_PROPERTY, p.toFixed(3))
@@ -151,11 +170,15 @@ export function DockPointer({ visible }: { visible: boolean }) {
     return () => cancelAnimationFrame(frame)
   }, [reduced, visible, wide])
 
-  if (!visible || !wide) return null
+  if (!visible) return null
 
   return (
-    <div className="dock-pointer" aria-hidden="true" ref={root}>
-      {ARROWS.map((index) => (
+    <div
+      className={wide ? 'dock-pointer' : 'dock-pointer dock-pointer--compact'}
+      aria-hidden="true"
+      ref={root}
+    >
+      {arrowsFor(wide ? TRAIL_LENGTH : COMPACT_TRAIL_LENGTH).map((index) => (
         <span className="dock-pointer__arrow" key={index} data-arrow={index}>
           <svg viewBox="0 0 16 9" width="16" height="9" focusable="false">
             <path
