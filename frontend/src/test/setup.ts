@@ -2,6 +2,14 @@ import '@testing-library/jest-dom/vitest'
 import { afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
+declare global {
+  var IS_REACT_ACT_ENVIRONMENT: boolean
+}
+
+// React only enables act() support when this flag is set. Without it, every direct
+// act() call in a test logs a warning to stderr.
+globalThis.IS_REACT_ACT_ENVIRONMENT = true
+
 afterEach(() => {
   cleanup()
   vi.unstubAllGlobals()
