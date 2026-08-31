@@ -52,3 +52,22 @@ const RIGS: Record<string, RigSpec> = {
 export function rigFor(activeId: string): RigSpec | null {
   return RIGS[activeId] ?? null
 }
+
+/**
+ * The rig-bearing sections in on-page order — hero first, then whichever
+ * others carry a model, in the order they appear in `RIGS` above. Drives
+ * lookahead preloading: while a given rig is current, the *next* one in this
+ * list is the one worth fetching ahead of time.
+ */
+const ORDER: RigSpec[] = [RIGS[''], RIGS.work, RIGS.experience]
+
+/**
+ * Given the id of the rig currently on screen, returns the rig that follows
+ * it (worth preloading now) or `null` if there is none — either because
+ * `currentRigId` is the last rig in the sequence, or unrecognised.
+ */
+export function nextRig(currentRigId: string | undefined): RigSpec | null {
+  const idx = ORDER.findIndex((r) => r.id === currentRigId)
+  if (idx === -1) return null
+  return ORDER[idx + 1] ?? null
+}

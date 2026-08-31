@@ -44,3 +44,17 @@ export function useKtx2Gltf(url: string) {
   ensureSupport(gl)
   return useGLTF(url, true, true, attachKtx2)
 }
+
+/**
+ * Starts fetching `url` ahead of any component actually rendering it, through
+ * the same KTX2/Draco/meshopt-configured loader `useKtx2Gltf` uses — sharing
+ * `useLoader`'s cache means a subsequent `useKtx2Gltf(url)` call resolves
+ * from cache (or simply suspends on the same in-flight promise) rather than
+ * re-fetching. `gl` is required so the transcoder's supported-format
+ * detection has run at least once before transcoding starts; callers that
+ * already hold a live renderer (e.g. via `useThree`) should pass it.
+ */
+export function preloadKtx2Gltf(url: string, gl: WebGLRenderer) {
+  ensureSupport(gl)
+  useGLTF.preload(url, true, true, attachKtx2)
+}

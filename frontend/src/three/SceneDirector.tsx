@@ -1,6 +1,9 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
+import { useThree } from '@react-three/fiber'
+import { whenIdle } from '../lib/idle'
 import { CharacterRig } from './CharacterRig'
-import { rigFor, type RigSpec } from './rigs'
+import { preloadKtx2Gltf } from './ktx2'
+import { nextRig, rigFor, type RigSpec } from './rigs'
 
 // Must comfortably exceed CharacterRig's own FADE_LAMBDA settle time so the
 // outgoing rig has visually finished fading before it unmounts.
@@ -19,6 +22,7 @@ export function SceneDirector({ activeId }: { activeId: string }) {
   const [current, setCurrent] = useState<RigSpec | null>(target)
   const [outgoing, setOutgoing] = useState<RigSpec | null>(null)
   const timer = useRef<number>()
+  const gl = useThree((s) => s.gl)
 
   useEffect(() => {
     if (target?.id === current?.id) return
@@ -28,6 +32,36 @@ export function SceneDirector({ activeId }: { activeId: string }) {
     timer.current = window.setTimeout(() => setOutgoing(null), OUTGOING_UNMOUNT_MS)
     return () => window.clearTimeout(timer.current)
   }, [target?.id])
+
+  // Lookahead: start fetching the model for the section that FOLLOWS the
+  // current one, so it has usually already arrived by the time that section
+  // becomes active and the rig fades in instead of popping. The hero is the
+  // odd case — it's already "current" the instant the page mounts, before the
+  // visitor has done anything — so its lookahead additionally waits for a
+  // real scroll event. That keeps a load-and-never-scroll visit down to
+  // exactly the hero's own model, same as before this change.
+  useEffect(() => {
+    const upcoming = nextRig(current?.id)
+    if (!upcoming) return undefined
+
+    const schedule = () => whenIdle(() => preloadKtx2Gltf(upcoming.model, gl))
+
+    if (current?.id !== 'hero') {
+      const cancel = schedule()
+      return cancel
+    }
+
+    let cancelIdle: (() => void) | undefined
+    const onScroll = () => {
+      window.removeEventListener('scroll', onScroll)
+      cancelIdle = schedule()
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      cancelIdle?.()
+    }
+  }, [current?.id, gl])
 
   return (
     <>
