@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ChatMessage } from './ChatMessage'
+import { DockPointer, hasDockOpened, rememberDockOpened } from './DockPointer'
 import { useChat } from './useChat'
 import './ChatDock.css'
 
@@ -26,6 +27,16 @@ export function ChatDock() {
   const panel = useRef<HTMLDivElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
   const wasOpen = useRef(false)
+  // The pointer's whole justification is that the visitor has not found the dock
+  // yet. Once they have, it has nothing left to say, so it retires for the rest
+  // of the session rather than gesturing at a thing they already know about.
+  const [pointed, setPointed] = useState(() => !hasDockOpened())
+
+  useEffect(() => {
+    if (!open) return
+    rememberDockOpened()
+    setPointed(false)
+  }, [open])
 
   useEffect(() => {
     if (open) input.current?.focus()
@@ -151,6 +162,8 @@ export function ChatDock() {
           </form>
         </div>
       )}
+
+      <DockPointer visible={!open && pointed} />
 
       <button
         ref={launcher}

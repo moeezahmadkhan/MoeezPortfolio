@@ -1,0 +1,59 @@
+/* The trail that points at the chat launcher.
+   Decorative in the strictest sense: aria-hidden in the markup, inert here, and
+   sized so it can never be mistaken for — or sit on top of — a tap target. */
+
+.dock-pointer {
+  /* How far each arrow travels down its path: from the head of the trail to its
+     resting place just above the launcher. A transform, never a layout box. */
+  --dock-pointer-travel: 72px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  /* Teal is the chat's colour. This is the one place it appears outside the
+     dock itself, because the thing it is pointing at is the dock. */
+  color: var(--teal);
+  /* Never between the visitor and the launcher: no hit-testing, ever. */
+  pointer-events: none;
+  /* .chat aligns its children to the right edge, which would leave the trail
+     hanging off the end of the launcher pill. This slides it back over the
+     middle of the pill — and, with the dock's own 24px inset, is what puts the
+     trail 72px in from the viewport. POINTER_MIN_WIDTH in DockPointer.tsx is
+     derived from that number: it is the width at which 72px is still gutter
+     rather than content, and below it the component renders nothing at all. */
+  margin-inline-end: var(--s-6);
+}
+
+.dock-pointer__arrow {
+  display: block;
+  line-height: 0;
+  /* The frame loop writes --dock-pointer-p: 0 at the head of the path, 1 parked
+     at the launcher. There is deliberately no transition here — the value
+     arrives already eased, off the smoothed scroll channel, and a transition on
+     top would add a second lag to a motion that is meant to track the wheel. */
+  transform: translate3d(0, calc((var(--dock-pointer-p, 1) - 1) * var(--dock-pointer-travel)), 0);
+  will-change: transform;
+}
+
+/* The trail fades out behind its leader, which is the LAST arrow — the one
+   nearest the launcher. Three rules because the trail is three arrows
+   (TRAIL_LENGTH in DockPointer.tsx, asserted by its test). */
+.dock-pointer__arrow:nth-child(1) {
+  opacity: 0.2;
+}
+
+.dock-pointer__arrow:nth-child(2) {
+  opacity: 0.42;
+}
+
+.dock-pointer__arrow:nth-child(3) {
+  opacity: 0.78;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Nothing will move, so promote nothing to its own layer. */
+  .dock-pointer__arrow {
+    will-change: auto;
+  }
+}
