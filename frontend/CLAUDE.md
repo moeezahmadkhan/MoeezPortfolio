@@ -4,7 +4,7 @@ This file guides Claude Code when working in the frontend directory.
 
 ## What this is
 
-A single-page portfolio for **Moeez Ahmad Khan**, AI/ML engineer. Clean, readable design focused on recruiting and direct outreach. The hero section includes a 3D animated wizard model as a visual signature, but this is decoration, not navigation — all content lives in scrollable HTML below. Static site, no backend.
+A single-page portfolio for **Moeez Ahmad Khan**, AI/ML engineer. Clean, readable design focused on recruiting and direct outreach. A 3D model presides over the hero and follows the visitor down the page, changing with the section — decoration, never navigation. All content lives in scrollable HTML, and the site is complete and readable with the canvas gated off entirely. Static site plus a small serverless chat API.
 
 ## Commands
 
@@ -29,15 +29,15 @@ The v1 architecture (Harry Potter–themed 3D scroll gallery with station camera
 - `src/lib/` — utilities: `media.ts` (reduced-motion / coarse-pointer / WebGL probes), `contactForm.ts` (validation + Web3Forms payload), `useSectionObserver.ts` (IntersectionObserver-driven active-section tracking), and their tests. `scrollState.ts` (the mutable scroll/pointer singleton) arrives with the 3D stage.
 - `src/styles/` — `tokens.css` (design tokens as CSS custom properties) and `base.css` (reset + element defaults).
 - `src/components/` — the built shell: `layout/` (Nav, Section, Footer), `site/` (Hero, About, Work, ProjectCard, Skills, Experience, Contact), `ui/` (Button, Tag, StatStrip, Reveal, Timeline), each paired with a `.css` file and most with a `.test.tsx`.
-- `src/three/` — salvaged 3D pieces: `ktx2.ts` (useKtx2Gltf loader), `characterMaterial.ts` (apply wizard material tint + glow passthrough). Not wired into the page yet — no canvas mounts today.
+- `src/three/` — the 3D stage, live on the page. `StageMount.tsx` (lazy boundary + the gate), `Stage.tsx` (canvas root; computes the active section id via `useSectionObserver`), `SceneDirector.tsx` (cross-fades one rig out while the next fades in, queueing so a fast second transition cannot truncate the first), `CharacterRig.tsx` (one rig that wears whichever model `rigs.ts` names for the section), `rigs.ts` (the section-id -> model table, plus `PINNED_SECTION_ID`), `rigPose.ts` (pure pose maths, writes into a caller-owned object to stay allocation-free per frame), `Backdrop.tsx`, `lights.tsx`, `tint.ts`, `useDragOrbit.ts`, `wizardState.ts`, `modelReadiness.ts`, `stageGate.ts`, `ktx2.ts`, `characterMaterial.ts`.
 - `src/test/` — `copy-voice.test.ts` (enforces no wizard vocabulary in src/); `setup.ts`; other tests.
-- `api/` — serverless functions (Vercel). Currently `familiar.ts` + `_core/` (to be renamed to `chat.ts` in upcoming work).
+- `api/` — serverless functions (Vercel). `familiar.ts` + `_core/{familiar,persona}.ts`, carried over from v1: the OpenRouter free-model cascade, per-model timeout, token caps and per-IP rate limiting all still apply. The persona itself is v1's and is being rewritten (first person, strictly grounded); the transport around it is being kept.
 
 **What is still being built:**
 
-- The 3D hero stage — `src/three/Stage.tsx`, `Backdrop.tsx`, `HeroWizard.tsx`, `WandFX.tsx`, `lights.ts`, `wizardState.ts` (partially described in `docs/redesign/ARCHITECTURE.md`). Today the hero is plain HTML with no canvas.
-- The chat dock — `src/components/chat/` (ChatDock, ChatPanel, useChat) does not exist yet.
-- Chat retrieval and persona (`api/_core/retrieval.ts`, corpus generation, persona system prompt refinement).
+- Motion polish (`docs/superpowers/plans/2026-09-01-motion-polish.md`) — a smoothed scroll channel plus a sweep of every animated property.
+- The chat dock — `src/components/chat/` (ChatDock, ChatPanel, useChat, DockPointer) does not exist yet.
+- Chat retrieval and persona (`api/_core/retrieval.ts`, corpus generation, the persona rewrite).
 
 See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
 
@@ -56,6 +56,15 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
 - The following words are **strictly banned** and will cause the build to fail if found in `src/`: grimoire, owl post, owlpost, spellbook, incantation, chronicles, familiar, muggle, hogwarts.
 - This replaces the old file's instruction to "keep new content in voice" — that instruction is revoked. Copy must be plain, direct, and professional.
 - `src/test/copy-voice.test.ts` checks for these words on every build; do not work around it.
+
+**Motion — the rules that keep being rediscovered:**
+- Anything driven by time in JS uses `damp` from `src/lib/frame.ts`, never `v += (t - v) * 0.1`. A 144Hz monitor and a 60Hz one must show the same motion.
+- Anything driven by scroll reads the **smoothed** channel, not the raw scroll position — raw scroll steps with the mouse wheel.
+- CSS transitions use the shared `--ease` token from `styles/tokens.css`. Nothing hardcodes its own curve.
+- Animate `transform` and `opacity` only.
+- Per-frame state lives in mutable module singletons (`scrollState`, `wizardState`, `focusState`, `orbitState`) read inside the frame loop. **Never** React state in a per-frame or per-pointer-event path.
+- Never key motion to hard-coded scroll fractions. Section membership comes from `useSectionObserver`; a scroll-fraction table is what got v1 deleted.
+- **Still screenshots cannot verify motion.** `tools/shoot.mjs` waits for `window.__modelReady`, which latches only once a rig has settled — so it is blind by construction to anything visible only mid-transition. Verify time-varying work by sampling state deliberately or asserting on it in a test.
 
 **Accessibility:**
 - Honour `prefers-reduced-motion` in all animations and transitions (check `lib/media.ts` helper).
