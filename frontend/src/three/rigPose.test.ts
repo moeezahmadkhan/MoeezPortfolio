@@ -1,5 +1,6 @@
+import { PINNED_SECTION_ID } from './rigs'
 import { describe, expect, it } from 'vitest'
-import { MAX_FOCUS_TURN, MAX_TILT, rigPose, type Pose } from './rigPose'
+import { MAX_FOCUS_TURN, MAX_TILT, rigPose, type Pose, PINNED_TURN, pinnedYaw } from './rigPose'
 
 // Finding 3 changed rigPose to write into a caller-supplied output object
 // instead of allocating a fresh one per call — each test gets its own so
@@ -53,5 +54,32 @@ describe('rigPose', () => {
     const returned = rigPose(0.5, 0.5, 0.1, 1, out)
     expect(returned).toBe(out)
     expect(out.yaw).not.toBe(0)
+  })
+
+  describe('pinnedYaw', () => {
+    it('is zero for a rig that is not the pinned one, at any progress', () => {
+      expect(pinnedYaw('hero', 0.5)).toBe(0)
+      expect(pinnedYaw('work', 1)).toBe(0)
+    })
+
+    it('turns the pinned rig from nothing to the full turn across the section', () => {
+      expect(pinnedYaw(PINNED_SECTION_ID, 0)).toBe(0)
+      expect(pinnedYaw(PINNED_SECTION_ID, 1)).toBeCloseTo(PINNED_TURN, 6)
+      expect(pinnedYaw(PINNED_SECTION_ID, 0.5)).toBeCloseTo(PINNED_TURN / 2, 6)
+    })
+
+    it('is monotonic, so scrolling one way never turns the model the other way', () => {
+      let previous = -Infinity
+      for (let p = 0; p <= 1; p += 0.05) {
+        const yaw = pinnedYaw(PINNED_SECTION_ID, p)
+        expect(yaw).toBeGreaterThanOrEqual(previous)
+        previous = yaw
+      }
+    })
+
+    it('clamps progress, so a rect read outside the section cannot overspin it', () => {
+      expect(pinnedYaw(PINNED_SECTION_ID, -0.4)).toBe(0)
+      expect(pinnedYaw(PINNED_SECTION_ID, 2.5)).toBeCloseTo(PINNED_TURN, 6)
+    })
   })
 })

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { NAV_ITEMS } from '../components/layout/Nav'
-import { nextRig, RIGS, rigFor } from './rigs'
+import { nextRig, RIGS, rigFor, PINNED_SECTION_ID } from './rigs'
 
 describe('rigFor', () => {
   const ids = ['', ...NAV_ITEMS.map((i) => i.id)]
@@ -72,5 +72,15 @@ describe('nextRig preload order', () => {
     const last = all[all.length - 1]
     expect(last).toBeDefined()
     expect(nextRig(last?.id)).toBeNull()
+  })
+
+  it('names a pinned section that RIGS actually has a rig for', () => {
+    // Three files agree on this id: this table, Experience.tsx (which registers
+    // the section with the scroll tracker AND renders it as the DOM id), and
+    // CharacterRig (which decides whose yaw the scroll drives). Nothing tells
+    // you when they stop agreeing — the model just quietly stops turning — so
+    // the id is exported from here and asserted to resolve.
+    expect(RIGS[PINNED_SECTION_ID]).toBeDefined()
+    expect(RIGS[PINNED_SECTION_ID].id).toBe(PINNED_SECTION_ID)
   })
 })

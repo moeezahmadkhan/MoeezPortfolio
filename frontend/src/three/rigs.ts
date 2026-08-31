@@ -30,6 +30,18 @@ export type RigSpec = {
  * is non-numeric, so that holds; don't add a purely-numeric-looking key (e.g.
  * `'1'`) without re-checking this, since those sort before string keys instead.
  */
+/**
+ * The one section whose model turns with the visitor's own scroll rather than
+ * only with the pointer (the "pinned moment"). Exported from here, beside the
+ * table it must be a key of, because three separate files have to agree on it:
+ * this table, `Experience.tsx` (which both registers the section with the
+ * scroll tracker and renders it as the DOM id the tracker measures), and
+ * `CharacterRig` (which decides whose yaw the scroll drives). If they ever
+ * disagree the model simply stops turning, with no error anywhere — so
+ * `rigs.test.ts` asserts this resolves to a real rig.
+ */
+export const PINNED_SECTION_ID = 'experience'
+
 export const RIGS: Record<string, RigSpec> = {
   '': {
     id: 'hero',

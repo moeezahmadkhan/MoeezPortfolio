@@ -1,3 +1,5 @@
+import { PINNED_SECTION_ID } from './rigs'
+
 // Beyond this the model reads as reacting to the pointer, not spinning.
 export const MAX_TILT = 0.18
 // A hard ceiling on the COMBINED yaw (pointer + focus). Wider than MAX_TILT alone
@@ -39,4 +41,25 @@ export function rigPose(
   out.lift = (1 - visible) * 1.6
   out.opacity = visible
   return out
+}
+
+// Roughly a half-turn across the pinned section: enough to read as a
+// deliberate, scroll-driven turn rather than the pointer-parallax wobble every
+// other rig gets, but short of a full rotation, which starts to look like a
+// turntable demo.
+export const PINNED_TURN = Math.PI * 0.85
+
+/**
+ * Pure: how far the pinned section's rig has turned, given how far the viewport
+ * has travelled through that section. Every other rig gets zero — a stale
+ * `pinnedProgress` left behind after `registerPinnedSection(null)` must not
+ * leak into some other section's pose.
+ *
+ * `progress` is clamped: `sectionProgress` already clamps, but this is the
+ * function that decides how far a model spins, and a single bad rect read
+ * should not be able to overspin it.
+ */
+export function pinnedYaw(rigId: string, progress: number): number {
+  if (rigId !== PINNED_SECTION_ID) return 0
+  return clamp(progress, 0, 1) * PINNED_TURN
 }
