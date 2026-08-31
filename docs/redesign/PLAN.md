@@ -11,6 +11,28 @@ old world stays recoverable.
 
 ---
 
+## Status — 2026-09-01
+
+| Phase | State |
+|---|---|
+| 0 — Prep and demolition | done |
+| 1 — Content model and tokens | done; content rewritten from the real CV |
+| 2 — The clean shell | done (26 commits), plus a responsive/a11y wave — Lighthouse a11y 100, zero sub-44px targets |
+| 3 — The 3D signature | done, and extended past its original scope: one rig per section with cross-fades, project focus, a pinned turn, magnetic CTAs, and a motion-polish pass (`docs/superpowers/plans/2026-09-01-motion-polish.md`) |
+| 4 — The chatbot | in progress; corpus and retrieval building now |
+| 5 — Ship polish | not started |
+
+Two things are owed and cannot be closed from inside this sandbox or by anyone but Moeez:
+
+- **One real-hardware Lighthouse run before deploy.** This environment renders in software, so it
+  scores performance ~52 against its own trace showing LCP ~1.4s on Slow 4G with 4x CPU throttling.
+  The trace metrics are trustworthy; the score is not.
+- **`content/persona/{voice,qa}.md`** are scaffolded and deliberately empty. Nobody else fills them
+  in — an answer written for Moeez about Moeez is the exact failure this build is designed to
+  prevent. Project repo/live URLs are the other open item.
+
+---
+
 ## Phase 0 — Prep and demolition
 
 **Goal:** a clean, buildable shell with the salvaged core intact and nothing wizard-world left.
