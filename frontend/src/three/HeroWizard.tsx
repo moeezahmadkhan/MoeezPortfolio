@@ -22,10 +22,10 @@ const WAND_TIP: [number, number, number] = [0.16, -0.1, 0.18]
 // model sits centred in that reserved column. Mobile: there is no reserved column —
 // the copy runs full width — so the model shrinks and moves up and behind it, read
 // as an ambient background shape rather than a competing figure.
-const DESKTOP_POSITION: [number, number, number] = [1.55, -0.9, 0]
-const DESKTOP_SCALE = 1.35
-const MOBILE_POSITION: [number, number, number] = [0, -1.4, 0]
-const MOBILE_SCALE = 0.6
+const DESKTOP_POSITION: [number, number, number] = [1.4, -0.21, 0]
+const DESKTOP_SCALE = 1.3
+const MOBILE_POSITION: [number, number, number] = [0, -1.21, 0]
+const MOBILE_SCALE = 0.3
 // The GLB's forward axis faces away from the camera as exported; rotate the whole
 // rig 180° so the figure reads face-on rather than showing the back of the head.
 const BASE_YAW = Math.PI
