@@ -9,20 +9,38 @@
 import type { Chunk } from './retrieval.js'
 
 // --- Models & endpoint ---
-// Models tried in order — first that responds wins. All free; the cascade keeps the
-// chat answering even when the primary's free endpoint is rate-limited upstream.
-// Verified against https://openrouter.ai/api/v1/models on 2026-08-26. The previous
-// list had gone stale — five of its six ids no longer resolve, so every request
-// burned five upstream 404s before reaching the one live model. Chat-tuned models
-// only: reasoning variants leak their scratchpad, and code/safety models ignore the
-// persona. Re-check this list (npm run check:models) when the chat starts falling
-// through to FALLBACK_REPLY.
+// Models tried in order — first that answers wins.
+//
+// Chosen by CALLING them, on 2026-09-01, not by checking that the ids resolve.
+// Resolving and working are different things: of the five free ids in the previous
+// list, all five resolved, three returned "Provider returned error" on the first
+// request, and one (nvidia/nemotron-3-super) leaked its own scratchpad straight
+// into `content` — it answered "We need to answer as Moeez, in one short
+// sentence..." instead of answering. That is why the primary is now a paid model.
+//
+// deepseek-v4-flash costs $0.05 / $1M input and $0.16 / $1M output. A measured
+// reply on this site's prompt sizes cost $0.0000048 — roughly 200,000 replies per
+// dollar, with MAX_OUTPUT_TOKENS capping the tail. It returns clean prose with no
+// reasoning tokens, which the free reasoning models do not.
+//
+// The free models behind it are a no-cost safety net, and they were picked the
+// same way — by calling all 18 free models on OpenRouter with this site's own
+// system prompt. Most were unusable: eight returned an EMPTY reply because hidden
+// reasoning tokens consumed the whole completion budget, three errored upstream,
+// and the nemotron reasoning variants narrated their own instructions into the
+// answer ("Here's a thinking process: 1. Analyze User Input..."). The two poolside
+// models answered in clean first person with zero reasoning tokens.
+//
+// `npm run check:models` sends a real request to each of these when a key is
+// present. Re-run it when the chat starts falling through to FALLBACK_REPLY.
 export const MODELS = [
-  'z-ai/glm-5.2:free', // primary — strongest persona adherence of the free tier
-  'google/gemma-4-31b-it:free',
-  'nvidia/nemotron-3-super-120b-a12b:free',
-  'minimax/minimax-m2.7:free',
-  'google/gemma-4-26b-a4b-it:free',
+  // Primary. Clean prose, no scratchpad, ~$0.000005 a reply at these prompt sizes.
+  'deepseek/deepseek-v4-flash',
+  // Free, and measured clean: zero reasoning tokens, answered in first person.
+  'poolside/laguna-s-2.1:free',
+  'poolside/laguna-xs-2.1:free',
+  // Free, clean content, but spends some completion budget reasoning first.
+  'nvidia/nemotron-3-ultra-550b-a55b:free',
 ]
 export const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 

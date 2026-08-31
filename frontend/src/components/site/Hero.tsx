@@ -4,7 +4,11 @@ import { Magnetic } from '../ui/Magnetic'
 import './Hero.css'
 
 export function Hero() {
-  const github = profile.socials.find((s) => s.label === 'GitHub')
+  // Read by label rather than by index so reordering profile.socials cannot
+  // silently swap which link the hero offers.
+  const social = (label: string) => profile.socials.find((s) => s.label === label)
+  const linkedin = social('LinkedIn')
+  const github = social('GitHub')
   return (
     <section id="top" className="hero" aria-label="Introduction">
       <div className="hero__inner">
@@ -20,6 +24,13 @@ export function Hero() {
               Résumé
             </Button>
           </Magnetic>
+          {linkedin && (
+            <Magnetic>
+              <Button href={linkedin.href} variant="ghost" target="_blank" rel="noreferrer">
+                LinkedIn
+              </Button>
+            </Magnetic>
+          )}
           {github && (
             <Magnetic>
               <Button href={github.href} variant="ghost" target="_blank" rel="noreferrer">
