@@ -1,0 +1,76 @@
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-top: var(--nav-h);
+}
+
+.hero__inner {
+  width: min(100% - var(--s-5) * 2, var(--maxw));
+  margin-inline: auto;
+  max-width: 22ch;
+}
+
+.hero__role {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: var(--s-3);
+}
+
+.hero__name {
+  font-size: var(--t-hero);
+  margin-bottom: var(--s-4);
+}
+
+.hero__thesis {
+  max-width: 46ch;
+  color: var(--muted);
+  font-size: clamp(1.05rem, 1rem + 0.5vw, 1.3rem);
+  margin-bottom: var(--s-5);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+
+.hero__meta {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--muted);
+}
+
+.hero__cue {
+  position: absolute;
+  left: 50%;
+  bottom: var(--s-5);
+  translate: -50% 0;
+  color: var(--muted);
+  font-size: var(--t-small);
+  animation: cue 2.4s var(--ease) infinite;
+}
+
+@keyframes cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+
+@media (min-width: 900px) {
+  .hero__inner {
+    /* Leave the right half clear — Plan 2 puts the wizard there. */
+    padding-right: 42%;
+  }
+}
