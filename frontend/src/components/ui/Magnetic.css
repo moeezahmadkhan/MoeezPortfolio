@@ -1,0 +1,34 @@
+/*
+ * The wrapper is always rendered, on every device, so the hero's button row has
+ * the same box on a phone as on a laptop. Only `--live` is magnetic; everything
+ * else here is the safety margin that makes the lean legal.
+ */
+.magnetic {
+  /* 44px is the floor for a tap target, and the lean can carry the control up to
+     --magnetic-max away from where the visitor aimed. Sizing the target to the
+     floor PLUS that ceiling means the overlap between where it was and where it
+     is mid-lean is still at least 44x44. src/components/ui/Magnetic.tsx keeps
+     MAGNETIC_MIN_TARGET_PX in step with this number, and a test asserts the
+     relation. */
+  --magnetic-min-target: 52px;
+
+  display: inline-flex;
+  min-width: var(--magnetic-min-target);
+  min-height: var(--magnetic-min-target);
+  /* transform only — never top/left/width/height. The offset is written as two
+     custom properties by the shared frame loop, already damped, so there is no
+     CSS transition here to fight it. */
+  transform: translate3d(var(--magnetic-x, 0px), var(--magnetic-y, 0px), 0);
+}
+
+.magnetic > * {
+  flex: 1;
+  min-height: var(--magnetic-min-target);
+}
+
+/* Promoted only where the offset can actually change. On a coarse pointer or
+   under reduced motion this class is absent, so no layer is created for an
+   element that will never move. */
+.magnetic--live {
+  will-change: transform;
+}
