@@ -11,7 +11,9 @@ export type RigSpec = {
  * Which model presides over which section. Keyed on the section ids
  * `useSectionObserver` reports (the same ids `NAV_ITEMS` exports) — NOT on scroll
  * fractions. Adding or reordering a section requires editing this table and
- * nothing else, which is the whole reason the v1 station system was deleted.
+ * nothing else: both `rigFor` and the preload order below (`nextRig`) are
+ * derived from this table alone, which is the whole reason the v1 station
+ * system was deleted — there is nowhere else to keep in sync.
  *
  * Sections absent from this table simply have no model; the hero rig (`''`) is
  * the pre-intersection default, i.e. what shows before the observer has reported
@@ -21,8 +23,14 @@ export type RigSpec = {
  * verbatim (see CharacterRig) — not to be adjusted here. Work and Experience were
  * tuned against `.shots/desktop-work.png`, `.shots/desktop-experience.png`, and
  * their mobile counterparts.
+ *
+ * Preload order (see `nextRig`) is this table's own key order, hero first —
+ * relies on the JS spec guaranteeing that non-numeric-string object keys
+ * enumerate in insertion order. Every key here (`''`, `'work'`, `'experience'`)
+ * is non-numeric, so that holds; don't add a purely-numeric-looking key (e.g.
+ * `'1'`) without re-checking this, since those sort before string keys instead.
  */
-const RIGS: Record<string, RigSpec> = {
+export const RIGS: Record<string, RigSpec> = {
   '': {
     id: 'hero',
     model: '/models/wizard_improved.glb',
@@ -55,11 +63,15 @@ export function rigFor(activeId: string): RigSpec | null {
 
 /**
  * The rig-bearing sections in on-page order — hero first, then whichever
- * others carry a model, in the order they appear in `RIGS` above. Drives
+ * others carry a model, in the order they appear in `RIGS` above. Derived
+ * from `RIGS` itself (see the docstring on `RIGS`) rather than restated as a
+ * second hand-maintained list, so a section added to `RIGS` is automatically
+ * reachable here too — `rigs.test.ts`'s "every rig is reachable from the
+ * preload chain" test guards against this drifting back out of sync. Drives
  * lookahead preloading: while a given rig is current, the *next* one in this
  * list is the one worth fetching ahead of time.
  */
-const ORDER: RigSpec[] = [RIGS[''], RIGS.work, RIGS.experience]
+const ORDER: RigSpec[] = Object.values(RIGS)
 
 /**
  * Given the id of the rig currently on screen, returns the rig that follows

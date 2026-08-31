@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 // From the concrete file, not the `@react-three/drei` barrel — see the comment on
 // the drei imports in Stage.tsx for why.
 import { Sparkles } from '@react-three/drei/core/Sparkles'
-import type { Group, Mesh, MeshStandardMaterial, PointLight } from 'three'
+import type { Group, Mesh, MeshStandardMaterial, PointLight, Points } from 'three'
 import { projects } from '../content'
 import { damp } from '../lib/frame'
 import { focusState } from '../lib/focusState'
@@ -13,7 +13,7 @@ import { useMatchMedia } from '../lib/useMatchMedia'
 import { applyWizardingMaterials, cloneMaterials, disposeMaterials } from './characterMaterial'
 import { useKtx2Gltf } from './ktx2'
 import { markModelReady } from './modelReadiness'
-import { rigPose } from './rigPose'
+import { rigPose, type Pose } from './rigPose'
 import { targetIntensity, wizardState } from './wizardState'
 import { orbitState, useDragOrbit } from './useDragOrbit'
 import type { RigSpec } from './rigs'
@@ -78,8 +78,24 @@ const READY_FADE_THRESHOLD = 0.95
  * wand-tip light and sparkles, the visibility fade and lift — generalised so any
  * section's model gets the same treatment, with the hero's own tuned constants
  * (`spec.position`/`spec.scale` for `'hero'`) carried over verbatim.
+ *
+ * `skipInitialFade` lets `SceneDirector` mount the very first rig of the page
+ * (always the hero, before the visitor has done anything) already fully
+ * materialised — the hero previously used `scrollState.heroVisible` directly
+ * and was never seen fading in, and this preserves that. It only affects the
+ * very first frame's starting value; a later cross-fade back to the hero
+ * mounts a fresh instance with `skipInitialFade` unset and dissolves in as
+ * normal.
  */
-export function CharacterRig({ spec, fadeIn }: { spec: RigSpec; fadeIn: boolean }) {
+export function CharacterRig({
+  spec,
+  fadeIn,
+  skipInitialFade = false,
+}: {
+  spec: RigSpec
+  fadeIn: boolean
+  skipInitialFade?: boolean
+}) {
   const isHero = spec.id === 'hero'
   // Only the hero section installs the drag-orbit listeners — `#top` is the hero
   // section element, and dragging any other rig was never a feature.
@@ -88,9 +104,13 @@ export function CharacterRig({ spec, fadeIn }: { spec: RigSpec; fadeIn: boolean 
   const { scene } = useKtx2Gltf(spec.model)
   const group = useRef<Group>(null)
   const glowRef = useRef<PointLight>(null)
+  const sparklesRef = useRef<Points>(null)
   // This rig's own cross-fade progress, independent of the hero's scroll-driven
   // heroVisible fraction (see the frame loop below).
-  const fade = useRef(0)
+  const fade = useRef(skipInitialFade ? 1 : 0)
+  // Reused every frame instead of a fresh `{ yaw, pitch, lift, opacity }`
+  // object literal per call — `rigPose` writes into this in place.
+  const pose = useRef<Pose>({ yaw: 0, pitch: 0, lift: 0, opacity: 0 }).current
   // Latches once this rig's `markModelReady` fires, so the check is a single
   // property write on the settling frame rather than every frame after.
   const reportedReady = useRef(false)
@@ -170,7 +190,7 @@ export function CharacterRig({ spec, fadeIn }: { spec: RigSpec; fadeIn: boolean 
     const isWorkRig = spec.id === 'work'
     const focusedSlug = isWorkRig ? focusState.projectSlug : null
     const focusBias = focusedSlug !== null ? (FOCUS_YAW_BIAS.get(focusedSlug) ?? 0) : 0
-    const pose = rigPose(scrollState.pointerX, scrollState.pointerY, focusBias, visible)
+    rigPose(scrollState.pointerX, scrollState.pointerY, focusBias, visible, pose)
     const t = state.clock.elapsedTime
 
     const orbit = isHero
@@ -204,10 +224,22 @@ export function CharacterRig({ spec, fadeIn }: { spec: RigSpec; fadeIn: boolean 
       ? Math.max(targetIntensity(wizardState.mode), FOCUS_INTENSITY_TARGET)
       : targetIntensity(wizardState.mode)
     wizardState.intensity = damp(wizardState.intensity, intensityTarget, 3, dt)
+    // Both the wand light and the sparkles ride on `pose.opacity` — the exact
+    // same value driving the body materials above — so the FX can never lead
+    // the body's own fade-in (Finding 2: previously both rendered at full
+    // configuration regardless of `fade`, so a visitor saw a bright wand tip
+    // and floating sparkles over a body that was still materialising).
     if (glowRef.current) {
       // A slow flicker on top of the mood level, so the wand never looks like a lamp.
       glowRef.current.intensity =
-        (2 + wizardState.intensity * 9) * (0.88 + Math.sin(t * 5.3) * 0.12)
+        (2 + wizardState.intensity * 9) * (0.88 + Math.sin(t * 5.3) * 0.12) * pose.opacity
+    }
+    if (sparklesRef.current) {
+      // Sparkles' own particle shader has no per-frame opacity uniform to
+      // drive (its alpha comes from a static per-particle buffer attribute
+      // baked in at creation), so scaling the whole point cloud toward zero
+      // is the allocation-free way to tie it to the same fade curve.
+      sparklesRef.current.scale.setScalar(pose.opacity)
     }
   })
 
@@ -221,6 +253,7 @@ export function CharacterRig({ spec, fadeIn }: { spec: RigSpec; fadeIn: boolean 
       <primitive object={model} />
       <pointLight ref={glowRef} position={WAND_TIP} color="#ffd79a" distance={1.1} decay={2} />
       <Sparkles
+        ref={sparklesRef}
         count={16}
         scale={[0.14, 0.18, 0.14]}
         position={WAND_TIP}

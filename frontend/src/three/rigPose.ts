@@ -17,20 +17,26 @@ function clamp(v: number, lo: number, hi: number): number {
  * parallax, plus a `focusBias` term (a hovered/focused project card, wired up by
  * a later task) that lets the model turn further than the pointer alone would
  * ever push it, still bounded by `MAX_FOCUS_TURN`.
+ *
+ * Writes into the caller-supplied `out` object instead of allocating a fresh
+ * one — this runs once per active rig per frame inside `useFrame`, and a
+ * literal-object return there would be a per-frame allocation. Callers hoist
+ * one `Pose` per rig instance and reuse it every frame; `out` is returned too,
+ * purely for call-site convenience.
  */
 export function rigPose(
   pointerX: number,
   pointerY: number,
   focusBias: number,
   visible: number,
+  out: Pose,
 ): Pose {
   const pointerYaw = clamp(pointerX * MAX_TILT, -MAX_TILT, MAX_TILT)
-  return {
-    yaw: clamp(pointerYaw + focusBias, -MAX_FOCUS_TURN, MAX_FOCUS_TURN),
-    pitch: clamp(-pointerY * MAX_TILT * 0.6, -MAX_TILT, MAX_TILT),
-    // As a rig fades away (scrolled off, or cross-fading out) the figure drifts
-    // up and out rather than clipping.
-    lift: (1 - visible) * 1.6,
-    opacity: visible,
-  }
+  out.yaw = clamp(pointerYaw + focusBias, -MAX_FOCUS_TURN, MAX_FOCUS_TURN)
+  out.pitch = clamp(-pointerY * MAX_TILT * 0.6, -MAX_TILT, MAX_TILT)
+  // As a rig fades away (scrolled off, or cross-fading out) the figure drifts
+  // up and out rather than clipping.
+  out.lift = (1 - visible) * 1.6
+  out.opacity = visible
+  return out
 }
