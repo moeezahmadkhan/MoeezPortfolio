@@ -10,6 +10,15 @@ export type Project = {
   featured: boolean
 }
 
+// To attach links to a project, add a `links` object to its entry:
+//   links: {
+//     repo: 'https://github.com/moeezahmadkhan/<repo>',   // source code
+//     demo: 'https://<live-url>',                          // live deployment
+//     writeup: 'https://<article-url>',                    // optional write-up
+//   }
+// Every key is optional — include only the ones that exist. Omit `links`
+// entirely when there is nothing to link to; the card renders fine without it.
+
 export const projects: Project[] = [
   {
     slug: 'horus',
