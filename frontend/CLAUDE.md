@@ -1,89 +1,90 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file guides Claude Code when working in the frontend directory.
 
 ## What this is
 
-A single-page personal portfolio for **Moeez Ahmad Khan** (AI/ML Engineer). It is themed as a Harry Potter / wizarding "archive": a candlelit 3D hero with a floating wizard figurine, followed by scroll-driven chapters (About, Spells, Grimoire of projects, Chronicles, Owl-post contact). Pure front end — no backend, no API.
+A single-page portfolio for **Moeez Ahmad Khan**, AI/ML engineer. Clean, readable design focused on recruiting and direct outreach. The hero section includes a 3D animated wizard model as a visual signature, but this is decoration, not navigation — all content lives in scrollable HTML below. Static site, no backend.
 
 ## Commands
 
+From `frontend/`:
+
 ```bash
-npm run dev      # Vite dev server (host:true → exposed on LAN, default port 5173)
-npm run build    # tsc -b (typecheck) then vite build → dist/
-npm run preview  # serve the production build
+npm run dev       # Vite dev server on http://localhost:5173
+npm run build     # tsc -b (typecheck first) then vite build → dist/
+npm run preview   # serve the production build
+npm test          # vitest run — jsdom environment, @testing-library/react
 ```
 
-There is no test runner, linter, or formatter configured. `npm run build` is the only correctness gate — it runs `tsc -b` first, so a type error fails the build. Type-check without bundling via `npx tsc -b`.
+The build fails if TypeScript errors exist. Type-check without bundling: `npx tsc -b`.
 
-## Architecture
+## Current state
 
-Two visual layers stacked by `App.tsx`:
+The v1 architecture (Harry Potter–themed 3D scroll gallery with station cameras, chapters, scroll rails) was deleted and tagged as `v1-wizard-world` for recovery. This is v2.
 
-1. **A fixed full-viewport WebGL canvas** (`src/scene/`) rendered once, behind everything.
-2. **Scrollable HTML content** (`src/components/`) on top.
+**Directories that exist today:**
 
-The 3D scene never re-mounts as you scroll. Instead the **camera moves through the static scene** while HTML chapters scroll past — this is the core trick of the site.
+- `src/content/` — all portfolio data: `profile.ts`, `projects.ts`, `skills.ts`, `experience.ts`, `index.ts`. Each is a typed module; this is the single source of truth for visible strings on the site and for the chatbot.
+- `src/lib/` — utilities: `scrollState.ts` (mutable singleton for scroll/pointer events), `media.ts` (responsive queries + reduced-motion check), `contactForm.ts` (Web3Forms payload), tests.
+- `src/styles/` — `tokens.css` (design custom properties), `base.css` (reset + defaults).
+- `src/three/` — salvaged 3D pieces: `ktx2.ts` (useKtx2Gltf loader), `characterMaterial.ts` (apply wizard material tint + glow passthrough).
+- `src/test/` — `copy-voice.test.ts` (enforces no wizard vocabulary in src/); `setup.ts`; other tests.
+- `api/` — serverless functions (Vercel). Currently `familiar.ts` + `_core/` (to be renamed to `chat.ts` in upcoming work).
 
-### The scroll bridge (`src/scroll.ts`)
+**What is still being built:**
 
-`scrollState` is a **module-level mutable singleton**, deliberately *outside* React state. A scroll/pointer listener (installed by `useScrollTracker`) writes `progress` (0→1 down the page), `raw` px, and `pointerX/Y` (−1→1) into it. The R3F components read it inside their `useFrame` loops every frame. This keeps scrolling from ever triggering a React re-render of the Canvas tree. **Do not lift `scrollState` into `useState`/context** — that would re-render the whole scene on every scroll event.
+- `src/components/` — does not exist yet. Needs layout (Nav, Section, Footer), site (Hero, About, Work, Skills, Experience, Contact, ProjectCard), ui (Button, Tag, Reveal, Timeline), and chat (ChatDock, ChatPanel, useChat).
+- `src/three/Stage.tsx`, `Backdrop.tsx`, `HeroWizard.tsx`, `WandFX.tsx`, `lights.ts`, `wizardState.ts` — the 3D canvas tree (partially described in `docs/redesign/ARCHITECTURE.md`).
+- Chat retrieval and persona (`api/_core/retrieval.ts`, corpus generation, persona system prompt refinement).
 
-### The scene (`src/scene/`)
-
-- `Scene.tsx` — the `<Canvas>`: lighting rig (candlelight + spot/rim/key lights), `Environment` with inline `Lightformer`s (no network HDRI), `Sparkles`, `ContactShadows`, and the `EffectComposer` post chain (**Bloom** is what makes the gold glow, plus Vignette + SMAA). Performance is adaptive: `PerformanceMonitor` + `AdaptiveDpr` drop the `dpr` on slow devices.
-- `CameraRig.tsx` — drives the camera. `KEYS` is a keyframe array (`at` = scroll fraction → camera `pos`/`look`). It samples + smoothsteps between keyframes by `scrollState.progress`, adds eased pointer parallax, and lerps frame-rate-independently. **To re-time the camera per chapter, edit `KEYS`.** A second array, **`KEYS_MOBILE`, is selected on phones** (`pointer: coarse` / width < 720) because the pinned sections collapse to natural height there (see `sections.css`), so the desktop fractions no longer line up with the chapters. Its `at` fractions are MEASURED at 390×844 via `tools/measure_mobile.mjs`, and its poses pull in + aim the look-point *below* each model so the figure lifts into the cleared top band of the portrait frame (the character stations reserve their top ~50svh for the 3D, copy drops to the bottom — see the mobile block in `sections.css`). Mobile also widens the camera `fov` (`Scene.tsx`) and stops the `responsiveState.zoom` shrink (`scroll.ts`) so models read large. Each MODEL chapter (conjuring/pact/tracker/map) gets an **entry + hold key PAIR** at the same pose so the camera SETTLES on the figure through that section's reading window instead of continuously drifting toward the next far-offset station (which slid models off-frame mid-section); text chapters keep a single key. **If you add/remove a chapter or change a model-station's mobile layout, re-run `measure_mobile.mjs` and resync `KEYS_MOBILE` fractions.**
-
-Stations are far apart in world space (x = −13…22), so the long camera whip-pans between them used to cross a black "dead zone" — the previous station popped out at its span edge before the next popped in. `src/scene/stationVisibility.ts` (`visibleInSpan`) gates each station's `.visible` on its `SECTION_START/END` **plus a scroll margin**, so a station stays rendered as it recedes / arrives early; animation timing still uses the clamped `localProgress`. Desktop additionally lingers the Pact "held" key (0.645) before whipping to the Tracker. A mobile-only front fill `pointLight` (centered, tight decay) in `Scene.tsx` lifts the central figurine (hero/about/grimoire/chronicles) out of silhouette without reaching the offset stations.
-- `WizardModel.tsx` — loads `/models/wizard.glb` (a static, rig-less mesh, ~3.6MB after meshopt compression; animated purely in-scene via Float + rotation). The `reveal` prop (0→1) scales it up out of the rune circle during the intro. Materials are cloned + tweaked (emissive warmth) so HMR never mutates shared state. The GLB carries **baked emissive `Glow_*` materials** (glowing eyes + wand magic) — the material traversal skips `Glow_*` so it doesn't clobber them, and Bloom makes them glow. A pulsing `pointLight` + `Sparkles` at `WAND_TIP` give the wand its animated magic. The model is rebuilt from `tools/wizard.original.glb` via `tools/build_wizard.sh` (Blender glow/2K-textures → gltf-transform meshopt); see `docs/wizard-glb-improvement.md`.
-- `RuneCircle.tsx` — procedural sigil on the floor; fades out by ~22% scroll (`scrollState.progress`).
-- `Candlelight.tsx` — a `pointLight` flickering via layered sines.
-
-### The intro timeline (`App.tsx`)
-
-drei's `useProgress` gates a preloader. When assets finish loading, a `requestAnimationFrame` ramp drives `reveal` 0→1 over 1.8s, passed into `Scene → WizardModel` to "conjure" the figurine. The preloader fades out via framer-motion `AnimatePresence`.
-
-### HTML chapters (`src/components/`)
-
-- `data.ts` — **all portfolio content** (projects, spellbook/skills, chronicles/experience) lives here as typed arrays. Edit copy here, not in JSX.
-- `Sections.tsx` — `About`, `Spells`, `Grimoire`, `Chronicles`, `OwlPost` — maps over `data.ts` into the wizard-themed sections.
-- `Reveal.tsx` — `Reveal` (scroll-into-view blur+rise) and `IgniteHeading` (per-word stagger). Shared scroll-reveal primitives built on framer-motion `whileInView`.
-- `Hero.tsx`, `Tilt.tsx` (pointer tilt cards), `ScrollRail.tsx` (chapter progress wand on the page edge), `Cursor.tsx` (custom wand-tip cursor + sparks, disabled on coarse pointers).
-
-> Note: `App.tsx` currently renders `<Hero>` plus a placeholder "Grimoire — coming next" section. The full chapter components (`Sections.tsx`, `ScrollRail.tsx`, `Cursor.tsx`, `data.ts`, etc.) exist but are **not yet wired into `App.tsx`** — wiring them in (and matching section `id`s to `CameraRig` `KEYS` and `ScrollRail` chapters) is the in-progress work.
-
-### Section ↔ camera ↔ rail coupling
-
-Three places share the chapter ordering and must stay in sync: the section `id`s in `Sections.tsx`, the `KEYS` scroll fractions in `CameraRig.tsx`, and the `chapters` anchors in `ScrollRail.tsx`. Changing the number/order of chapters means updating all three.
+See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
 
 ## Conventions
 
-- **Design tokens** live in `src/styles/global.css` as CSS custom properties (palette: ink `#07070d`, gold `#e7c27d`, rune-teal; fonts Cinzel / Cormorant Garamond / JetBrains Mono loaded in `index.html`). Use the variables; don't hard-code hex in components except inside the 3D scene where three.js needs literal colors.
-- Each component pairs with a sibling `.css` file imported at the top.
-- Wizarding metaphor is intentional throughout copy and class names (spells = skills, grimoire = projects, owl post = contact, "incantations" = playful project names). Keep new content in voice.
+**Portfolio content:**
+- All visible text (projects, skills, roles, bio, links, copy) lives in `src/content/` as TypeScript modules. Edit copy there, never invent JSX strings.
+- Never invent facts: no metrics, dates, client names, or employer details that are not already in the content files. Point people to email if asked for something not in the data.
 
-## Verifying 3D renders headlessly
+**Design & styling:**
+- Design tokens (colors, spacing, type scales) live in `src/styles/tokens.css` as CSS custom properties. Use the variables in components; only bare colors are allowed inside `three/` where Three.js needs literal hex values.
+- Each component pairs with a `.css` file, imported at the top.
 
-`puppeteer-core` is a dev dependency for screenshotting the WebGL output. Drive it with system Chrome (`/usr/bin/google-chrome-stable`) using `--use-gl=angle --use-angle=swiftshader`. The `glBlitFramebuffer` WebGL warning under SwiftShader is harmless.
+**Copy voice — explicit ban on wizarding vocabulary:**
+- Section names are: Work, About, Skills, Experience, Contact.
+- The following words are **strictly banned** and will cause the build to fail if found in `src/`: grimoire, owl post, owlpost, spellbook, incantation, chronicles, familiar, muggle, hogwarts.
+- This replaces the old file's instruction to "keep new content in voice" — that instruction is revoked. Copy must be plain, direct, and professional.
+- `src/test/copy-voice.test.ts` checks for these words on every build; do not work around it.
 
-## Large assets
+**Accessibility:**
+- Honour `prefers-reduced-motion` in all animations and transitions (check `lib/media.ts` helper).
+- Canvas is `aria-hidden` and decorative only.
+- All content is accessible via keyboard and screen reader; do not rely on 3D for meaning.
 
-`wizard.glb` and the CV PDF live under `public/` and are served as-is. The shipped model is `public/models/wizard.glb` (~3.6MB, meshopt-compressed). Its uncompressed source is `tools/wizard.original.glb` (kept out of `public/` so it isn't bundled); regenerate the shipped model with `tools/build_wizard.sh`. Two extra source GLBs and a PDF sit in the repo root (not served).
+## 3D model pipeline (salvaged)
 
-### Other characters (Spellcaster, Pact pair)
+Four character models ship with KTX2 ETC1S texture compression:
+- `public/models/wizard_improved.glb` (~850 KB after meshopt + KTX2)
+- `public/models/spellcaster.glb`, `pact_pair.glb`, `cricket_improved.glb`
 
-Raw Tripo character GLBs (~500k tris, 15MB) are optimized for the web with `tools/build_character.sh <input.glb> <public/models/out.glb> [ratio]` — a gltf-transform `dedup → weld → simplify → meshopt` pipeline (~125k tris / ~1.4MB out, matching the wizard's footprint). No Blender needed: geometry only, textures are left as-is. The shipped characters are `public/models/spellcaster.glb` (Conjuring chapter, `src/scene/spell/SpellCaster.tsx`) and `public/models/pact_pair.glb` (a single mesh holding the founder + investor as a composed pair, `src/scene/pact/ThePact.tsx`). Their raw sources sit in the repo root.
+**Loading:** Use `useKtx2Gltf(path)` from `src/three/ktx2.ts`, not `useGLTF`. Drei's `useGLTF` auto-wires Draco and meshopt but not KTX2; this helper attaches a `KTX2Loader` pointed at `public/basis/` (self-hosted Basis transcoder, copied from three.js examples).
 
-All character glow/theme is done **in React, not baked**: `src/scene/characterMaterial.ts` (`applyWizardingMaterials`) gives each cloned model the warm emissive tint + crisp PBR finish (and passes `Glow_*` materials through untouched), and each scene adds its own FX (wand-tip orb + light + Sparkles, chalice/bond glow) at a tunable model-space coord — same approach as `WizardModel`. Tune the per-character transform constants at the top of `SpellCaster.tsx` / `ThePact.tsx`. Verify framing headlessly with `tools/shot_chars.mjs` (skips the cinematic intro, then screenshots the Conjuring/Pact/Map scenes).
+**Building:** 
+- `tools/build_wizard.sh` — regenerates wizard from `tools/wizard.original.glb` (Blender → gltf-transform meshopt).
+- `tools/build_character.sh <input.glb> <output.glb>` — optimizes raw Tripo GLBs (gltf-transform: dedup → weld → simplify → meshopt).
+- `tools/build_ktx2.sh` — applies ETC1S compression to any of the above (requires Khronos `ktx` CLI on PATH).
 
-### KTX2 / Basis GPU textures
+Run in that order if updating models. See `docs/redesign/ARCHITECTURE.md` section 5 for performance budget and rationale.
 
-The four shipped models (`wizard_improved`, `cricket_improved`, `spellcaster`, `pact_pair`) carry **ETC1S (Basis Universal) KTX2 textures**, applied as a post-step by `tools/build_ktx2.sh` (run it after `build_wizard.sh` / `build_character.sh`). Their plain JPEGs already downloaded small, but decoded to 5–22 MB of **VRAM each** (~130 MB total) — ETC1S keeps them GPU-compressed (~8× less VRAM) while download stays flat (it also downscales the two 2K basecolors to 1K). The script does `(resize) → etc1s → re-apply the model's own geometry codec` (draco for wizard/cricket, meshopt for spellcaster/pact), because gltf-transform strips geometry compression when it rewrites the file. Requires the Khronos `ktx` CLI on PATH (KhronosGroup/KTX-Software).
+**Materials:** Apply `applyWizardingMaterials` from `src/three/characterMaterial.ts` to cloned models. It adds warm emissive tint, preserves `Glow_*` materials for Bloom, and keeps the model readable in candlelit scenes.
 
-On the React side, **drei's `useGLTF` auto-wires Draco + meshopt but NOT KTX2**, so all four scene components load via `useKtx2Gltf` (`src/scene/ktx2.ts`) instead of `useGLTF`. It attaches a `KTX2Loader` pointed at the self-hosted Basis transcoder in **`public/basis/`** (copied from `three/examples/jsm/libs/basis/`, so no CDN) and runs `detectSupport(gl)`. If you add another KTX2 model, load it with `useKtx2Gltf`, not `useGLTF`.
+## Testing
 
-### Marauder's Map art + detected subject
+- **Unit tests:** `vitest run` — tests live alongside code as `.test.ts` files.
+- **Copy voice:** `src/test/copy-voice.test.ts` — fails the build if banned words appear in `src/`.
+- **Content shape:** `src/content/content.test.ts` — validates that the profile, projects, skills, and experience modules match their TypeScript shapes.
+- **Type gate:** `npm run build` runs `tsc -b` first; a type error fails the build.
 
-The map table (`src/scene/map/MapTable.tsx`) is textured with **`public/maraudersmap.png`** — the illustration the user supplied (a Marauder's-Map scene with a baked-in "TARGET TELEMETRY LOG" panel: SCANNED SUBJECT ID, IMAGE EMBEDDINGS, COMPARISON_MATCH — the AI/vision angle drawn right into the art). It arrived as a 2.6MB SVG wrapping a 1013×1024 raster; `tools/extract_map_png.mjs` pulls the PNG out so we ship that directly instead of rasterizing a huge data-URI SVG. The material carries an emissive copy of the texture (`emissiveIntensity` ≈ 0.7) so it stays legible in the candlelit hall and its gold/teal ink blooms. (The old procedural `parchment.ts`/`useSvgTexture` path is no longer used by MapTable but is kept for its tests.)
+## Deployment
 
-On top of the map, `public/walker.svg` (a flat teal hooded-walker silhouette — needs explicit `width`/`height` so `TextureLoader` rasterizes it) is billboarded along the patrol path by `src/scene/map/Walker.tsx`, so the gold detection reticle locks onto it like a vision-model bounding box.
+Vercel (manual via `./ship` from the repo root). GitHub Actions and the Vercel GitHub App are locked by the EMU account. `OPENROUTER_API_KEY` must be set as a Vercel project env var for the chat API to work; without it, a fallback reply is returned.
