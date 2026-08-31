@@ -7,3 +7,4 @@ dist
 # local env (Web3Forms key, etc.)
 .env
 .env.local
+*.tsbuildinfo

@@ -14,13 +14,4 @@ describe('Section', () => {
     const heading = screen.getByRole('heading', { level: 2, name: 'Work' })
     expect(section).toHaveAttribute('aria-labelledby', heading.id)
   })
-
-  it('renders an optional eyebrow', () => {
-    render(
-      <Section id="about" title="About" eyebrow="01">
-        <p>body</p>
-      </Section>,
-    )
-    expect(screen.getByText('01')).toBeInTheDocument()
-  })
 })

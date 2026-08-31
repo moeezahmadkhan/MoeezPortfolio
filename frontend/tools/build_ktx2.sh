@@ -11,7 +11,7 @@
 # Recipe per model: (downscale any 2K basecolor to 1K) -> etc1s -> re-apply the
 # model's own geometry codec (draco or meshopt), which gltf-transform strips
 # when it rewrites the file. The React side decodes KTX2 via /public/basis/ (see
-# src/scene/ktx2.ts); drei's useGLTF wires Draco + meshopt but NOT KTX2 itself.
+# src/three/ktx2.ts); drei's useGLTF wires Draco + meshopt but NOT KTX2 itself.
 #
 # Requires the Khronos `ktx` CLI on PATH (KhronosGroup/KTX-Software).
 set -euo pipefail
