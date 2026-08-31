@@ -1,0 +1,186 @@
+import { useEffect, useMemo, useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
+// From the concrete file, not the `@react-three/drei` barrel — see the comment on
+// the drei imports in Stage.tsx for why.
+import { Sparkles } from '@react-three/drei/core/Sparkles'
+import type { Group, Mesh, MeshStandardMaterial, PointLight } from 'three'
+import { damp } from '../lib/frame'
+import { scrollState } from '../lib/scrollState'
+import { isCoarsePointer } from '../lib/media'
+import { useMatchMedia } from '../lib/useMatchMedia'
+import { applyWizardingMaterials, cloneMaterials, disposeMaterials } from './characterMaterial'
+import { useKtx2Gltf } from './ktx2'
+import { rigPose } from './rigPose'
+import { targetIntensity, wizardState } from './wizardState'
+import { orbitState, useDragOrbit } from './useDragOrbit'
+import type { RigSpec } from './rigs'
+
+// Model-space position of the wand tip, tuned against the hero wizard's own
+// geometry (see task-5-report.md from the predecessor plan). Reused as a shared
+// "wand glow" anchor across every rig — a stylistic constant for the site's
+// magic-light accent, not a per-model measurement.
+const WAND_TIP: [number, number, number] = [0.16, -0.1, 0.18]
+
+// The single source of truth, on the JS side, for the width at which the hero
+// layout gains its reserved right column — must match Hero.css's own
+// `@media (min-width: 900px)`. Read live via `useMatchMedia` so placement
+// follows an actual resize rather than freezing whatever was true at mount.
+const DESKTOP_COLUMN_QUERY = '(min-width: 900px)'
+
+// Every shipped GLB's forward axis faces away from the camera as exported —
+// rotate the whole rig 180° so the figure reads face-on rather than showing
+// the back of the head.
+const BASE_YAW = Math.PI
+
+// How quickly a rig's own opacity chases its fadeIn/fadeOut target. Fast enough
+// to have visibly settled well within SceneDirector's 900ms outgoing-unmount
+// window.
+const FADE_LAMBDA = 4
+
+/**
+ * One rig, wearing whichever model `spec` names. Absorbs everything the
+ * predecessor plan's `HeroWizard` did — pointer parallax, drag-to-orbit, the
+ * wand-tip light and sparkles, the visibility fade and lift — generalised so any
+ * section's model gets the same treatment, with the hero's own tuned constants
+ * (`spec.position`/`spec.scale` for `'hero'`) carried over verbatim.
+ */
+export function CharacterRig({ spec, fadeIn }: { spec: RigSpec; fadeIn: boolean }) {
+  const isHero = spec.id === 'hero'
+  // Only the hero section installs the drag-orbit listeners — `#top` is the hero
+  // section element, and dragging any other rig was never a feature.
+  useDragOrbit(isHero)
+
+  const { scene } = useKtx2Gltf(spec.model)
+  const group = useRef<Group>(null)
+  const glowRef = useRef<PointLight>(null)
+  // This rig's own cross-fade progress, independent of the hero's scroll-driven
+  // heroVisible fraction (see the frame loop below).
+  const fade = useRef(0)
+
+  // Reactive: `Hero.css` reserves the right column live, on resize, via its own
+  // `@media (min-width: 900px)` — this rig's placement has to follow it live
+  // too, not freeze whatever was true at mount. `useMatchMedia` only re-renders
+  // on an actual breakpoint crossing, never on every resize pixel.
+  const hasDesktopColumn = useMatchMedia(DESKTOP_COLUMN_QUERY)
+  const mobile = isCoarsePointer() || !hasDesktopColumn
+  const basePosition = mobile ? spec.mobilePosition : spec.position
+  const baseScale = mobile ? spec.mobileScale : spec.scale
+
+  // `scene.clone(true)` deep-clones the node hierarchy, but three's Mesh#copy()
+  // assigns the *same* material reference(s) as the source — it does not clone
+  // them (see `cloneMaterials`'s doc comment). `scene` here is the cached GLTF
+  // scene from `useKtx2Gltf`'s URL-keyed cache, and this rig mounts repeatedly
+  // as sections change, so without `cloneMaterials` every mount of the same
+  // model would fight over one shared set of materials. `cloneMaterials` runs
+  // first so `applyWizardingMaterials` — including its `Glow_*` emissive
+  // pass-through — operates on this instance's own materials. Collecting the
+  // transparent materials once here — instead of re-traversing the scene graph
+  // every frame just to touch `.opacity` — keeps the frame body allocation-free.
+  const { model, materials } = useMemo(() => {
+    const copy = scene.clone(true)
+    cloneMaterials(copy)
+    applyWizardingMaterials(copy)
+    const mats: MeshStandardMaterial[] = []
+    copy.traverse((child) => {
+      const mesh = child as Mesh
+      const mat = mesh.material as MeshStandardMaterial | undefined
+      if (mesh.isMesh && mat && 'transparent' in mat) {
+        mat.transparent = true
+        mats.push(mat)
+      }
+    })
+    return { model: copy, materials: mats }
+  }, [scene])
+
+  // Now that this rig owns its materials outright (cloned above, not shared with
+  // the cache), it must dispose them on unmount or every mount leaks GPU memory.
+  // Geometry is NOT disposed — it's still shared with the cache and other
+  // mounts of the same model still read it.
+  useEffect(() => {
+    return () => disposeMaterials(model)
+  }, [model])
+
+  useFrame((state, dt) => {
+    const g = group.current
+    if (!g) return
+
+    // This rig's own cross-fade, driven by SceneDirector's fadeIn prop, always
+    // advances — including while invisible — so an incoming rig actually ramps
+    // 0 → 1 rather than freezing at 0 behind the early return below.
+    fade.current = damp(fade.current, fadeIn ? 1 : 0, FADE_LAMBDA, dt)
+    // The hero additionally tracks how much of it is still on screen as the
+    // visitor scrolls past — scrollState.heroVisible, exactly as HeroWizard did.
+    // Other rigs have no such continuous measure (their section either owns the
+    // screen or it doesn't; SceneDirector's cross-fade already handles the
+    // transition), so they are simply "fully visible" once faded in.
+    const sectionVisible = isHero ? scrollState.heroVisible : 1
+    const visible = fade.current * sectionVisible
+    g.visible = visible > 0.01
+    // Once a rig has fully faded out it costs one visibility check per frame,
+    // nothing more.
+    if (!g.visible) return
+
+    // Wired up to focusState.projectSlug by a later task, which turns the model
+    // toward a hovered/focused project card. Zero here keeps this rig's pose
+    // identical to pointer-only parallax until that lands.
+    const focusBias = 0
+    const pose = rigPose(scrollState.pointerX, scrollState.pointerY, focusBias, visible)
+    const t = state.clock.elapsedTime
+
+    const orbit = isHero
+      ? orbitState.dragging
+        ? orbitState.offset
+        : (orbitState.offset = damp(orbitState.offset, 0, 1.4, dt))
+      : 0
+
+    g.rotation.y = damp(
+      g.rotation.y,
+      BASE_YAW + pose.yaw + orbit + Math.sin(t * 0.18) * 0.06,
+      2.6,
+      dt,
+    )
+    g.rotation.x = damp(g.rotation.x, pose.pitch, 2.6, dt)
+    g.position.y = damp(
+      g.position.y,
+      basePosition[1] + pose.lift + Math.sin(t * 0.7) * 0.045,
+      2.2,
+      dt,
+    )
+
+    for (let i = 0; i < materials.length; i++) {
+      materials[i].opacity = pose.opacity
+    }
+
+    wizardState.intensity = damp(
+      wizardState.intensity,
+      targetIntensity(wizardState.mode),
+      3,
+      dt,
+    )
+    if (glowRef.current) {
+      // A slow flicker on top of the mood level, so the wand never looks like a lamp.
+      glowRef.current.intensity =
+        (2 + wizardState.intensity * 9) * (0.88 + Math.sin(t * 5.3) * 0.12)
+    }
+  })
+
+  return (
+    // `dispose={null}` stays: R3F's default auto-dispose walks this whole subtree
+    // on unmount and disposes BOTH geometry and material on everything under it,
+    // which would dispose the geometries still shared with the GLTF cache. The
+    // `useEffect` above disposes the (now-owned) materials by hand instead, and
+    // leaves geometry alone.
+    <group ref={group} position={basePosition} scale={baseScale} dispose={null}>
+      <primitive object={model} />
+      <pointLight ref={glowRef} position={WAND_TIP} color="#ffd79a" distance={1.1} decay={2} />
+      <Sparkles
+        count={16}
+        scale={[0.14, 0.18, 0.14]}
+        position={WAND_TIP}
+        size={2.4}
+        speed={0.35}
+        color="#f6dfa6"
+      />
+    </group>
+  )
+}

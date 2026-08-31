@@ -14,9 +14,14 @@ export function applyDrag(offset: number, dx: number): number {
 /**
  * Drag-to-orbit on the hero. The canvas itself is pointer-events:none so it never
  * eats clicks; the hero SECTION is what listens, and only while it is on screen.
+ *
+ * `enabled` gates installation entirely — only the hero rig should pass `true`,
+ * since `#top` is the hero section element and dragging any other rig was never
+ * a feature. Defaults to `true` so this stays a drop-in for the hero's own use.
  */
-export function useDragOrbit(): void {
+export function useDragOrbit(enabled: boolean = true): void {
   useEffect(() => {
+    if (!enabled) return
     const hero = document.getElementById('top')
     if (!hero) return
     let lastX = 0
@@ -38,15 +43,18 @@ export function useDragOrbit(): void {
       hero.classList.remove('is-dragging')
     }
 
-    hero.addEventListener('pointerdown', down)
+    // None of these call preventDefault, so all four can be passive — that's
+    // latency hygiene for the browser's scroll/gesture heuristics, not a
+    // behavioural change.
+    hero.addEventListener('pointerdown', down, { passive: true })
     window.addEventListener('pointermove', move, { passive: true })
-    window.addEventListener('pointerup', up)
-    window.addEventListener('pointercancel', up)
+    window.addEventListener('pointerup', up, { passive: true })
+    window.addEventListener('pointercancel', up, { passive: true })
     return () => {
       hero.removeEventListener('pointerdown', down)
       window.removeEventListener('pointermove', move)
       window.removeEventListener('pointerup', up)
       window.removeEventListener('pointercancel', up)
     }
-  }, [])
+  }, [enabled])
 }
