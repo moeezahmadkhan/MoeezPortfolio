@@ -63,14 +63,21 @@ frontend/
       chat/    ChatDock.tsx  ChatPanel.tsx  ChatMessage.tsx
                useChat.ts  chatClient.ts  chat.test.ts
     three/
+      StageMount.tsx             # lazy boundary + the render gate
       Stage.tsx                  # the single <Canvas> root
+      SceneDirector.tsx          # cross-fades one rig out as the next fades in
+      CharacterRig.tsx           # one rig, wearing whichever model the section names
+      rigs.ts                    # section id -> model table; PINNED_SECTION_ID
+      rigPose.ts                 # pure pose maths (pointer, focus, pinned turn)
       Backdrop.tsx               # fullscreen shader quad
-      HeroWizard.tsx             # GLB + float + pointer orbit
-      WandFX.tsx                 # point light + sparkles at wand tip
-      lights.ts                  # shared lighting rig
+      lights.tsx                 # shared lighting rig
+      tint.ts                    # per-section backdrop tint
+      useDragOrbit.ts            # drag-to-turn, springs back
       wizardState.ts             # idle | attentive | casting singleton
+      modelReadiness.ts          # window.__modelReady, for the screenshot tool
+      stageGate.ts               # WebGL / reduced-motion / save-data gate
       ktx2.ts                    # salvaged as-is
-      characterMaterial.ts       # salvaged as-is
+      characterMaterial.ts       # salvaged as-is; clones materials per mount
       shaders/backdrop.vert  backdrop.frag
   tools/
     build_character.sh  build_ktx2.sh  build_wizard.sh   # salvaged
@@ -81,7 +88,7 @@ frontend/
 
 **Deleted outright:** `src/scene/{tracker,map,pact,spell}/`, `CameraRig.tsx`,
 `ScrollDriver.tsx`, `stationVisibility.ts`, `spans.ts`, `Scene.tsx`, `RuneCircle.tsx`,
-`Candlelight.tsx`, `WizardModel.tsx` (superseded by `HeroWizard.tsx`), `chapters.ts`,
+`Candlelight.tsx`, `WizardModel.tsx` (superseded by `CharacterRig.tsx`), `chapters.ts`,
 `smoothScroll.ts`, `useScrollSettle.ts`, `components/{Sections,ScrollRail,ScrollCues,Candles,CinematicIntro,GrimoireChat,Hero,Tilt,SceneBoundary}.tsx`,
 `src/data.ts`. Tags the old tree as `v1-wizard-world` before deleting so it stays recoverable.
 
@@ -113,7 +120,7 @@ scroll / pointer events ──► lib/scrollState.ts (mutable singleton, NOT Rea
                                                 ├─► Nav active link (React state, ~7 renders total)
                                                 └─► Backdrop tint uniform
 
-chat open / streaming ──► three/wizardState.ts ──► HeroWizard + WandFX read in useFrame
+chat open / streaming ──► three/wizardState.ts ──► CharacterRig reads it in useFrame
 ```
 
 Rule carried over from v1 and still binding: **never lift `scrollState` into React state or
@@ -205,18 +212,33 @@ Uniforms are written in `useFrame` from `scrollState` and the section observer's
 call, no textures, no allocation per frame. Tint per section: hero=gold, work=teal-lean,
 experience=deep ink — subtle enough that it reads as depth, not as a colour change.
 
-### `src/three/HeroWizard.tsx`
+### `src/three/CharacterRig.tsx`
 
-Loads `/models/wizard_improved.glb` through the salvaged `useKtx2Gltf` (not `useGLTF` — drei
-auto-wires Draco/meshopt but not KTX2). Applies `applyWizardingMaterials` (skips `Glow_*`).
+One component for every section's model — the hero's original `HeroWizard` generalised, carrying
+its tuned constants over verbatim. `rigs.ts` maps a section id to a model; `SceneDirector` mounts
+the rig for the active section and keeps the outgoing one alive until it has finished dissolving.
+
+Loads its GLB through the salvaged `useKtx2Gltf` (not `useGLTF` — drei auto-wires Draco/meshopt
+but not KTX2). Deep-clones the cached scene, then clones its **materials** (three's `Mesh.copy`
+assigns the same material references, so without this every mount of a model would fight over one
+set) and applies `applyWizardingMaterials`, which passes `Glow_*` through untouched. Materials are
+disposed by hand on unmount; geometry is not, because the cache still owns it.
+
 Behaviour per frame:
 
-- `Float`-style idle bob + slow Y rotation.
-- Pointer parallax: model yaw/pitch eased toward `scrollState.pointerX/Y`, clamped to ±0.18 rad.
-- Drag-to-orbit: pointer-down adds a damped yaw offset, springs back on release.
-- `heroVisible` scales opacity/scale to 0 and returns `null` from the frame body once it hits 0,
-  so an off-screen hero costs nothing.
-- Reads `wizardState.mode` for pose blend targets.
+- Idle bob + slow Y drift, both damped.
+- Pointer parallax: yaw/pitch eased toward `scrollState.pointerX/Y`, clamped to ±0.18 rad.
+- Focus bias: the Work rig turns toward whichever project card is hovered **or focused**, derived
+  from the grid's own layout rather than a slug table, and bounded by `MAX_FOCUS_TURN`.
+- The pinned turn: in `PINNED_SECTION_ID`'s section only, `pinnedYaw` adds up to `PINNED_TURN`
+  of rotation driven by how far the viewport has travelled through that section.
+- Drag-to-orbit on the hero: pointer-down adds a damped yaw offset, springs back on release.
+- Cross-fade: each rig owns a `fade` chasing `fadeIn`. The wand light and the sparkles both ride
+  the same `pose.opacity` as the body materials, so FX can never lead the body in. The very first
+  rig of a page load mounts already materialised (`skipInitialFade`) — the hero never had an
+  entrance and must not gain one.
+- Once fully faded out, the frame body costs one visibility check and returns.
+- Reads `wizardState.mode` for the wand's brightness.
 
 ### `src/three/wizardState.ts`
 

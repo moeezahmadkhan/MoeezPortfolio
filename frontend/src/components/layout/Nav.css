@@ -1,0 +1,112 @@
+.nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 20;
+  height: var(--nav-h);
+  backdrop-filter: blur(12px);
+  background: rgb(var(--ink-rgb) / 0.72);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav__inner {
+  height: 100%;
+  width: min(100% - var(--s-5) * 2, var(--maxw));
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+}
+
+.nav__brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-mono);
+  font-size: var(--t-small);
+  letter-spacing: 0.06em;
+}
+
+.nav__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: var(--t-small);
+  color: var(--text);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: var(--s-1) var(--s-3);
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.nav__links {
+  display: none;
+}
+
+/* Scoped to below the desktop breakpoint so this can never outrank the
+   `@media (min-width: 780px) .nav__links` rule if `open` state is ever
+   stale after a resize (e.g. the menu was opened at mobile width). */
+@media (max-width: 779px) {
+  .nav__links.is-open {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    position: absolute;
+    inset: var(--nav-h) 0 auto;
+    padding: var(--s-4) var(--s-5);
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* Real vertical padding turns each row into a >=44px tap target — this is
+     the primary navigation on mobile. */
+  .nav__links.is-open .nav__link,
+  .nav__links.is-open .nav__cv {
+    padding-block: var(--s-3);
+  }
+}
+
+.nav__link,
+.nav__cv {
+  font-size: var(--t-small);
+  color: var(--muted);
+  transition: color 0.2s var(--ease);
+}
+
+.nav__link:hover,
+.nav__cv:hover,
+.nav__link[aria-current='true'] {
+  color: var(--text);
+}
+
+.nav__link[aria-current='true'] {
+  position: relative;
+}
+
+.nav__link[aria-current='true']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.nav__cv {
+  color: var(--gold);
+}
+
+@media (min-width: 780px) {
+  .nav__toggle {
+    display: none;
+  }
+  .nav__links {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+  }
+}

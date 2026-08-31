@@ -1,0 +1,51 @@
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.stage canvas {
+  display: block;
+}
+
+.stage--static {
+  display: grid;
+  place-items: center end;
+  padding-right: 6vw;
+}
+
+.stage--static img {
+  max-height: 70svh;
+  width: auto;
+  opacity: 0.9;
+  /* Without this the fallback ends in a hard rectangle against a near-black
+     page, which reads as a broken image rather than as a lit figure. The canvas
+     it stands in for has no edges, so neither should it. */
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 48%, #000 42%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 48%, #000 42%, transparent 100%);
+}
+
+/* Drag-to-orbit cursor affordance lives in StageCursor.css, imported by Stage.tsx
+   itself (not here) — this file is imported by StageMount even when the canvas
+   never mounts (reduced motion / no WebGL), and those visitors must not see a
+   grab cursor for a drag that was never installed. */
+
+@media (max-width: 899px) {
+  /* Bottom, not top. This layer is `position: fixed`, so wherever it sits it
+     sits there over every section — and pinned under the nav it landed square
+     on each heading, with its own hard rectangular edge cutting through the
+     copy. The bottom is where the live model stands on mobile anyway
+     (rigs.ts's mobilePosition), so the canvas and the no-canvas fallback now
+     agree about where the figure is. */
+  .stage--static {
+    place-items: end center;
+    padding: 0 0 var(--s-5);
+  }
+  .stage--static img {
+    max-height: 34svh;
+    /* Narrower screens have no clear column to give it, so it recedes further
+       than on desktop: the copy must win every overlap on a phone. */
+    opacity: 0.5;
+  }
+}

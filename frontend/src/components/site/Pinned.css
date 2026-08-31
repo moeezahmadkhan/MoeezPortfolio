@@ -1,0 +1,21 @@
+/*
+ * The pinned moment (Task 5 of the 3D-interactions plan): the one section
+ * where the model holds the centre and turns through the visitor's own
+ * scroll, instead of sitting to one side like every other rig.
+ *
+ * `.pinned` is applied to the section only while the stage is actually
+ * mounted (see Experience.tsx's `shouldRenderStage` check) — with the canvas
+ * gated off there is no model to make room for, so the section falls back to
+ * its normal, un-narrowed layout rather than stranding the copy beside an
+ * empty column.
+ *
+ * Mirrors Hero.css's own `padding-right` reservation for the same rig slot,
+ * rather than a JS-computed layout: a CSS-only, section-scoped change that
+ * degrades to nothing where it doesn't apply (mobile, reduced-motion,
+ * no-WebGL, save-data).
+ */
+@media (min-width: 900px) {
+  .pinned .section__inner {
+    padding-right: 46%;
+  }
+}

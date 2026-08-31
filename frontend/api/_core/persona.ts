@@ -1,5 +1,5 @@
 // The Familiar's identity + all tunable knobs for the chat proxy.
-// Facts are compiled from src/data.ts and Moeez's CV. Edit copy here.
+// Facts are compiled from src/content/ and Moeez's CV. Edit copy here.
 
 // --- Models & endpoint ---
 // Models tried in order — first that responds wins. All free; the cascade keeps the

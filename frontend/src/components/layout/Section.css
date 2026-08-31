@@ -1,0 +1,30 @@
+.section {
+  padding-block: var(--s-7);
+}
+
+.section--tight {
+  padding-block: var(--s-6);
+}
+
+.section__inner {
+  width: min(100% - var(--s-5) * 2, var(--maxw));
+  margin-inline: auto;
+}
+
+.section__head {
+  margin-bottom: var(--s-6);
+}
+
+.section__title {
+  font-size: var(--t-h2);
+}
+
+@media (min-width: 900px) {
+  .section {
+    padding-block: var(--s-10);
+  }
+
+  .section--tight {
+    padding-block: var(--s-8);
+  }
+}

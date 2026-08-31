@@ -1,0 +1,28 @@
+/* Skills.css */
+.skills {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.skills__title {
+  font-size: var(--t-small);
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: var(--s-3);
+}
+
+.skills__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  padding: 0;
+}
+
+@media (min-width: 780px) {
+  .skills {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-6);
+  }
+}

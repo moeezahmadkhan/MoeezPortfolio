@@ -1,0 +1,119 @@
+.contact {
+  display: grid;
+  gap: var(--s-6);
+}
+
+.contact__lead {
+  color: var(--muted);
+  max-width: 40ch;
+}
+
+.contact__email {
+  display: inline-block;
+  margin-top: var(--s-4);
+  font-size: var(--t-h3);
+  color: var(--gold);
+  border-bottom: 1px solid rgb(var(--gold-rgb) / 0.4);
+}
+
+@media (pointer: coarse) {
+  .contact__email {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+.contact__meta {
+  margin-top: var(--s-3);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--muted);
+}
+
+.contact__socials {
+  display: flex;
+  gap: var(--s-4);
+  list-style: none;
+  padding: 0;
+  margin-top: var(--s-4);
+  font-size: var(--t-small);
+}
+
+.contact__socials a {
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+}
+
+@media (pointer: coarse) {
+  .contact__socials a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding-block: var(--s-2);
+  }
+}
+
+.contact__form {
+  display: grid;
+  gap: var(--s-3);
+}
+
+.field {
+  display: grid;
+  gap: var(--s-1);
+  font-size: var(--t-small);
+  color: var(--muted);
+}
+
+.field label {
+  display: grid;
+  gap: var(--s-1);
+}
+
+.field input,
+.field textarea {
+  font: inherit;
+  /* Fixed at 16px (not var(--t-small)) so a focused field never dips under
+     the size that triggers Mobile Safari's auto-zoom-on-focus. */
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-base);
+  padding: var(--s-2) var(--s-3);
+  min-height: 44px;
+}
+
+.field input[aria-invalid='true'],
+.field textarea[aria-invalid='true'] {
+  border-color: var(--error);
+}
+
+.field__error {
+  font-style: normal;
+  color: var(--error);
+  font-size: var(--t-micro);
+}
+
+.contact__form .btn {
+  justify-self: start;
+  font: inherit;
+  font-size: var(--t-small);
+  cursor: pointer;
+}
+
+.contact__status {
+  min-height: 1.2em;
+  font-size: var(--t-small);
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .contact {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-7);
+  }
+}

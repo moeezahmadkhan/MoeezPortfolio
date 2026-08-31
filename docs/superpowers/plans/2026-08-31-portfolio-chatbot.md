@@ -12,6 +12,57 @@
 **Architecture doc:** `docs/redesign/ARCHITECTURE.md` (§4 chat pipeline)
 **Predecessors:** Plans 1 and 2 complete and merged.
 
+## Amendments (2026-09-01, from Moeez)
+
+Three requirements stated after this plan was written. They bind every task below.
+
+**A. It answers ONLY from his own material.** Not "grounded where possible" — the bot must not answer from general knowledge at all. If retrieval returns nothing that covers the question, the correct behaviour is to say so and point at the email, never to produce a plausible-sounding answer. Treat a refusal as a correct outcome, not a gap. Task 8's eval must therefore include questions whose right answer *is* a refusal, and an answer that is fluent but unsupported counts as a failure even when it happens to be true.
+
+**B. Arrows must point at the chat dock**, so a visitor notices it. This is a new deliverable — see Task 10 below. It is decorative: `aria-hidden`, honouring `prefers-reduced-motion`, never overlapping copy, never shrinking a tap target below 44px, and never becoming something the visitor has to dismiss.
+
+**C. Same environment, no new provider.** Reuse the existing server-side `OPENROUTER_API_KEY` and the existing free-model cascade. No paid API, no second key, no `VITE_` prefix on it (that would ship the key to the browser). `VITE_WEB3FORMS_KEY` stays the contact form's key. `.env.example` already documents both; the live values live in Vercel's project environment.
+
+---
+
+### Task 10: Arrows that point at the dock
+
+**Files:**
+- Create: `frontend/src/components/chat/DockPointer.tsx`, `DockPointer.css`
+- Modify: `frontend/src/components/chat/ChatDock.tsx`
+- Test: `frontend/src/components/chat/DockPointer.test.tsx`
+
+**Interfaces:**
+- Consumes: `prefersReducedMotion` from `src/lib/media.ts`; the dock's open state; `scrollState` (read per frame via rAF, never React state).
+- Produces: `<DockPointer visible: boolean />` — a decorative trail of a few arrows that travel toward the launcher as the visitor scrolls.
+
+- [ ] **Step 1: Write the failing tests**
+
+Cover: it renders nothing when the dock is open; it is `aria-hidden` and contributes no accessible name; it renders a static (unanimated) form under `prefers-reduced-motion`; and it disappears permanently once the visitor has opened the dock at least once in the session.
+
+- [ ] **Step 2: Run them and watch them fail**
+
+- [ ] **Step 3: Implement**
+
+Design constraints, in order of importance:
+- **Decorative only.** `aria-hidden="true"`, `pointer-events: none`. It must never sit between the visitor and the launcher, and must never be the thing they tap.
+- **It stops.** Show it on arrival, and retire it once the visitor opens the dock — or after a bounded number of loops. A pointer that gestures forever reads as a nag, and this is a portfolio, not a growth-hacked funnel.
+- **Scroll-driven (amended 2026-09-01, Moeez).** The arrows are not on a timer loop: they *move with the scroll*. A few arrows (3 is the working number) sit in a short trail and advance toward the dock as a function of scroll progress, each lagging the one before it, so scrolling down visibly pushes them along the path to the launcher. Scrolling up walks them back. Read **`scrollState.smooth.progress`**, not the raw field — the smoothed channel already exists (commit `5b64069`) precisely so scroll-linked motion inherits the glide instead of stepping with the wheel. Read it inside one rAF loop and write a CSS custom property (or a transform); never React state per scroll event, exactly as the 3D layer does. Adding a second `damp` on top is not needed and would only add lag.
+- **Quiet by default.** A short trail with slow, damped travel beats a swarm. Use the existing tokens; the arrow is the one place `--teal` may appear outside the dock itself, since it belongs to the chat surface.
+- **Reduced motion.** Under `prefers-reduced-motion` it still renders — a visitor who dislikes motion still benefits from knowing the dock exists — but as a static mark with no animation.
+- **Mobile.** At 390px the dock sits bottom-right over content. The arrow must not cover copy or any control, and must not add to the vertical scroll.
+
+- [ ] **Step 4: Verify**
+
+Stills cannot evidence scroll-linked motion (see the memory `screenshot-verification-blind-spot`). Verify the travel by **sampling**: drive a real browser, step `scrollY` through the page, and record each arrow's computed transform beside `scrollState.progress` at each step — the trail must advance monotonically toward the dock, with each arrow lagging its predecessor, and never overshoot past the launcher. Then screenshot at 390 and 1440 with the dock closed and again with it open. Confirm the arrow reads as an invitation rather than clutter, vanishes when the dock opens, and never overlaps a control. Then confirm with the canvas gated off that nothing about it depends on WebGL.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git commit -m "feat: point the way to the chat without nagging"
+```
+
+---
+
 ## Global Constraints
 
 - **First person, always.** The bot is Moeez. No "my master", no third-person narrator.

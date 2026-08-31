@@ -1,0 +1,53 @@
+:root {
+  /* Ground and surfaces. The site is dark by design — there is no light theme. */
+  --ink: #07070d;
+  --ink-rgb: 7 7 13;
+  --surface: #0e0e17;
+  --surface-2: #14141f;
+  --line: rgb(231 194 125 / 0.14);
+
+  /* Text */
+  --text: #ece9e4;
+  --muted: #9a978f;
+
+  /* Accent. Gold is the ONLY accent on the page. Teal is reserved for the
+     chat/AI surface so that "the machine is talking" reads as a different voice. */
+  --gold: #e7c27d;
+  --gold-bright: #f6dfa6;
+  --gold-rgb: 231 194 125;
+  --teal: #5fd3c6;
+  --error: #d97070;
+
+  /* Type */
+  --font-sans: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Type scale, fluid between 390px and 1440px */
+  --t-hero: clamp(2.6rem, 1.4rem + 5vw, 5.2rem);
+  --t-h2: clamp(1.7rem, 1.2rem + 2vw, 2.6rem);
+  --t-h3: clamp(1.15rem, 1rem + 0.6vw, 1.4rem);
+  --t-body: clamp(1rem, 0.96rem + 0.2vw, 1.08rem);
+  --t-small: 0.86rem;
+  --t-micro: 0.74rem;
+
+  /* Spacing — 8px scale. Nothing outside this list. */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 16px;
+  --s-4: 24px;
+  --s-5: 32px;
+  --s-6: 48px;
+  --s-7: 64px;
+  --s-8: 96px;
+  --s-9: 128px;
+  --s-10: 192px;
+
+  --r-base: 4px;
+  --r-soft: 12px;
+  --r-pill: 999px;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --nav-h: 64px;
+  --maxw: 1120px;
+}

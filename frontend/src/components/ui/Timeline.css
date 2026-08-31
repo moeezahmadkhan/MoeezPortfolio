@@ -1,0 +1,42 @@
+/* Timeline.css */
+.timeline {
+  list-style: none;
+  padding: 0;
+}
+
+.timeline__item {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-5) 0;
+  border-top: 1px solid var(--line);
+}
+
+.timeline__period {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--gold);
+  letter-spacing: 0.06em;
+}
+
+.timeline__role {
+  font-size: var(--t-h3);
+  margin-bottom: var(--s-2);
+}
+
+.timeline__bullets {
+  color: var(--muted);
+  font-size: var(--t-small);
+  padding-left: var(--s-3);
+  max-width: 56ch;
+}
+
+.timeline__bullets li + li {
+  margin-top: var(--s-2);
+}
+
+@media (min-width: 900px) {
+  .timeline__item {
+    grid-template-columns: 200px 1fr;
+    gap: var(--s-5);
+  }
+}

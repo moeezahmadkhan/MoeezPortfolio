@@ -1,0 +1,19 @@
+/* Drag-to-orbit cursor affordance for the hero. Deliberately split out of
+   Stage.css: this file is imported by Stage.tsx itself, which only loads (and
+   only installs useDragOrbit's listeners) once the canvas actually mounts.
+   StageMount.tsx imports Stage.css eagerly for the static-art fallback, so
+   these rules must not live there — a reduced-motion or no-WebGL visitor,
+   who never gets the drag interaction, must never get this cursor either. */
+
+#top {
+  cursor: grab;
+}
+
+#top.is-dragging {
+  cursor: grabbing;
+}
+
+#top a,
+#top button {
+  cursor: pointer;
+}

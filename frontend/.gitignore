@@ -7,3 +7,9 @@ dist
 # local env (Web3Forms key, etc.)
 .env
 .env.local
+*.tsbuildinfo
+
+# Scratch: verification probes, and the esbuild staging dir the persona/model
+# scripts write to (they clean up after themselves, but not after a crash).
+*.tmp.mjs
+.tmp/

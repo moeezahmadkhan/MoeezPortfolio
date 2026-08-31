@@ -1,0 +1,97 @@
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-soft);
+  overflow: hidden;
+  transition:
+    border-color 0.25s var(--ease),
+    transform 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
+}
+
+/* The same affordance for both a pointer hover and a keyboard focus landing on
+   a link inside — this is what a reduced-motion or no-WebGL visitor gets in
+   place of the model turning to look, so it has to read as deliberate on its
+   own, not like a leftover next to the 3D reaction. */
+.card:hover,
+.card:focus-within {
+  border-color: rgb(var(--gold-rgb) / 0.36);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -18px rgb(var(--gold-rgb) / 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover,
+  .card:focus-within {
+    transform: none;
+  }
+}
+
+.card__shot {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  width: 100%;
+  border-bottom: 1px solid var(--line);
+}
+
+.card__body {
+  padding: var(--s-5);
+}
+
+.card__title {
+  font-size: var(--t-h3);
+}
+
+.card__metric {
+  font-family: var(--font-mono);
+  font-size: var(--t-small);
+  color: var(--gold);
+  margin-top: var(--s-1);
+}
+
+.card__outcome {
+  margin-top: var(--s-3);
+  color: var(--text);
+  max-width: 56ch;
+}
+
+.card__detail {
+  margin-top: var(--s-3);
+  padding-left: var(--s-3);
+  color: var(--muted);
+  font-size: var(--t-small);
+  max-width: 56ch;
+}
+
+.card__detail li + li {
+  margin-top: var(--s-2);
+}
+
+.card__stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: var(--s-4);
+  padding: 0;
+}
+
+.card__links {
+  display: flex;
+  gap: var(--s-4);
+  margin-top: var(--s-4);
+  font-size: var(--t-small);
+  color: var(--gold);
+}
+
+.card__links a {
+  border-bottom: 1px solid rgb(var(--gold-rgb) / 0.4);
+}
+
+@media (pointer: coarse) {
+  .card__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
