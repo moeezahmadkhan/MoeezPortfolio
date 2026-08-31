@@ -2,6 +2,7 @@ import defaultCorpus from './corpus.generated.json' with { type: 'json' }
 import {
   buildRefusalReply,
   buildSystemPrompt,
+  fence,
   FALLBACK_REPLY,
   MAX_MESSAGE_CHARS,
   MAX_OUTPUT_TOKENS,
@@ -18,6 +19,33 @@ export type ChatRole = 'user' | 'assistant'
 export type ChatMessage = { role: ChatRole; content: string }
 
 // Sanitize, drop junk, truncate, and keep only the most recent MAX_TURNS messages.
+/**
+ * Whatever else was retrieved, ship the block that carries his real LinkedIn and
+ * email alongside it.
+ *
+ * The live eval found every model in the cascade inventing a way to reach him —
+ * `moeez@khan.pro`, `hey@moeezahmadkhan.com`, and a truncated
+ * `linkedin.com/in/moeez-ahmad-khan` that resolves to nobody — in about 4% of
+ * the replies that reached a model. The system prompt forbids that twice. It
+ * also, in the same breath, ORDERS the model to point at LinkedIn and email
+ * when it cannot answer. When retrieval hands over the skills chunk and not the
+ * contact chunk, those two instructions cannot both be obeyed, and the model
+ * resolves the contradiction by improvising an address.
+ *
+ * Fixing that in the prompt would be arguing with a model about arithmetic it
+ * cannot do. Fixing it here removes the contradiction: the details are always
+ * in front of it, so "give the exact link from the notes" is always possible.
+ *
+ * Returns the list unchanged when the contact block is already in it, or when
+ * the corpus has no such block (a corpus with no links must not fabricate one).
+ */
+export function withContactBlock(chunks: Chunk[], corpus: Chunk[]): Chunk[] {
+  if (chunks.length === 0) return chunks
+  const contact = corpus.find((c) => /linkedin\.com\/in\//i.test(c.text))
+  if (!contact || chunks.some((c) => c.id === contact.id)) return chunks
+  return [...chunks, contact]
+}
+
 export function capMessages(messages: ChatMessage[]): ChatMessage[] {
   const clean = (Array.isArray(messages) ? messages : [])
     .filter((m): m is ChatMessage =>
@@ -43,7 +71,16 @@ export function buildRequestBody(
 ): OpenRouterBody {
   return {
     model,
-    messages: [{ role: 'system', content: system }, ...messages],
+    // Every visitor turn is fenced. The notes block is delimited by markers, and
+    // a visitor who types the closing marker could otherwise convince a model
+    // that the notes had ended — the live eval watched one do exactly that, and
+    // the model then answered from general knowledge about an unrelated project.
+    // Chunk text has always been fenced; the visitor is the untrusted side and
+    // was not.
+    messages: [
+      { role: 'system', content: system },
+      ...messages.map((m) => (m.role === 'user' ? { ...m, content: fence(m.content) } : m)),
+    ],
     max_tokens: MAX_OUTPUT_TOKENS,
   }
 }
@@ -108,7 +145,7 @@ export async function handleChatRequest(args: HandleArgs): Promise<ChatResult> {
   // scoring the whole transcript lets an earlier topic outvote the current one.
   const corpus = args.corpus ?? (defaultCorpus as Chunk[])
   const lastUser = [...capped].reverse().find((m) => m.role === 'user')
-  const chunks = retrieve(lastUser?.content ?? '', corpus)
+  const chunks = withContactBlock(retrieve(lastUser?.content ?? '', corpus), corpus)
 
   // Nothing in the notes covers this. `retrieve` already applied COVERAGE_FLOOR, so
   // this is not "the best chunk was weak" — it is "he never wrote this down".
