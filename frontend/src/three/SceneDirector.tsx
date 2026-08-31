@@ -5,8 +5,9 @@ import { CharacterRig } from './CharacterRig'
 import { preloadKtx2Gltf } from './ktx2'
 import { nextRig, rigFor, type RigSpec } from './rigs'
 
-// Must comfortably exceed CharacterRig's own FADE_LAMBDA settle time so the
-// outgoing rig has visually finished fading before it unmounts.
+// Must comfortably exceed the settle time of the rig cross-fade's own
+// FADE_LAMBDA (motion.ts) so the outgoing rig has visually finished fading
+// before it unmounts.
 const OUTGOING_UNMOUNT_MS = 900
 
 // One mounted CharacterRig, tracked by a `genId` that is assigned once, when

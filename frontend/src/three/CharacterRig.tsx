@@ -13,10 +13,18 @@ import { useMatchMedia } from '../lib/useMatchMedia'
 import { applyWizardingMaterials, cloneMaterials, disposeMaterials } from './characterMaterial'
 import { useKtx2Gltf } from './ktx2'
 import { markModelReady } from './modelReadiness'
+import {
+  INTENSITY_LAMBDA,
+  LIFT_LAMBDA,
+  ORBIT_RETURN_LAMBDA,
+  TURN_LAMBDA,
+  advanceFade,
+  rigVisibility,
+} from './motion'
 import { pinnedYaw, rigPose, type Pose } from './rigPose'
 import { targetIntensity, wizardState } from './wizardState'
 import { orbitState, useDragOrbit } from './useDragOrbit'
-import type { RigSpec } from './rigs'
+import { HERO_RIG_ID, type RigSpec } from './rigs'
 
 // Model-space position of the wand tip, tuned against the hero wizard's own
 // geometry (see task-5-report.md from the predecessor plan). Reused as a shared
@@ -34,11 +42,6 @@ const DESKTOP_COLUMN_QUERY = '(min-width: 900px)'
 // rotate the whole rig 180° so the figure reads face-on rather than showing
 // the back of the head.
 const BASE_YAW = Math.PI
-
-// How quickly a rig's own opacity chases its fadeIn/fadeOut target. Fast enough
-// to have visibly settled well within SceneDirector's 900ms outgoing-unmount
-// window.
-const FADE_LAMBDA = 4
 
 // Which way the Work rig turns for each featured project, derived from the
 // featured grid's own layout (Work.css: the first card spans the full row,
@@ -69,7 +72,8 @@ const FOCUS_INTENSITY_TARGET = 0.75
 // How far into its fade-in a rig counts as "visibly settled" for
 // `markModelReady` — high enough that a screenshot taken right after isn't
 // noticeably dimmer than the fully-settled model, low enough to fire before
-// `FADE_LAMBDA` has asymptotically crept the last few percent forever.
+// `FADE_LAMBDA` (motion.ts) has asymptotically crept the last few percent
+// forever.
 const READY_FADE_THRESHOLD = 0.95
 
 /**
@@ -96,7 +100,7 @@ export function CharacterRig({
   fadeIn: boolean
   skipInitialFade?: boolean
 }) {
-  const isHero = spec.id === 'hero'
+  const isHero = spec.id === HERO_RIG_ID
   // Only the hero section installs the drag-orbit listeners — `#top` is the hero
   // section element, and dragging any other rig was never a feature.
   useDragOrbit(isHero)
@@ -165,7 +169,7 @@ export function CharacterRig({
     // This rig's own cross-fade, driven by SceneDirector's fadeIn prop, always
     // advances — including while invisible — so an incoming rig actually ramps
     // 0 → 1 rather than freezing at 0 behind the early return below.
-    fade.current = damp(fade.current, fadeIn ? 1 : 0, FADE_LAMBDA, dt)
+    fade.current = advanceFade(fade.current, fadeIn, dt)
     // Only the incoming rig ever reports ready — an outgoing one's fade only
     // ever heads toward 0, so it would never cross the threshold anyway.
     if (fadeIn && !reportedReady.current && fade.current > READY_FADE_THRESHOLD) {
@@ -173,12 +177,10 @@ export function CharacterRig({
       markModelReady(spec.id)
     }
     // The hero additionally tracks how much of it is still on screen as the
-    // visitor scrolls past — scrollState.heroVisible, exactly as HeroWizard did.
-    // Other rigs have no such continuous measure (their section either owns the
-    // screen or it doesn't; SceneDirector's cross-fade already handles the
-    // transition), so they are simply "fully visible" once faded in.
-    const sectionVisible = isHero ? scrollState.heroVisible : 1
-    const visible = fade.current * sectionVisible
+    // visitor scrolls past. `rigVisibility` owns which scroll channel that
+    // reads — the smoothed one, so this fade glides with the scroll instead of
+    // stepping with the wheel like the raw field does.
+    const visible = rigVisibility(spec.id, fade.current, scrollState)
     g.visible = visible > 0.01
     // Once a rig has fully faded out it costs one visibility check per frame,
     // nothing more.
@@ -196,7 +198,7 @@ export function CharacterRig({
     const orbit = isHero
       ? orbitState.dragging
         ? orbitState.offset
-        : (orbitState.offset = damp(orbitState.offset, 0, 1.4, dt))
+        : (orbitState.offset = damp(orbitState.offset, 0, ORBIT_RETURN_LAMBDA, dt))
       : 0
 
     // Only the pinned section's own rig turns with scroll; `pinnedYaw` returns
@@ -209,14 +211,14 @@ export function CharacterRig({
     g.rotation.y = damp(
       g.rotation.y,
       BASE_YAW + pose.yaw + orbit + pinnedTurn + Math.sin(t * 0.18) * 0.06,
-      2.6,
+      TURN_LAMBDA,
       dt,
     )
-    g.rotation.x = damp(g.rotation.x, pose.pitch, 2.6, dt)
+    g.rotation.x = damp(g.rotation.x, pose.pitch, TURN_LAMBDA, dt)
     g.position.y = damp(
       g.position.y,
       basePosition[1] + pose.lift + Math.sin(t * 0.7) * 0.045,
-      2.2,
+      LIFT_LAMBDA,
       dt,
     )
 
@@ -230,7 +232,7 @@ export function CharacterRig({
     const intensityTarget = cardFocused
       ? Math.max(targetIntensity(wizardState.mode), FOCUS_INTENSITY_TARGET)
       : targetIntensity(wizardState.mode)
-    wizardState.intensity = damp(wizardState.intensity, intensityTarget, 3, dt)
+    wizardState.intensity = damp(wizardState.intensity, intensityTarget, INTENSITY_LAMBDA, dt)
     // Both the wand light and the sparkles ride on `pose.opacity` — the exact
     // same value driving the body materials above — so the FX can never lead
     // the body's own fade-in (Finding 2: previously both rendered at full
