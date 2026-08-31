@@ -1,0 +1,31 @@
+.section {
+  padding-block: var(--s-8);
+}
+
+.section__inner {
+  width: min(100% - var(--s-5) * 2, var(--maxw));
+  margin-inline: auto;
+}
+
+.section__head {
+  margin-bottom: var(--s-6);
+}
+
+.section__eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: var(--s-2);
+}
+
+.section__title {
+  font-size: var(--t-h2);
+}
+
+@media (min-width: 900px) {
+  .section {
+    padding-block: var(--s-10);
+  }
+}
