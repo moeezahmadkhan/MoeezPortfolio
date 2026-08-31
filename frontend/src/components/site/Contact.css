@@ -16,6 +16,14 @@
   border-bottom: 1px solid rgb(var(--gold-rgb) / 0.4);
 }
 
+@media (pointer: coarse) {
+  .contact__email {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
 .contact__meta {
   margin-top: var(--s-3);
   font-family: var(--font-mono);
@@ -35,6 +43,17 @@
 .contact__socials a {
   color: var(--muted);
   border-bottom: 1px solid var(--line);
+}
+
+@media (pointer: coarse) {
+  .contact__socials a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding-block: var(--s-2);
+  }
 }
 
 .contact__form {
@@ -57,11 +76,15 @@
 .field input,
 .field textarea {
   font: inherit;
+  /* Fixed at 16px (not var(--t-small)) so a focused field never dips under
+     the size that triggers Mobile Safari's auto-zoom-on-focus. */
+  font-size: 1rem;
   color: var(--text);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r-base);
   padding: var(--s-2) var(--s-3);
+  min-height: 44px;
 }
 
 .field input[aria-invalid='true'],

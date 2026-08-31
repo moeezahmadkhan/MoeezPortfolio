@@ -1,8 +1,10 @@
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--s-2);
   padding: var(--s-2) var(--s-4);
+  min-height: 44px;
   border-radius: var(--r-pill);
   font-size: var(--t-small);
   font-weight: 500;

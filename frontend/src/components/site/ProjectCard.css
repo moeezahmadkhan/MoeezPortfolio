@@ -35,6 +35,7 @@
 .card__outcome {
   margin-top: var(--s-3);
   color: var(--text);
+  max-width: 56ch;
 }
 
 .card__detail {
@@ -42,6 +43,7 @@
   padding-left: var(--s-3);
   color: var(--muted);
   font-size: var(--t-small);
+  max-width: 56ch;
 }
 
 .card__detail li + li {
@@ -66,4 +68,13 @@
 
 .card__links a {
   border-bottom: 1px solid rgb(var(--gold-rgb) / 0.4);
+}
+
+@media (pointer: coarse) {
+  .card__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    min-width: 44px;
+  }
 }

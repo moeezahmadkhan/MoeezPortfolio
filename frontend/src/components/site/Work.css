@@ -45,6 +45,15 @@
   font-size: var(--t-small);
 }
 
+@media (pointer: coarse) {
+  .work__list-item a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
 @media (min-width: 900px) {
   .work__grid {
     grid-template-columns: repeat(2, 1fr);

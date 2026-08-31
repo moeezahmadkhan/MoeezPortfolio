@@ -20,3 +20,14 @@
   list-style: none;
   padding: 0;
 }
+
+@media (pointer: coarse) {
+  .footer__links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding-block: var(--s-2);
+  }
+}

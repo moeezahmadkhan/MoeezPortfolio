@@ -25,6 +25,9 @@
 }
 
 .nav__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font: inherit;
   font-size: var(--t-small);
   color: var(--text);
@@ -32,6 +35,7 @@
   border: 1px solid var(--line);
   border-radius: var(--r-pill);
   padding: var(--s-1) var(--s-3);
+  min-height: 44px;
   cursor: pointer;
 }
 
@@ -52,6 +56,13 @@
     padding: var(--s-4) var(--s-5);
     background: var(--surface);
     border-bottom: 1px solid var(--line);
+  }
+
+  /* Real vertical padding turns each row into a >=44px tap target — this is
+     the primary navigation on mobile. */
+  .nav__links.is-open .nav__link,
+  .nav__links.is-open .nav__cv {
+    padding-block: var(--s-3);
   }
 }
 

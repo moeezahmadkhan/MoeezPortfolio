@@ -1,9 +1,9 @@
 .section {
-  padding-block: var(--s-8);
+  padding-block: var(--s-7);
 }
 
 .section--tight {
-  padding-block: var(--s-7);
+  padding-block: var(--s-6);
 }
 
 .section__inner {
