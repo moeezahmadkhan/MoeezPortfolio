@@ -53,6 +53,7 @@ export default defineConfig(({ mode }) => {
       globals: false,
       setupFiles: ['./src/test/setup.ts'],
       include: ['src/**/*.test.{ts,tsx}', 'api/**/*.test.ts'],
+      env: { VITE_WEB3FORMS_KEY: 'test-key' },
     },
   }
 })

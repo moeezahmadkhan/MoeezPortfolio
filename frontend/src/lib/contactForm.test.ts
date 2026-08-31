@@ -16,13 +16,19 @@ describe('validate', () => {
 
   it('flags a missing message', () => {
     const errors = validate({ name: 'Ron', email: 'r@burrow.uk', message: '' })
-    expect(errors.message).toBeTruthy()
+    expect(errors.message).toBe('Add a message.')
   })
 
   it('flags a malformed email', () => {
-    expect(validate({ name: 'Ron', email: 'not-an-email', message: 'Hi' }).email).toBeTruthy()
-    expect(validate({ name: 'Ron', email: 'a@b', message: 'Hi' }).email).toBeTruthy()
-    expect(validate({ name: 'Ron', email: '', message: 'Hi' }).email).toBeTruthy()
+    expect(validate({ name: 'Ron', email: 'not-an-email', message: 'Hi' }).email).toBe(
+      'Enter a valid email address.',
+    )
+    expect(validate({ name: 'Ron', email: 'a@b', message: 'Hi' }).email).toBe(
+      'Enter a valid email address.',
+    )
+    expect(validate({ name: 'Ron', email: '', message: 'Hi' }).email).toBe(
+      'Enter a valid email address.',
+    )
   })
 
   it('accepts a normal email and trims surrounding whitespace when checking', () => {

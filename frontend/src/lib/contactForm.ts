@@ -16,8 +16,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export function validate(fields: ContactFields): FieldErrors {
   const errors: FieldErrors = {}
   if (!fields.name.trim()) errors.name = 'Please share your name.'
-  if (!EMAIL_RE.test(fields.email.trim())) errors.email = 'A valid return address, please.'
-  if (!fields.message.trim()) errors.message = 'The scroll is empty — add a message.'
+  if (!EMAIL_RE.test(fields.email.trim())) errors.email = 'Enter a valid email address.'
+  if (!fields.message.trim()) errors.message = 'Add a message.'
   return errors
 }
 
