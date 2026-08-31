@@ -1,0 +1,8 @@
+export { profile } from './profile'
+export type { Profile, Social, Stat } from './profile'
+export { projects } from './projects'
+export type { Project } from './projects'
+export { skills } from './skills'
+export type { SkillGroup } from './skills'
+export { experience } from './experience'
+export type { Role } from './experience'
