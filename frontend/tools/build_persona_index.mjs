@@ -58,6 +58,11 @@ function chunkMarkdown(source, markdown) {
   return chunks
 }
 
+/** The href for one of profile.socials, by label. Undefined if he removed it. */
+function socialHref(profile, label) {
+  return profile.socials.find((s) => s.label === label)?.href
+}
+
 /** Turns the typed content into prose the retriever can score. */
 function factsFromContent({ profile, projects, skills, experience }) {
   const blocks = []
@@ -65,6 +70,24 @@ function factsFromContent({ profile, projects, skills, experience }) {
   blocks.push({
     heading: 'Who I am',
     text: `${profile.name}, ${profile.role}. ${profile.thesis} Based in ${profile.location}. Contact: ${profile.email}. ${profile.bio.join(' ')}`,
+  })
+
+  // A chunk of its own, not a line inside "Who I am". "How do I get in touch?"
+  // is one of the most likely questions a recruiter asks, and it shares almost
+  // no vocabulary with a bio — so the links need a block whose own wording is
+  // the wording of that question. Every URL here comes from profile.socials;
+  // nothing is typed in by hand.
+  blocks.push({
+    heading: 'How to reach me and where to find me online',
+    text: [
+      `The best way to contact me is email: ${profile.email}.`,
+      `You can also reach me, connect, or message me on LinkedIn: ${socialHref(profile, 'LinkedIn')}.`,
+      `My code is on GitHub: ${socialHref(profile, 'GitHub')}.`,
+      `My site is ${socialHref(profile, 'Website')}.`,
+      'If you want to hire me, talk about a role, or just get in touch, LinkedIn and email both work.',
+    ]
+      .filter((line) => !line.includes('undefined'))
+      .join(' '),
   })
 
   for (const p of projects) {
