@@ -1,0 +1,69 @@
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-soft);
+  overflow: hidden;
+  transition: border-color 0.25s var(--ease);
+}
+
+.card:hover {
+  border-color: rgb(var(--gold-rgb) / 0.36);
+}
+
+.card__shot {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  width: 100%;
+  border-bottom: 1px solid var(--line);
+}
+
+.card__body {
+  padding: var(--s-5);
+}
+
+.card__title {
+  font-size: var(--t-h3);
+}
+
+.card__metric {
+  font-family: var(--font-mono);
+  font-size: var(--t-small);
+  color: var(--gold);
+  margin-top: var(--s-1);
+}
+
+.card__outcome {
+  margin-top: var(--s-3);
+  color: var(--text);
+}
+
+.card__detail {
+  margin-top: var(--s-3);
+  padding-left: var(--s-3);
+  color: var(--muted);
+  font-size: var(--t-small);
+}
+
+.card__detail li + li {
+  margin-top: var(--s-2);
+}
+
+.card__stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: var(--s-4);
+  padding: 0;
+}
+
+.card__links {
+  display: flex;
+  gap: var(--s-4);
+  margin-top: var(--s-4);
+  font-size: var(--t-small);
+  color: var(--gold);
+}
+
+.card__links a {
+  border-bottom: 1px solid rgb(var(--gold-rgb) / 0.4);
+}
