@@ -19,6 +19,9 @@
 }
 
 .nav__brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-family: var(--font-mono);
   font-size: var(--t-small);
   letter-spacing: 0.06em;

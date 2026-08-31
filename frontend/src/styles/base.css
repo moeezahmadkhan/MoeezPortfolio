@@ -54,7 +54,10 @@ img {
   left: var(--s-3);
   top: calc(-1 * var(--s-9));
   z-index: 100;
-  padding: var(--s-2) var(--s-3);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--s-3);
   background: var(--surface-2);
   border-radius: var(--r-base);
   transition: top 0.2s var(--ease);
