@@ -15,48 +15,61 @@ export const projects: Project[] = [
     slug: 'horus',
     name: 'Project Horus',
     outcome:
-      'A face identification pipeline that detects, embeds, and matches people in live video against a searchable index.',
+      'An automated pipeline that identifies students from live video, matching faces against an enrolled index in real time.',
     detail: [
-      'YOLO and SCRFD for detection, ArcFace embeddings for identity, FAISS for nearest-neighbour search across the enrolled set.',
-      'Hardened against the conditions that actually break these systems in the field: uneven lighting and high-throughput streams.',
+      'Detects faces in real time with YOLO and SCRFD, then generates ArcFace embeddings for each detection.',
+      'Matches those embeddings against a FAISS vector index to assign identity.',
+      'Tuned for reliability across varied edge-case environments and high-throughput processing.',
     ],
-    stack: ['Python', 'YOLO', 'SCRFD', 'ArcFace', 'FAISS', 'OpenCV'],
+    stack: ['YOLO', 'SCRFD', 'ArcFace', 'FAISS'],
     featured: true,
   },
   {
     slug: 'silmaril',
     name: 'Silmaril AI',
     outcome:
-      'Pitch-deck analysis that pulls financial metrics and founder signals out of investor decks and matches them against investor criteria.',
+      'A strategic platform for venture capital that extracts financial metrics from pitch decks and turns them into structured insight.',
     detail: [
-      'Ingests and parses decks, runs LLM extraction over the contents, and embeds the result so founders and investors can be matched.',
-      'Shipped as a FastAPI service behind a React front end with a Kanban view of the deal pipeline.',
+      'Parses pitch decks with an AI-driven engine that extracts financial metrics automatically.',
+      'Delivers automated growth recommendations alongside Company Scores and Founder insights.',
     ],
-    stack: ['FastAPI', 'React', 'LLM extraction', 'Embeddings', 'PostgreSQL'],
+    stack: ['AI-driven parsing engine', 'Financial metric extraction'],
     featured: true,
   },
   {
-    slug: 'whoop-chat',
+    slug: 'wearable-ai-chat',
     name: 'Wearable AI chat',
     outcome:
-      'Low-latency conversational AI over live Whoop biometric streams, turning raw signals into health and performance insight.',
+      'AI chat software for high-end wearables (Whoop), built for ultra-low-latency, lightweight inference at the edge.',
     detail: [
-      'Parses a live biometric stream into a real-time store the model can query.',
-      'Prompt and context strategy tuned to the hardware budget — the constraint is latency and context size, not model quality.',
+      'Focused on ultra-low-latency responses so the chat experience keeps pace with live wearable data.',
+      'Runs lightweight edge inference suited to wearable hardware constraints.',
     ],
-    stack: ['Python', 'LLM serving', 'Streaming data', 'Prompt engineering'],
+    stack: ['Edge inference', 'Low-latency AI chat'],
     featured: true,
+  },
+  {
+    slug: 'cv-intelligence-platform',
+    name: 'CV intelligence platform',
+    outcome:
+      'A full-stack computer vision platform that tracks humans and animals in real time and turns the feed into dashboard analytics.',
+    detail: [
+      'Delivers context-aware AI insights drawn from the live video feed.',
+      'Surfaces results through real-time dashboard analytics.',
+    ],
+    stack: ['Computer vision', 'Real-time dashboards'],
+    featured: false,
   },
   {
     slug: 'query-sphere',
     name: 'Query Sphere',
     outcome:
-      'A cross-platform community app with real-time messaging, built on Flutter and Firebase.',
+      'A Flutter-based AI community app with real-time messaging and smart search, backed by Firebase.',
     detail: [
-      'Realtime sync across devices with Firebase as the backing store.',
-      'Full client build for both mobile platforms from one codebase.',
+      'Real-time messaging layer synced across devices.',
+      'Smart search querying across the community content.',
     ],
-    stack: ['Flutter', 'Firebase', 'Realtime'],
+    stack: ['Flutter', 'Firebase'],
     links: { repo: 'https://github.com/moeezahmadkhan/querysphere' },
     featured: false,
   },
@@ -64,12 +77,25 @@ export const projects: Project[] = [
     slug: 'stay-booking',
     name: 'Stay-booking platform',
     outcome:
-      'A full MERN booking application with property management and JWT-secured authentication.',
+      'A full MERN-stack booking application with property listing, dashboard management, and secure session authentication.',
     detail: [
-      'Property listing, search, and booking flows backed by MongoDB.',
-      'Token-based auth with protected routes across an Express API.',
+      'Dynamic property booking pipelines from listing through checkout.',
+      'Dashboard management layers for hosts, secured with JWT session authentication.',
     ],
-    stack: ['MongoDB', 'Express', 'React', 'Node', 'JWT'],
+    stack: ['MongoDB', 'Express', 'React', 'Node.js', 'JWT'],
+    featured: false,
+  },
+  {
+    slug: '3d-portfolio',
+    name: 'Interactive 3D Portfolio',
+    outcome:
+      'A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects.',
+    detail: [
+      'Built with Three.js and custom Blender models for a premium interactive feel.',
+      'Includes an integrated AI chatbot that handles contextual visitor questions within the experience.',
+    ],
+    stack: ['Three.js', 'Blender'],
+    links: { demo: 'https://moeezahmadkhan.com' },
     featured: false,
   },
 ]

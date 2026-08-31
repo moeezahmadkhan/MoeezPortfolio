@@ -2,16 +2,54 @@ export type SkillGroup = { title: string; items: string[] }
 
 export const skills: SkillGroup[] = [
   {
-    title: 'MLOps & orchestration',
-    items: ['Docker', 'Kafka', 'QLoRA fine-tuning', 'n8n automation', 'CI/CD'],
+    title: 'AI/ML & Orchestration',
+    items: [
+      'Agentic AI',
+      'RAG Pipelines',
+      'Model Context Protocol (MCP)',
+      'LLM Fine-Tuning (QLoRA)',
+      'Workflow Automation (n8n)',
+      'LLM Serving & Quantization',
+      'FAISS Vector DB',
+    ],
   },
   {
-    title: 'Model deployment & serving',
-    items: ['FastAPI', 'Nginx', 'LLM serving & quantization', 'Edge deployment', 'REST APIs'],
+    title: 'Backend Development',
+    items: [
+      'Node.js',
+      'Express',
+      'NestJS',
+      'TypeScript',
+      'Python',
+      'FastAPI',
+      'C++',
+      'SQL',
+      'RESTful APIs',
+      'WebSocket',
+    ],
   },
   {
-    title: 'Cloud & infrastructure',
-    items: ['AWS (EC2 · Bedrock)', 'GCP', 'Linux', 'FAISS', 'PostgreSQL'],
+    title: 'Cloud & Deployment',
+    items: [
+      'AWS (EC2, Bedrock)',
+      'GCP',
+      'Docker',
+      'Kafka',
+      'Nginx',
+      'CI/CD Pipelines',
+      'Linux/Ubuntu System Administration',
+    ],
   },
-  { title: 'Languages', items: ['Python', 'C++', 'SQL', 'Bash', 'TypeScript'] },
+  {
+    title: 'Frontend & Graphics',
+    items: [
+      'React',
+      'Next.js',
+      'Flutter',
+      'Three.js',
+      'Blender',
+      'UI/UX Micro-Interactions',
+      'State Management',
+    ],
+  },
 ]

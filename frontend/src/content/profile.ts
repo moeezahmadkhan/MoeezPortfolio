@@ -16,24 +16,25 @@ export type Profile = {
 
 export const profile: Profile = {
   name: 'Moeez Ahmad Khan',
-  role: 'AI/ML Engineer',
+  role: 'AI/ML Developer',
   thesis:
-    'I build computer-vision and LLM systems, and the infrastructure that keeps them running in production.',
+    'I design low-latency backend APIs, autonomous multi-agent systems, and real-time computer vision pipelines, and take them from model orchestration through containerized cloud deployment.',
   bio: [
-    'I work across the whole span of an AI product: the model, the serving layer, and the interface people actually touch. Most of my work lives in computer vision and LLM systems — face recognition pipelines, document understanding, and low-latency chat over live biometric data.',
-    'I studied at Information Technology University, Lahore (BSCS), and I now assist on its MS Agentic AI course while shipping production systems for two teams.',
+    "I'm currently an AI Engineer at Ecommerce Steem, where I'm building AI chat software for Whoop wearables, a computer vision platform that tracks humans and animals in real time, and automation pipelines that connect LLMs to external tools using the Model Context Protocol.",
+    "Before that, I worked as an AI & Computer Vision Developer at QUIDSol, building face-identification and pitch-deck-analysis pipelines, and as a Teacher's Assistant at Information Technology University, mentoring graduate students in agentic AI. I hold a BSCS from ITU (2021–2025), specializing in agentic AI, computer vision, and reinforcement learning.",
   ],
-  location: 'Lahore, Pakistan · open to remote',
+  location: 'Lahore, Pakistan',
   email: 'kmoeez2018@gmail.com',
   cvUrl: '/Moeez_Ahmad_Khan_CV.pdf',
   portrait: '/moeez.jpeg',
   stats: [
-    { value: 'CV + LLM', label: 'Core focus' },
-    { value: '3', label: 'Teams shipped for' },
+    { value: 'AI Engineer', label: 'Currently at Ecommerce Steem' },
+    { value: 'BSCS, ITU', label: '2021 – 2025' },
     { value: 'Lahore, PK', label: 'Based in' },
   ],
   socials: [
     { label: 'GitHub', href: 'https://github.com/moeezahmadkhan' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/moeez-ahmad-khan-68a403364/' },
+    { label: 'Website', href: 'https://moeezahmadkhan.com' },
   ],
 }
