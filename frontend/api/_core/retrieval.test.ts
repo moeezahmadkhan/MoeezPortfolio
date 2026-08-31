@@ -203,6 +203,32 @@ describe('retrieve answers the questions qa.md was written to cover', () => {
     expect(top('What did you do at ITU?')).toBe('Who I am')
   })
 
+  it('hands out the links, however the question is phrased', () => {
+    // Steering visitors toward LinkedIn is an explicit requirement, so these
+    // must not be left to chance: contact questions share almost no vocabulary
+    // with a bio, and before the corpus gained a block of its own for the links
+    // every one of these refused while his email sat in the profile chunk.
+    const contactBlock = 'How to reach me and where to find me online'
+    for (const question of [
+      'How do I get in touch?',
+      'How can I contact you?',
+      'How do I reach you?',
+      'Are you on LinkedIn?',
+      'What is your LinkedIn?',
+      'Can I connect with you?',
+      'How do I hire you?',
+      'Where can I find your code?',
+    ]) {
+      expect(top(question), question).toBe(contactBlock)
+    }
+  })
+
+  it('carries the actual LinkedIn URL, not a description of one', () => {
+    const block = retrieve('Are you on LinkedIn?', real, 1)[0]
+    expect(block.text).toContain('linkedin.com/in/')
+    expect(block.text).toContain('github.com/')
+  })
+
   // The remaining four ask about him rather than about his work, and the facts
   // corpus has no word in common with them at all — not one that is merely absent,
   // but nothing to retrieve. Refusing is correct until he writes the answer down,
@@ -212,7 +238,6 @@ describe('retrieve answers the questions qa.md was written to cover', () => {
     'What are you weakest at?',
     'Do you prefer research or shipping?',
     'What do you use day to day?',
-    'How do I get in touch?',
   ]
 
   for (const question of notYetWritten) {
@@ -224,17 +249,19 @@ describe('retrieve answers the questions qa.md was written to cover', () => {
   it('answers them as soon as he writes the answer down', () => {
     // qa.md chunks carry the question as their heading, so filling one in is what
     // closes the gap. This is the corpus healing itself, not a scoring change.
+    const question = 'What are you weakest at?'
     const filled: Chunk[] = [
       ...real,
       {
-        id: 'qa#touch',
+        id: 'qa#weakest',
         source: 'content/persona/qa.md',
-        heading: 'How do I get in touch?',
-        text: 'Email is best. I read everything that arrives and I answer within a day or two.',
+        heading: question,
+        text: 'Placeholder standing in for an answer only Moeez can write; the point of this test is the retrieval path, not the words.',
         tokens: 22,
       },
     ]
-    expect(retrieve('How do I get in touch?', filled, 1)[0].heading).toBe('How do I get in touch?')
+    expect(retrieve(question, real)).toEqual([])
+    expect(retrieve(question, filled, 1)[0].heading).toBe(question)
   })
 })
 
