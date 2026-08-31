@@ -21,6 +21,19 @@
   opacity: 0.9;
 }
 
+#top {
+  cursor: grab;
+}
+
+#top.is-dragging {
+  cursor: grabbing;
+}
+
+#top a,
+#top button {
+  cursor: pointer;
+}
+
 @media (max-width: 899px) {
   .stage--static {
     place-items: start center;

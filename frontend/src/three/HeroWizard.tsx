@@ -9,6 +9,7 @@ import { applyWizardingMaterials } from './characterMaterial'
 import { useKtx2Gltf } from './ktx2'
 import { heroPose } from './heroPose'
 import { targetIntensity, wizardState } from './wizardState'
+import { orbitState, useDragOrbit } from './useDragOrbit'
 
 const MODEL = '/models/wizard_improved.glb'
 // Model-space position of the wand tip. `gltf-transform inspect` puts this GLB's
@@ -31,6 +32,7 @@ const MOBILE_SCALE = 0.3
 const BASE_YAW = Math.PI
 
 export function HeroWizard() {
+  useDragOrbit()
   const { scene } = useKtx2Gltf(MODEL)
   const group = useRef<Group>(null)
   const glow = useRef<PointLight>(null)
@@ -75,7 +77,16 @@ export function HeroWizard() {
     const pose = heroPose(scrollState.pointerX, scrollState.pointerY, visible)
     const t = state.clock.elapsedTime
 
-    g.rotation.y = damp(g.rotation.y, BASE_YAW + pose.yaw + Math.sin(t * 0.18) * 0.06, 2.6, dt)
+    const orbit = orbitState.dragging
+      ? orbitState.offset
+      : (orbitState.offset = damp(orbitState.offset, 0, 1.4, dt))
+
+    g.rotation.y = damp(
+      g.rotation.y,
+      BASE_YAW + pose.yaw + orbit + Math.sin(t * 0.18) * 0.06,
+      2.6,
+      dt,
+    )
     g.rotation.x = damp(g.rotation.x, pose.pitch, 2.6, dt)
     g.position.y = damp(
       g.position.y,
