@@ -29,6 +29,13 @@ describe('Contact', () => {
     expect(document.getElementById('name-error')).toHaveTextContent(/please share your name/i)
   })
 
+  it('moves focus to the first invalid field on a failed submit', async () => {
+    render(<Contact />)
+    await userEvent.click(screen.getByRole('button', { name: /send/i }))
+    const nameInput = await screen.findByLabelText(/name/i)
+    expect(nameInput).toHaveFocus()
+  })
+
   it('posts a valid message and confirms it', async () => {
     vi.stubGlobal(
       'fetch',
