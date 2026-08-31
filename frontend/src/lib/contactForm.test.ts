@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest'
-import { validate, buildSubmission } from './owlPost'
+import { validate, buildSubmission } from './contactForm'
 
 describe('validate', () => {
   it('accepts a well-formed submission with no errors', () => {
-    const errors = validate({ name: 'Hermione', email: 'h@hogwarts.edu', message: 'Hello there' })
+    const errors = validate({ name: 'Hermione', email: 'h@example.com', message: 'Hello there' })
     expect(errors).toEqual({})
   })
 
   it('flags an empty name', () => {
-    const errors = validate({ name: '   ', email: 'h@hogwarts.edu', message: 'Hi' })
+    const errors = validate({ name: '   ', email: 'h@example.com', message: 'Hi' })
     expect(errors.name).toBeTruthy()
     expect(errors.email).toBeUndefined()
     expect(errors.message).toBeUndefined()
@@ -31,13 +31,13 @@ describe('validate', () => {
 })
 
 describe('buildSubmission', () => {
-  const fields = { name: 'Hermione', email: 'h@hogwarts.edu', message: 'Need an agent built.' }
+  const fields = { name: 'Hermione', email: 'h@example.com', message: 'Need an agent built.' }
 
   it('includes the access key and trimmed field values', () => {
     const payload = buildSubmission(fields, 'KEY-123')
     expect(payload.access_key).toBe('KEY-123')
     expect(payload.name).toBe('Hermione')
-    expect(payload.email).toBe('h@hogwarts.edu')
+    expect(payload.email).toBe('h@example.com')
     expect(payload.message).toBe('Need an agent built.')
   })
 
