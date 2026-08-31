@@ -20,7 +20,11 @@
   color: var(--ink);
 }
 
-.btn--solid:hover {
+/* Focus reads exactly as loudly as hover. A magnetic CTA leans toward a cursor
+   and cannot lean toward a keyboard, so if focus were only the global outline it
+   would look inert beside a hovered sibling. */
+.btn--solid:hover,
+.btn--solid:focus-visible {
   background: var(--gold-bright);
 }
 
@@ -29,7 +33,8 @@
   color: var(--text);
 }
 
-.btn--ghost:hover {
+.btn--ghost:hover,
+.btn--ghost:focus-visible {
   border-color: rgb(var(--gold-rgb) / 0.5);
   color: var(--gold);
 }

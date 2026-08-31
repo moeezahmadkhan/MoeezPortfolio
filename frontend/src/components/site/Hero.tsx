@@ -1,5 +1,6 @@
 import { profile } from '../../content'
 import { Button } from '../ui/Button'
+import { Magnetic } from '../ui/Magnetic'
 import './Hero.css'
 
 export function Hero() {
@@ -11,14 +12,20 @@ export function Hero() {
         <h1 className="hero__name">{profile.name}</h1>
         <p className="hero__thesis">{profile.thesis}</p>
         <div className="hero__actions">
-          <Button href="#work">View work</Button>
-          <Button href={profile.cvUrl} variant="ghost" target="_blank" rel="noreferrer">
-            Résumé
-          </Button>
-          {github && (
-            <Button href={github.href} variant="ghost" target="_blank" rel="noreferrer">
-              GitHub
+          <Magnetic>
+            <Button href="#work">View work</Button>
+          </Magnetic>
+          <Magnetic>
+            <Button href={profile.cvUrl} variant="ghost" target="_blank" rel="noreferrer">
+              Résumé
             </Button>
+          </Magnetic>
+          {github && (
+            <Magnetic>
+              <Button href={github.href} variant="ghost" target="_blank" rel="noreferrer">
+                GitHub
+              </Button>
+            </Magnetic>
           )}
         </div>
         <p className="hero__meta">{profile.location}</p>
