@@ -1,0 +1,22 @@
+.footer {
+  border-top: 1px solid var(--line);
+  padding-block: var(--s-5);
+  font-size: var(--t-small);
+  color: var(--muted);
+}
+
+.footer__inner {
+  width: min(100% - var(--s-5) * 2, var(--maxw));
+  margin-inline: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  justify-content: space-between;
+}
+
+.footer__links {
+  display: flex;
+  gap: var(--s-4);
+  list-style: none;
+  padding: 0;
+}
