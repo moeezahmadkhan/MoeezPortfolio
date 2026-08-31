@@ -32,8 +32,8 @@ Three requirements stated after this plan was written. They bind every task belo
 - Test: `frontend/src/components/chat/DockPointer.test.tsx`
 
 **Interfaces:**
-- Consumes: `prefersReducedMotion` from `src/lib/media.ts`; the dock's open state.
-- Produces: `<DockPointer visible: boolean />` — a decorative arrow (or short arrow trail) indicating the launcher.
+- Consumes: `prefersReducedMotion` from `src/lib/media.ts`; the dock's open state; `scrollState` (read per frame via rAF, never React state).
+- Produces: `<DockPointer visible: boolean />` — a decorative trail of a few arrows that travel toward the launcher as the visitor scrolls.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -46,13 +46,14 @@ Cover: it renders nothing when the dock is open; it is `aria-hidden` and contrib
 Design constraints, in order of importance:
 - **Decorative only.** `aria-hidden="true"`, `pointer-events: none`. It must never sit between the visitor and the launcher, and must never be the thing they tap.
 - **It stops.** Show it on arrival, and retire it once the visitor opens the dock — or after a bounded number of loops. A pointer that gestures forever reads as a nag, and this is a portfolio, not a growth-hacked funnel.
-- **Quiet by default.** One arrow with a short, slow motion beats a cluster. Use the existing tokens; the arrow is the one place `--teal` may appear outside the dock itself, since it belongs to the chat surface.
+- **Scroll-driven (amended 2026-09-01, Moeez).** The arrows are not on a timer loop: they *move with the scroll*. A few arrows (3 is the working number) sit in a short trail and advance toward the dock as a function of scroll progress, each lagging the one before it, so scrolling down visibly pushes them along the path to the launcher. Scrolling up walks them back. Read `scrollState` inside one rAF loop and write a CSS custom property (or transform) — never React state per scroll event, exactly as the 3D layer does. The travel must be **damped** (`damp` from `src/lib/frame.ts`), not bound to raw scroll, or the wheel's discrete steps show as stutter — this is the same smoothing rule the whole motion layer follows (see the motion-polish plan).
+- **Quiet by default.** A short trail with slow, damped travel beats a swarm. Use the existing tokens; the arrow is the one place `--teal` may appear outside the dock itself, since it belongs to the chat surface.
 - **Reduced motion.** Under `prefers-reduced-motion` it still renders — a visitor who dislikes motion still benefits from knowing the dock exists — but as a static mark with no animation.
 - **Mobile.** At 390px the dock sits bottom-right over content. The arrow must not cover copy or any control, and must not add to the vertical scroll.
 
 - [ ] **Step 4: Verify**
 
-Screenshot at 390 and 1440 with the dock closed and again with it open. Confirm the arrow reads as an invitation rather than clutter, vanishes when the dock opens, and never overlaps a control. Then confirm with the canvas gated off that nothing about it depends on WebGL.
+Stills cannot evidence scroll-linked motion (see the memory `screenshot-verification-blind-spot`). Verify the travel by **sampling**: drive a real browser, step `scrollY` through the page, and record each arrow's computed transform beside `scrollState.progress` at each step — the trail must advance monotonically toward the dock, with each arrow lagging its predecessor, and never overshoot past the launcher. Then screenshot at 390 and 1440 with the dock closed and again with it open. Confirm the arrow reads as an invitation rather than clutter, vanishes when the dock opens, and never overlaps a control. Then confirm with the canvas gated off that nothing about it depends on WebGL.
 
 - [ ] **Step 5: Commit**
 
