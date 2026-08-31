@@ -12,6 +12,7 @@ import { Preload } from '@react-three/drei/core/Preload'
 import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
 import { useMemo, useState } from 'react'
 import { NAV_ITEMS } from '../components/layout/Nav'
+import { usePageVisible } from '../lib/usePageVisible'
 import { useSectionObserver } from '../lib/useSectionObserver'
 import { Backdrop } from './Backdrop'
 import { HeroLights } from './lights'
@@ -28,10 +29,17 @@ export function Stage() {
   // Capped to [1, 1.5] (not the usual [1, 2]) — measured performance budget: see
   // task-6-7-report.md.
   const [dpr, setDpr] = useState(1.5)
+  // A background tab still gets throttled animation frames rather than none, so
+  // without this the GPU keeps drawing a scene nobody is looking at.
+  const visible = usePageVisible()
 
   return (
     <div className="stage" aria-hidden="true">
       <Canvas
+        // 'never' stops the loop outright while the tab is in the background.
+        // R3F renders one frame on the way back, so returning to the tab shows
+        // the scene where it left off rather than a blank canvas.
+        frameloop={visible ? 'always' : 'never'}
         dpr={dpr}
         gl={{ antialias: false, powerPreference: 'high-performance', alpha: false }}
         camera={{ position: [0, 0.4, 4.2], fov: 38 }}
