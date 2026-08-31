@@ -1,11 +1,19 @@
 import type { Project } from '../../content'
+import { clearProjectFocus, setProjectFocus } from '../../lib/focusState'
 import { Tag } from '../ui/Tag'
 import './ProjectCard.css'
 
 export function ProjectCard({ project }: { project: Project }) {
   const headingId = `project-${project.slug}`
   return (
-    <article className="card" aria-labelledby={headingId}>
+    <article
+      className="card"
+      aria-labelledby={headingId}
+      onPointerEnter={() => setProjectFocus(project.slug, 'pointer')}
+      onPointerLeave={() => clearProjectFocus(project.slug)}
+      onFocus={() => setProjectFocus(project.slug, 'keyboard')}
+      onBlur={() => clearProjectFocus(project.slug)}
+    >
       {project.shot && (
         <img className="card__shot" src={project.shot} alt="" loading="lazy" aria-hidden="true" />
       )}

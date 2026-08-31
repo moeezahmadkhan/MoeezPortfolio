@@ -3,11 +3,28 @@
   border: 1px solid var(--line);
   border-radius: var(--r-soft);
   overflow: hidden;
-  transition: border-color 0.25s var(--ease);
+  transition:
+    border-color 0.25s var(--ease),
+    transform 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
 }
 
-.card:hover {
+/* The same affordance for both a pointer hover and a keyboard focus landing on
+   a link inside — this is what a reduced-motion or no-WebGL visitor gets in
+   place of the model turning to look, so it has to read as deliberate on its
+   own, not like a leftover next to the 3D reaction. */
+.card:hover,
+.card:focus-within {
   border-color: rgb(var(--gold-rgb) / 0.36);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -18px rgb(var(--gold-rgb) / 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover,
+  .card:focus-within {
+    transform: none;
+  }
 }
 
 .card__shot {

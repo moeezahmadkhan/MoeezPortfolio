@@ -4,7 +4,9 @@ import { useFrame } from '@react-three/fiber'
 // the drei imports in Stage.tsx for why.
 import { Sparkles } from '@react-three/drei/core/Sparkles'
 import type { Group, Mesh, MeshStandardMaterial, PointLight } from 'three'
+import { projects } from '../content'
 import { damp } from '../lib/frame'
+import { focusState } from '../lib/focusState'
 import { scrollState } from '../lib/scrollState'
 import { isCoarsePointer } from '../lib/media'
 import { useMatchMedia } from '../lib/useMatchMedia'
@@ -37,6 +39,32 @@ const BASE_YAW = Math.PI
 // to have visibly settled well within SceneDirector's 900ms outgoing-unmount
 // window.
 const FADE_LAMBDA = 4
+
+// Which way the Work rig turns for each featured project, derived from the
+// featured grid's own layout (Work.css: the first card spans the full row,
+// every card after it alternates between the grid's two columns) rather than
+// a table keyed on specific slugs — so reordering or renaming a project in
+// content/projects.ts can't silently point the model at the wrong side.
+// Built once, at module scope, so useFrame only ever does a Map lookup.
+const FOCUS_YAW_MAGNITUDE = 0.24
+const FOCUS_YAW_BIAS: ReadonlyMap<string, number> = (() => {
+  const bias = new Map<string, number>()
+  const featured = projects.filter((p) => p.featured)
+  featured.forEach((project, i) => {
+    if (i === 0) {
+      bias.set(project.slug, 0) // the full-width lead card — no side to turn toward
+      return
+    }
+    const onLeft = (i - 1) % 2 === 0
+    bias.set(project.slug, onLeft ? -FOCUS_YAW_MAGNITUDE : FOCUS_YAW_MAGNITUDE)
+  })
+  return bias
+})()
+
+// How bright the wand gets while a project card holds focus — brighter than
+// idle or attentive, shy of full "casting" so this reads as "attentive to the
+// visitor" without fighting the chat UI's own mood signal.
+const FOCUS_INTENSITY_TARGET = 0.75
 
 // How far into its fade-in a rig counts as "visibly settled" for
 // `markModelReady` — high enough that a screenshot taken right after isn't
@@ -136,10 +164,12 @@ export function CharacterRig({ spec, fadeIn }: { spec: RigSpec; fadeIn: boolean 
     // nothing more.
     if (!g.visible) return
 
-    // Wired up to focusState.projectSlug by a later task, which turns the model
-    // toward a hovered/focused project card. Zero here keeps this rig's pose
-    // identical to pointer-only parallax until that lands.
-    const focusBias = 0
+    // Only the Work rig turns toward a focused project card — a visitor
+    // tabbing through Work's links while a different section owns the screen
+    // still updates focusState, but that section's model shouldn't react to it.
+    const isWorkRig = spec.id === 'work'
+    const focusedSlug = isWorkRig ? focusState.projectSlug : null
+    const focusBias = focusedSlug !== null ? (FOCUS_YAW_BIAS.get(focusedSlug) ?? 0) : 0
     const pose = rigPose(scrollState.pointerX, scrollState.pointerY, focusBias, visible)
     const t = state.clock.elapsedTime
 
@@ -167,12 +197,13 @@ export function CharacterRig({ spec, fadeIn }: { spec: RigSpec; fadeIn: boolean 
       materials[i].opacity = pose.opacity
     }
 
-    wizardState.intensity = damp(
-      wizardState.intensity,
-      targetIntensity(wizardState.mode),
-      3,
-      dt,
-    )
+    // A focused project card brightens the wand on top of whatever the chat
+    // UI's mood already asks for — never dimmer than that baseline.
+    const cardFocused = focusedSlug !== null && FOCUS_YAW_BIAS.has(focusedSlug)
+    const intensityTarget = cardFocused
+      ? Math.max(targetIntensity(wizardState.mode), FOCUS_INTENSITY_TARGET)
+      : targetIntensity(wizardState.mode)
+    wizardState.intensity = damp(wizardState.intensity, intensityTarget, 3, dt)
     if (glowRef.current) {
       // A slow flicker on top of the mood level, so the wand never looks like a lamp.
       glowRef.current.intensity =
