@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 // From the concrete file, not the `@react-three/drei` barrel — see the comment on
 // the drei imports in Stage.tsx for why.
@@ -7,7 +7,7 @@ import type { Group, Mesh, MeshStandardMaterial, PointLight } from 'three'
 import { damp } from '../lib/frame'
 import { scrollState } from '../lib/scrollState'
 import { isCoarsePointer } from '../lib/media'
-import { applyWizardingMaterials } from './characterMaterial'
+import { applyWizardingMaterials, cloneMaterials, disposeMaterials } from './characterMaterial'
 import { useKtx2Gltf } from './ktx2'
 import { heroPose } from './heroPose'
 import { targetIntensity, wizardState } from './wizardState'
@@ -49,11 +49,19 @@ export function HeroWizard() {
   const basePosition = mobile ? MOBILE_POSITION : DESKTOP_POSITION
   const baseScale = mobile ? MOBILE_SCALE : DESKTOP_SCALE
 
-  // Clone so HMR never mutates the cached GLTF's shared materials. Collecting the
-  // transparent materials once here — instead of re-traversing the scene graph every
-  // frame just to touch `.opacity` — keeps the frame body allocation-free.
+  // `scene.clone(true)` deep-clones the node hierarchy, but three's Mesh#copy()
+  // assigns the *same* material reference(s) as the source — it does not clone
+  // them (see `cloneMaterials`'s doc comment). `scene` here is the cached GLTF
+  // scene from `useKtx2Gltf`'s URL-keyed cache, so without `cloneMaterials` the
+  // per-frame opacity mutation below would mutate the cache's shared materials,
+  // corrupting every other mount of this model. `cloneMaterials` runs first so
+  // `applyWizardingMaterials` — including its `Glow_*` emissive pass-through —
+  // operates on this instance's own materials. Collecting the transparent
+  // materials once here — instead of re-traversing the scene graph every frame
+  // just to touch `.opacity` — keeps the frame body allocation-free.
   const { model, materials } = useMemo(() => {
     const copy = scene.clone(true)
+    cloneMaterials(copy)
     applyWizardingMaterials(copy)
     const mats: MeshStandardMaterial[] = []
     copy.traverse((child) => {
@@ -66,6 +74,14 @@ export function HeroWizard() {
     })
     return { model: copy, materials: mats }
   }, [scene])
+
+  // Now that this component owns its materials outright (cloned above, not
+  // shared with the cache), it must dispose them on unmount or every mount
+  // leaks GPU memory. Geometry is NOT disposed — it's still shared with the
+  // cache and other consumers still read it.
+  useEffect(() => {
+    return () => disposeMaterials(model)
+  }, [model])
 
   useFrame((state, dt) => {
     const g = group.current
@@ -115,6 +131,11 @@ export function HeroWizard() {
   })
 
   return (
+    // `dispose={null}` stays: R3F's default auto-dispose walks this whole subtree
+    // on unmount and disposes BOTH geometry and material on everything under it,
+    // which would dispose the geometries still shared with the GLTF cache. The
+    // `useEffect` above disposes the (now-owned) materials by hand instead, and
+    // leaves geometry alone.
     <group ref={group} position={basePosition} scale={baseScale} dispose={null}>
       <primitive object={model} />
       {/* distance/scale below are proportioned to the GLB's true ~1-unit-tall bounding
