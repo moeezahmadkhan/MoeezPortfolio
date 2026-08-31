@@ -18,7 +18,7 @@ export const projects: Project[] = [
       'A face identification pipeline that detects, embeds, and matches people in live video against a searchable index.',
     detail: [
       'YOLO and SCRFD for detection, ArcFace embeddings for identity, FAISS for nearest-neighbour search across the enrolled set.',
-      'Hardened against the conditions that actually break these systems in the field: uneven lighting, motion blur, and high-throughput streams.',
+      'Hardened against the conditions that actually break these systems in the field: uneven lighting and high-throughput streams.',
     ],
     stack: ['Python', 'YOLO', 'SCRFD', 'ArcFace', 'FAISS', 'OpenCV'],
     featured: true,
@@ -41,7 +41,7 @@ export const projects: Project[] = [
     outcome:
       'Low-latency conversational AI over live Whoop biometric streams, turning raw signals into health and performance insight.',
     detail: [
-      'Parses a live biometric stream into a real-time store the model can query without a round trip to cold storage.',
+      'Parses a live biometric stream into a real-time store the model can query.',
       'Prompt and context strategy tuned to the hardware budget — the constraint is latency and context size, not model quality.',
     ],
     stack: ['Python', 'LLM serving', 'Streaming data', 'Prompt engineering'],
