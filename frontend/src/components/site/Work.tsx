@@ -9,7 +9,7 @@ export function Work() {
   const earlier = projects.filter((p) => !p.featured)
 
   return (
-    <Section id="work" title="Work" eyebrow="02">
+    <Section id="work" title="Work">
       <div className="work__grid">
         {featured.map((project, i) => (
           <Reveal key={project.slug} delay={i * 60}>

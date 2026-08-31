@@ -2,6 +2,10 @@
   padding-block: var(--s-8);
 }
 
+.section--tight {
+  padding-block: var(--s-7);
+}
+
 .section__inner {
   width: min(100% - var(--s-5) * 2, var(--maxw));
   margin-inline: auto;
@@ -27,5 +31,9 @@
 @media (min-width: 900px) {
   .section {
     padding-block: var(--s-10);
+  }
+
+  .section--tight {
+    padding-block: var(--s-8);
   }
 }

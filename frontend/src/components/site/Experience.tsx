@@ -5,7 +5,7 @@ import { Timeline } from '../ui/Timeline'
 
 export function Experience() {
   return (
-    <Section id="experience" title="Experience" eyebrow="04">
+    <Section id="experience" title="Experience">
       <Reveal>
         <Timeline roles={experience} />
       </Reveal>

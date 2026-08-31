@@ -40,7 +40,7 @@ export function Contact() {
   }
 
   return (
-    <Section id="contact" title="Contact" eyebrow="05">
+    <Section id="contact" title="Contact" density="tight">
       <div className="contact">
         <div className="contact__direct">
           <p className="contact__lead">

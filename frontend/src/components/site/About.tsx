@@ -6,7 +6,7 @@ import './About.css'
 
 export function About() {
   return (
-    <Section id="about" title="About" eyebrow="01">
+    <Section id="about" title="About">
       <div className="about">
         <Reveal>
           <div className="about__copy">

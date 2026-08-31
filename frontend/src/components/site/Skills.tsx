@@ -6,11 +6,11 @@ import './Skills.css'
 
 export function Skills() {
   return (
-    <Section id="skills" title="Skills" eyebrow="03">
-      <div className="skills">
-        {skills.map((group, i) => (
-          <Reveal key={group.title} delay={i * 50}>
-            <div className="skills__group">
+    <Section id="skills" title="Skills" density="tight">
+      <Reveal>
+        <div className="skills">
+          {skills.map((group, i) => (
+            <div className="skills__group" key={group.title}>
               <h3 className="skills__title" id={`skills-${i}`}>
                 {group.title}
               </h3>
@@ -20,9 +20,9 @@ export function Skills() {
                 ))}
               </ul>
             </div>
-          </Reveal>
-        ))}
-      </div>
+          ))}
+        </div>
+      </Reveal>
     </Section>
   )
 }
