@@ -7,6 +7,7 @@ import type { Group, Mesh, MeshStandardMaterial, PointLight } from 'three'
 import { damp } from '../lib/frame'
 import { scrollState } from '../lib/scrollState'
 import { isCoarsePointer } from '../lib/media'
+import { useMatchMedia } from '../lib/useMatchMedia'
 import { applyWizardingMaterials, cloneMaterials, disposeMaterials } from './characterMaterial'
 import { useKtx2Gltf } from './ktx2'
 import { heroPose } from './heroPose'
@@ -29,6 +30,12 @@ const DESKTOP_POSITION: [number, number, number] = [1.4, -0.21, 0]
 const DESKTOP_SCALE = 1.3
 const MOBILE_POSITION: [number, number, number] = [0, -1.21, 0]
 const MOBILE_SCALE = 0.3
+// The single source of truth, on the JS side, for the width at which the layout
+// gains its reserved right column — must match Hero.css's own
+// `@media (min-width: 900px)`. Every other place in this component that needs
+// the breakpoint reads it through `useMatchMedia(DESKTOP_COLUMN_QUERY)` below,
+// so there is exactly one 900 to keep in sync with the CSS.
+const DESKTOP_COLUMN_QUERY = '(min-width: 900px)'
 // The GLB's forward axis faces away from the camera as exported; rotate the whole
 // rig 180° so the figure reads face-on rather than showing the back of the head.
 const BASE_YAW = Math.PI
@@ -39,13 +46,13 @@ export function HeroWizard() {
   const group = useRef<Group>(null)
   const glow = useRef<PointLight>(null)
 
-  // Mobile placement is a one-time layout decision, not a per-frame concern — this
-  // component is remounted on a hard breakpoint change (page reload), same as
-  // shouldRenderStage's own capability checks.
-  const mobile = useMemo(
-    () => isCoarsePointer() || (typeof window !== 'undefined' && window.innerWidth < 900),
-    [],
-  )
+  // Reactive: `Hero.css` reserves the right column live, on resize, via its own
+  // `@media (min-width: 900px)` — this component's placement has to follow it
+  // live too, not freeze whatever was true at mount. `useMatchMedia` only
+  // re-renders on an actual breakpoint crossing (the query's `change` event),
+  // never on every resize pixel.
+  const hasDesktopColumn = useMatchMedia(DESKTOP_COLUMN_QUERY)
+  const mobile = isCoarsePointer() || !hasDesktopColumn
   const basePosition = mobile ? MOBILE_POSITION : DESKTOP_POSITION
   const baseScale = mobile ? MOBILE_SCALE : DESKTOP_SCALE
 
