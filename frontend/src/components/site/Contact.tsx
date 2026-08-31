@@ -62,40 +62,64 @@ export function Contact() {
         </div>
 
         <form className="contact__form" onSubmit={onSubmit} noValidate>
-          <label className="field">
-            <span>Name</span>
-            <input
-              name="name"
-              value={fields.name}
-              onChange={(e) => setFields({ ...fields, name: e.target.value })}
-              aria-invalid={Boolean(errors.name)}
-            />
-            {errors.name && <em className="field__error">{errors.name}</em>}
-          </label>
+          <div className="field">
+            <label htmlFor="contact-name">
+              <span>Name</span>
+              <input
+                id="contact-name"
+                name="name"
+                value={fields.name}
+                onChange={(e) => setFields({ ...fields, name: e.target.value })}
+                aria-invalid={Boolean(errors.name)}
+                aria-describedby={errors.name ? 'name-error' : undefined}
+              />
+            </label>
+            {errors.name && (
+              <em className="field__error" id="name-error">
+                {errors.name}
+              </em>
+            )}
+          </div>
 
-          <label className="field">
-            <span>Email</span>
-            <input
-              name="email"
-              type="email"
-              value={fields.email}
-              onChange={(e) => setFields({ ...fields, email: e.target.value })}
-              aria-invalid={Boolean(errors.email)}
-            />
-            {errors.email && <em className="field__error">{errors.email}</em>}
-          </label>
+          <div className="field">
+            <label htmlFor="contact-email">
+              <span>Email</span>
+              <input
+                id="contact-email"
+                name="email"
+                type="email"
+                value={fields.email}
+                onChange={(e) => setFields({ ...fields, email: e.target.value })}
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? 'email-error' : undefined}
+              />
+            </label>
+            {errors.email && (
+              <em className="field__error" id="email-error">
+                {errors.email}
+              </em>
+            )}
+          </div>
 
-          <label className="field">
-            <span>Message</span>
-            <textarea
-              name="message"
-              rows={5}
-              value={fields.message}
-              onChange={(e) => setFields({ ...fields, message: e.target.value })}
-              aria-invalid={Boolean(errors.message)}
-            />
-            {errors.message && <em className="field__error">{errors.message}</em>}
-          </label>
+          <div className="field">
+            <label htmlFor="contact-message">
+              <span>Message</span>
+              <textarea
+                id="contact-message"
+                name="message"
+                rows={5}
+                value={fields.message}
+                onChange={(e) => setFields({ ...fields, message: e.target.value })}
+                aria-invalid={Boolean(errors.message)}
+                aria-describedby={errors.message ? 'message-error' : undefined}
+              />
+            </label>
+            {errors.message && (
+              <em className="field__error" id="message-error">
+                {errors.message}
+              </em>
+            )}
+          </div>
 
           <button className="btn btn--solid" type="submit" disabled={state === 'sending'}>
             {state === 'sending' ? 'Sending…' : 'Send message'}

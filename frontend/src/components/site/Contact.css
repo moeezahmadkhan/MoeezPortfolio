@@ -49,6 +49,11 @@
   color: var(--muted);
 }
 
+.field label {
+  display: grid;
+  gap: var(--s-1);
+}
+
 .field input,
 .field textarea {
   font: inherit;

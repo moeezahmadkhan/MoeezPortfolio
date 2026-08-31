@@ -21,6 +21,14 @@ describe('Contact', () => {
     expect(fetchSpy).not.toHaveBeenCalled()
   })
 
+  it('describes an invalid field to assistive tech via aria-describedby', async () => {
+    render(<Contact />)
+    await userEvent.click(screen.getByRole('button', { name: /send/i }))
+    const nameInput = await screen.findByLabelText(/name/i)
+    expect(nameInput).toHaveAttribute('aria-describedby', 'name-error')
+    expect(document.getElementById('name-error')).toHaveTextContent(/please share your name/i)
+  })
+
   it('posts a valid message and confirms it', async () => {
     vi.stubGlobal(
       'fetch',
