@@ -1,6 +1,7 @@
 :root {
   /* Ground and surfaces. The site is dark by design — there is no light theme. */
   --ink: #07070d;
+  --ink-rgb: 7 7 13;
   --surface: #0e0e17;
   --surface-2: #14141f;
   --line: rgb(231 194 125 / 0.14);
@@ -15,10 +16,11 @@
   --gold-bright: #f6dfa6;
   --gold-rgb: 231 194 125;
   --teal: #5fd3c6;
+  --error: #d97070;
 
   /* Type */
   --font-sans: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Fraunces', 'Cinzel', Georgia, serif;
+  --font-display: 'Fraunces', Georgia, serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   /* Type scale, fluid between 390px and 1440px */

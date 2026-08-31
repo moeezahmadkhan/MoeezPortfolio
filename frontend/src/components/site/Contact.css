@@ -66,12 +66,12 @@
 
 .field input[aria-invalid='true'],
 .field textarea[aria-invalid='true'] {
-  border-color: #d97070;
+  border-color: var(--error);
 }
 
 .field__error {
   font-style: normal;
-  color: #d97070;
+  color: var(--error);
   font-size: var(--t-micro);
 }
 

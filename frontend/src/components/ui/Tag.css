@@ -4,6 +4,6 @@
   color: var(--muted);
   border: 1px solid var(--line);
   border-radius: var(--r-pill);
-  padding: 2px var(--s-2);
+  padding: var(--s-1) var(--s-2);
   list-style: none;
 }
