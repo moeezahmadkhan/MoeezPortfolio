@@ -26,8 +26,8 @@ The v1 architecture (Harry Potter–themed 3D scroll gallery with station camera
 **Directories that exist today:**
 
 - `src/content/` — all portfolio data: `profile.ts`, `projects.ts`, `skills.ts`, `experience.ts`, `index.ts`. Each is a typed module; this is the single source of truth for visible strings on the site and for the chatbot.
-- `src/lib/` — utilities: `scrollState.ts` (mutable singleton for scroll/pointer events), `media.ts` (responsive queries + reduced-motion check), `contactForm.ts` (Web3Forms payload), tests.
-- `src/styles/` — `tokens.css` (design custom properties), `base.css` (reset + defaults).
+- `src/lib/` — utilities: `media.ts` (reduced-motion / coarse-pointer / WebGL probes), `contactForm.ts` (validation + Web3Forms payload), and their tests. `scrollState.ts` (the mutable scroll/pointer singleton) arrives with the 3D stage.
+- `src/styles/` — the design tokens and base styles. Currently still `global.css`; it becomes `tokens.css` + `base.css` in the shell plan's Task 5.
 - `src/three/` — salvaged 3D pieces: `ktx2.ts` (useKtx2Gltf loader), `characterMaterial.ts` (apply wizard material tint + glow passthrough).
 - `src/test/` — `copy-voice.test.ts` (enforces no wizard vocabulary in src/); `setup.ts`; other tests.
 - `api/` — serverless functions (Vercel). Currently `familiar.ts` + `_core/` (to be renamed to `chat.ts` in upcoming work).
