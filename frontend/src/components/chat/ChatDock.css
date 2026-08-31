@@ -1,0 +1,297 @@
+/* Teal is the chat's colour and appears nowhere else on the site. It is how a
+   visitor tells the machine's voice from Moeez's page. */
+
+.chat {
+  position: fixed;
+  right: var(--s-4);
+  bottom: var(--s-4);
+  /* Above the nav (20), below the skip link (100). */
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--s-3);
+}
+
+.chat__launcher {
+  font: inherit;
+  font-size: var(--t-small);
+  color: var(--ink);
+  background: var(--teal);
+  border: none;
+  border-radius: var(--r-pill);
+  /* 44px is the floor for a tap target, and this is the one control a visitor
+     has to find on a phone. */
+  min-height: 44px;
+  padding-inline: var(--s-4);
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.45);
+  transition: transform 0.2s var(--ease);
+}
+
+.chat__launcher:hover {
+  transform: translateY(-2px);
+}
+
+.chat__panel {
+  width: min(94vw, 380px);
+  height: min(70svh, 560px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid rgb(95 211 198 / 0.28);
+  border-radius: var(--r-soft);
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.55);
+  animation: chat-in 0.28s var(--ease) both;
+}
+
+/* Transform and opacity only: the panel is fixed, but a scale on a layout box
+   would still re-flow its own contents every frame. */
+@keyframes chat-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Named areas, not auto-placement: `grid-row` on the close button alone gives it
+   a definite row, which places it first — in column 1, ahead of the title. */
+.chat__head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'title close'
+    'disclaimer close';
+  align-items: center;
+  gap: var(--s-1) var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.chat__title {
+  grid-area: title;
+  font-weight: 500;
+}
+
+.chat__disclaimer {
+  grid-area: disclaimer;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--teal);
+}
+
+.chat__close {
+  grid-area: close;
+  font: inherit;
+  font-size: var(--t-micro);
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  min-height: 44px;
+  min-width: 44px;
+  padding-inline: var(--s-2);
+  cursor: pointer;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.chat__close:hover {
+  color: var(--text);
+  border-color: rgb(95 211 198 / 0.4);
+}
+
+.chat__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--s-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.chat__empty p {
+  color: var(--muted);
+  font-size: var(--t-small);
+}
+
+.chat__starters {
+  display: grid;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+}
+
+.chat__starters button {
+  font: inherit;
+  font-size: var(--t-small);
+  text-align: left;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-base);
+  min-height: 44px;
+  padding: var(--s-2) var(--s-3);
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.chat__starters button:hover {
+  border-color: rgb(95 211 198 / 0.4);
+  color: var(--teal);
+}
+
+.chat__log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.chat__msg {
+  font-size: var(--t-small);
+}
+
+.chat__msg p {
+  white-space: pre-wrap;
+  /* The refusal quotes a full LinkedIn URL. In a 343px panel that has to break
+     mid-token or it pushes a horizontal scrollbar into the dock. */
+  overflow-wrap: anywhere;
+}
+
+.chat__who {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.chat__msg--moeez .chat__who {
+  color: var(--teal);
+}
+
+.chat__typing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chat__typing span[aria-hidden] {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+  animation: chat-blink 1.2s var(--ease-loop) infinite;
+}
+
+.chat__typing span[aria-hidden]:nth-of-type(2) {
+  animation-delay: 0.15s;
+}
+
+.chat__typing span[aria-hidden]:nth-of-type(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes chat-blink {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.chat__form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s-2);
+  padding: var(--s-3);
+  border-top: 1px solid var(--line);
+}
+
+/* Visually hidden, still read aloud: the input's label and the typing state. */
+.chat__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.chat__form input {
+  font: inherit;
+  /* Fixed at 16px (not var(--t-small)) so a focused field never dips under the
+     size that triggers Mobile Safari's auto-zoom-on-focus. */
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-base);
+  min-height: 44px;
+  padding: var(--s-2) var(--s-3);
+  min-width: 0;
+}
+
+.chat__form input::placeholder {
+  color: var(--muted);
+}
+
+.chat__form button {
+  font: inherit;
+  font-size: var(--t-small);
+  color: var(--ink);
+  background: var(--teal);
+  border: none;
+  border-radius: var(--r-base);
+  min-height: 44px;
+  padding-inline: var(--s-3);
+  cursor: pointer;
+}
+
+.chat__form button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Phones. The dock is discussing the page, so it must not blanket it: the panel
+   keeps a clear band of the document visible above itself, and it never adds to
+   the page's own scroll height. */
+@media (max-width: 560px) {
+  .chat {
+    right: var(--s-3);
+    bottom: var(--s-3);
+    left: var(--s-3);
+  }
+
+  .chat__panel {
+    width: 100%;
+    height: min(58svh, 460px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat__panel {
+    animation: none;
+  }
+
+  .chat__launcher {
+    transition: none;
+  }
+
+  .chat__launcher:hover {
+    transform: none;
+  }
+
+  .chat__typing span[aria-hidden] {
+    animation: none;
+    opacity: 0.6;
+  }
+}

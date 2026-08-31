@@ -7,6 +7,7 @@ import { Skills } from './components/site/Skills'
 import { Experience } from './components/site/Experience'
 import { Contact } from './components/site/Contact'
 import { StageMount } from './three/StageMount'
+import { ChatDock } from './components/chat/ChatDock'
 import { useScrollTracker } from './lib/scrollState'
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
+      <ChatDock />
     </>
   )
 }
