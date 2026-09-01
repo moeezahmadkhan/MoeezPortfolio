@@ -160,6 +160,36 @@ describe('CSS motion', () => {
     expect(offenders).toEqual([])
   })
 
+  it('never gives an element an entrance with no way to leave', () => {
+    // The smell behind two of the three snapping surfaces: a `@keyframes`
+    // entrance plays once, on mount, and says nothing about leaving. The chat
+    // panel had `animation: chat-in` and vanished between two frames; the
+    // mobile menu had no motion at all. A transition has both directions.
+    //
+    // A one-shot `animation` is only a problem when the element it decorates
+    // can go away again. Looping animations (the scroll cue breathes forever)
+    // and elements that also declare a transition are fine.
+    const offenders: string[] = []
+    for (const file of cssFiles) {
+      const css = stripComments(readFileSync(file, 'utf8'))
+      for (const block of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+        const selector = block[1].trim()
+        const body = block[2]
+        if (selector.startsWith('@')) continue
+        const animation = body.match(/(?:^|[;\s])animation\s*:([^;]*)/)
+        if (!animation) continue
+        const value = animation[1].trim()
+        // `animation: none` is how the reduced-motion block TAKES an animation
+        // away. Flagging it would be exactly backwards.
+        if (value === 'none') continue
+        if (/\binfinite\b/.test(value)) continue
+        if (/(?:^|[;\s])transition\s*:/.test(body)) continue
+        offenders.push(`${file}: ${selector} has a one-shot animation and no transition`)
+      }
+    }
+    expect(offenders).toEqual([])
+  })
+
   it('still neutralises every transition and animation under reduced motion', () => {
     // The site-wide safety net. Individual components may (and do) additionally
     // opt out by hand; this is what covers the ones that forget.
