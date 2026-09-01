@@ -32,3 +32,29 @@ describe('persona corpus', () => {
     expect(after).toBe(before)
   })
 })
+
+// The chatbot's whole premise is a first-person Moeez rather than a third-person
+// assistant describing him. The live evaluation flagged 18 of 101 replies with no
+// first-person pronoun anywhere, and they clustered on "what is X" questions:
+// "Project Horus is an automated pipeline that identifies students…".
+//
+// The model was mirroring its notes. Project chunks are generated from the site's
+// own project copy, which is written in the third person because a project card
+// reads that way — so the notes handed to the model described his work as a
+// catalogue entry, and it answered in kind. The site copy is right as it is; the
+// framing belongs in the chunk, which only the bot ever reads.
+describe('the corpus speaks in his voice', () => {
+  const projectChunks = corpus.filter((c: { heading: string }) =>
+    c.heading.startsWith('Project: '),
+  )
+
+  it('has project chunks to check', () => {
+    expect(projectChunks.length).toBeGreaterThan(0)
+  })
+
+  it('frames every project as his own work, in the first person', () => {
+    for (const chunk of projectChunks) {
+      expect(chunk.text, chunk.heading).toMatch(/\b(I|my)\b/)
+    }
+  })
+})

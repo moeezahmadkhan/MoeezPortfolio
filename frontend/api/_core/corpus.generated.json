@@ -31,50 +31,50 @@
     "id": "facts#project:-project-horus#4",
     "source": "src/content/index.ts",
     "heading": "Project: Project Horus",
-    "text": "An automated pipeline that identifies students from live video, matching faces against an enrolled index in real time. Detects faces in real time with YOLO and SCRFD, then generates ArcFace embeddings for each detection. Matches those embeddings against a FAISS vector index to assign identity. Tuned for reliability across varied edge-case environments and high-throughput processing. Built with YOLO, SCRFD, ArcFace, FAISS.",
-    "tokens": 83
+    "text": "Project Horus is a project I built. An automated pipeline that identifies students from live video, matching faces against an enrolled index in real time. Detects faces in real time with YOLO and SCRFD, then generates ArcFace embeddings for each detection. Matches those embeddings against a FAISS vector index to assign identity. Tuned for reliability across varied edge-case environments and high-throughput processing. Built with YOLO, SCRFD, ArcFace, FAISS.",
+    "tokens": 92
   },
   {
     "id": "facts#project:-silmaril-ai#5",
     "source": "src/content/index.ts",
     "heading": "Project: Silmaril AI",
-    "text": "A strategic platform for venture capital that extracts financial metrics from pitch decks and turns them into structured insight. Parses pitch decks with an AI-driven engine that extracts financial metrics automatically. Delivers automated growth recommendations alongside Company Scores and Founder insights. Built with AI-driven parsing engine, Financial metric extraction.",
-    "tokens": 67
+    "text": "Silmaril AI is a project I built. A strategic platform for venture capital that extracts financial metrics from pitch decks and turns them into structured insight. Parses pitch decks with an AI-driven engine that extracts financial metrics automatically. Delivers automated growth recommendations alongside Company Scores and Founder insights. Built with AI-driven parsing engine, Financial metric extraction.",
+    "tokens": 76
   },
   {
     "id": "facts#project:-wearable-ai-chat#6",
     "source": "src/content/index.ts",
     "heading": "Project: Wearable AI chat",
-    "text": "AI chat software for high-end wearables (Whoop), built for ultra-low-latency, lightweight inference at the edge. Focused on ultra-low-latency responses so the chat experience keeps pace with live wearable data. Runs lightweight edge inference suited to wearable hardware constraints. Built with Edge inference, Low-latency AI chat.",
-    "tokens": 61
+    "text": "Wearable AI chat is a project I built. AI chat software for high-end wearables (Whoop), built for ultra-low-latency, lightweight inference at the edge. Focused on ultra-low-latency responses so the chat experience keeps pace with live wearable data. Runs lightweight edge inference suited to wearable hardware constraints. Built with Edge inference, Low-latency AI chat.",
+    "tokens": 72
   },
   {
     "id": "facts#project:-cv-intelligence-platform#7",
     "source": "src/content/index.ts",
     "heading": "Project: CV intelligence platform",
-    "text": "A full-stack computer vision platform that tracks humans and animals in real time and turns the feed into dashboard analytics. Delivers context-aware AI insights drawn from the live video feed. Surfaces results through real-time dashboard analytics. Built with Computer vision, Real-time dashboards.",
-    "tokens": 57
+    "text": "CV intelligence platform is a project I built. A full-stack computer vision platform that tracks humans and animals in real time and turns the feed into dashboard analytics. Delivers context-aware AI insights drawn from the live video feed. Surfaces results through real-time dashboard analytics. Built with Computer vision, Real-time dashboards.",
+    "tokens": 68
   },
   {
     "id": "facts#project:-query-sphere#8",
     "source": "src/content/index.ts",
     "heading": "Project: Query Sphere",
-    "text": "A Flutter-based AI community app with real-time messaging and smart search, backed by Firebase. Real-time messaging layer synced across devices. Smart search querying across the community content. Built with Flutter, Firebase. Source: https://github.com/moeezahmadkhan/querysphere",
-    "tokens": 45
+    "text": "Query Sphere is a project I built. A Flutter-based AI community app with real-time messaging and smart search, backed by Firebase. Real-time messaging layer synced across devices. Smart search querying across the community content. Built with Flutter, Firebase. Source: https://github.com/moeezahmadkhan/querysphere",
+    "tokens": 54
   },
   {
     "id": "facts#project:-stay-booking-platform#9",
     "source": "src/content/index.ts",
     "heading": "Project: Stay-booking platform",
-    "text": "A full MERN-stack booking application with property listing, dashboard management, and secure session authentication. Dynamic property booking pipelines from listing through checkout. Dashboard management layers for hosts, secured with JWT session authentication. Built with MongoDB, Express, React, Node.js, JWT.",
-    "tokens": 53
+    "text": "Stay-booking platform is a project I built. A full MERN-stack booking application with property listing, dashboard management, and secure session authentication. Dynamic property booking pipelines from listing through checkout. Dashboard management layers for hosts, secured with JWT session authentication. Built with MongoDB, Express, React, Node.js, JWT.",
+    "tokens": 63
   },
   {
     "id": "facts#project:-interactive-3d-portfolio#10",
     "source": "src/content/index.ts",
     "heading": "Project: Interactive 3D Portfolio",
-    "text": "A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender.",
-    "tokens": 59
+    "text": "Interactive 3D Portfolio is a project I built. A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender.",
+    "tokens": 69
   },
   {
     "id": "facts#role:-ai-engineer-at-ecommerce-steem#11",

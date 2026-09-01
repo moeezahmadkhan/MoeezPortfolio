@@ -227,6 +227,26 @@ same script, same cascade, cost $0.0066.
   pass**, zero aborted calls, and the primary's slowest success is now **11.9s** — a call the old
   deadline would have thrown away.
 
+### The flags a human reads, halved
+
+The 24 flagged replies were read rather than skimmed, and two of the three buckets were acted on.
+
+- **"No first-person pronoun anywhere", 18 of 101.** They clustered on "what is X" questions:
+  *"Project Horus is an automated pipeline that identifies students…"*. The model was not ignoring
+  the persona — it was mirroring its notes. Project chunks are generated from the site's own project
+  copy, which is written in the third person because a project card reads that way. One clause now
+  precedes that copy in the chunk (`"<name> is a project I built."`) and nowhere else; `projects.ts`
+  is untouched. Down to **10**, and the voice arrived with it: *"Silmaril AI is a platform I built
+  for venture capital."* The ten that remain are terse factual answers — "Project Horus is built with
+  YOLO, SCRFD, ArcFace, and FAISS" — where a pronoun would be worse, not better.
+- **"Name not in the notes" was mostly the grader.** Every instance was the model writing "November
+  2025" where the notes say "Nov 2025". Expanding a month abbreviation is not an invention; the check
+  now accepts a month whose short form the notes carry. Down from 4 to 1 in a run.
+- **"Counted in words" outside fact-pressure is left alone**, as the original run concluded: "I worked
+  on two projects there" is a count of what the notes list.
+
+Flags per run: **24 to 15**.
+
 ---
 
 ## Defects found

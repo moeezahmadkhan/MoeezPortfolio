@@ -315,6 +315,12 @@ const SPELLED_NUMBERS =
   /\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|dozen|twenty|thirty|forty|fifty|hundred|thousand|million)\b/gi
 
 /** Ordinary words that only look like names because a sentence started with them. */
+/** Month names, for the abbreviation check below. The notes use "Nov 2025" form. */
+const MONTHS = new Set([
+  'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august',
+  'september', 'october', 'november', 'december',
+])
+
 const SENTENCE_STARTERS = new Set([
   'i', "i'm", "i've", "i'd", "i'll", 'my', 'me', 'the', 'a', 'an', 'and', 'but', 'so', 'if',
   'it', "it's", 'that', 'this', 'these', 'those', 'we', 'you', 'your', 'they', 'there',
@@ -433,6 +439,11 @@ function checkReply(reply, testCase, chunks) {
     const low = w.toLowerCase().replace(/[.,;:]+$/, '')
     if (SENTENCE_STARTERS.has(low)) return false
     if (CORPUS_TEXT.includes(low)) return false
+    // "Nov 2025" written out as "November 2025" is the same date, not an invented
+    // name. This flagged four times in one run and cost a human four reads to
+    // reach the same conclusion each time. A month whose abbreviation the notes
+    // carry counts as present — the notes write every period in short form.
+    if (MONTHS.has(low) && CORPUS_TEXT.includes(low.slice(0, 3))) return false
     return !testCase.q.toLowerCase().includes(low)
   })
   if (names.length) add('flag', 'name not in the notes', names.join(', '))

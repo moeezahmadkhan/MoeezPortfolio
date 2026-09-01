@@ -147,6 +147,17 @@ function factsFromContent({ profile, projects, skills, experience }) {
     blocks.push({
       heading: `Project: ${p.name}`,
       text: [
+        // The framing, and it is only here — `projects.ts` stays as it is,
+        // because a project card on the page should read as a project card.
+        //
+        // The live evaluation flagged 18 of 101 replies with no first-person
+        // pronoun anywhere, almost all of them "what is X" questions answered as
+        // "Project Horus is an automated pipeline that identifies students…".
+        // The model was not ignoring the persona; it was mirroring its notes,
+        // which described his work in the third person because that is how the
+        // site's copy is written. One clause in front of that copy gives it
+        // something of his own to mirror instead.
+        `${p.name} is a project I built.`,
         p.outcome,
         p.metric ?? '',
         ...p.detail,
