@@ -55,11 +55,55 @@ const MIN_ANIMATION_MS = 60
 // `wait` only in `setup`, since `act` must land inside a single frame.
 const SCENARIOS = [
   {
+    name: 'chat panel opens',
+    viewport: [390, 844],
+    act: [{ click: '.chat__launcher' }],
+    watch: '.chat__panel',
+  },
+  {
     name: 'chat panel closes',
     viewport: [390, 844],
     setup: [{ click: '.chat__launcher' }, { wait: 600 }],
     act: [{ click: '.chat__close' }],
     watch: '.chat__panel',
+  },
+  {
+    name: 'mobile menu opens',
+    viewport: [390, 844],
+    act: [{ click: '.nav__toggle' }],
+    watch: '.nav__links',
+  },
+  {
+    name: 'mobile menu closes',
+    viewport: [390, 844],
+    setup: [{ click: '.nav__toggle' }, { wait: 600 }],
+    act: [{ click: '.nav__toggle' }],
+    watch: '.nav__links',
+  },
+  {
+    name: 'field turns invalid',
+    viewport: [390, 844],
+    // Submitting an empty form is what marks the fields invalid; that is the
+    // path a visitor actually takes, not a synthetic attribute flip.
+    setup: [{ scrollTo: '#contact' }, { wait: 900 }],
+    act: [{ click: '.contact__form button[type=submit]' }],
+    watch: '.field input',
+  },
+  {
+    name: 'project card on hover',
+    viewport: [1440, 900],
+    setup: [{ scrollTo: '#work' }, { wait: 1200 }],
+    // `:hover` cannot be forced from script, so drive the same declarations the
+    // hover rule sets. If `.card`'s transition is ever dropped this still fails.
+    act: [
+      {
+        style: {
+          selector: '.card',
+          set: { borderColor: 'rgb(231 194 125 / 0.36)', transform: 'translateY(-2px)' },
+        },
+      },
+    ],
+    watch: '.card',
   },
 ]
 
