@@ -14,14 +14,14 @@ import { markModelReady } from './modelReadiness'
 import {
   INTENSITY_LAMBDA,
   LIFT_LAMBDA,
-  ORBIT_RETURN_LAMBDA,
+  PITCH_LAMBDA,
   TURN_LAMBDA,
   advanceFade,
   rigVisibility,
 } from './motion'
 import { pinnedYaw, rigPose, type Pose } from './rigPose'
 import { targetIntensity, wizardState } from './wizardState'
-import { orbitState, useDragOrbit } from './useDragOrbit'
+import { advanceOrbit, orbitState, useDragOrbit } from './useDragOrbit'
 import { HERO_RIG_ID, type RigSpec } from './rigs'
 
 // Model-space position of the wand tip, tuned against the hero wizard's own
@@ -188,11 +188,14 @@ export function CharacterRig({
     rigPose(scrollState.pointerX, scrollState.pointerY, focusBias, visible, pose, mobile)
     const t = state.clock.elapsedTime
 
-    const orbit = isHero
-      ? orbitState.dragging
-        ? orbitState.offset
-        : (orbitState.offset = damp(orbitState.offset, 0, ORBIT_RETURN_LAMBDA, dt))
-      : 0
+    // Written as a statement, not a nested ternary with an inline call: this
+    // runs every frame, and `advanceOrbit` mutates `orbitState` in place rather
+    // than returning a fresh object, so the assignment has to be a statement.
+    let orbit = 0
+    if (isHero) {
+      if (!orbitState.dragging) advanceOrbit(orbitState, dt)
+      orbit = orbitState.offset
+    }
 
     // Only the pinned section's own rig turns with scroll; `pinnedYaw` returns
     // zero for everyone else, so a stale `pinnedProgress` left behind after
@@ -212,7 +215,7 @@ export function CharacterRig({
       TURN_LAMBDA,
       dt,
     )
-    g.rotation.x = damp(g.rotation.x, pose.pitch, TURN_LAMBDA, dt)
+    g.rotation.x = damp(g.rotation.x, pose.pitch, PITCH_LAMBDA, dt)
     g.position.y = damp(
       g.position.y,
       basePosition[1] + pose.lift + Math.sin(t * 0.7) * 0.045,

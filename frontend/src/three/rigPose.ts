@@ -1,7 +1,10 @@
 import { PINNED_SECTION_ID } from './rigs'
 
 // Beyond this the model reads as reacting to the pointer, not spinning.
-export const MAX_TILT = 0.18
+// Raised from 0.18 (about ten degrees), which measured as shy — the figure
+// barely acknowledged the visitor. Tuned by shot review at both widths; the
+// ceiling is MAX_FOCUS_TURN, past which it reads as a turntable.
+export const MAX_TILT = 0.28
 // A hard ceiling on the COMBINED yaw (pointer + focus). Wider than MAX_TILT alone
 // so a focused project card can visibly turn the model past its pointer-only
 // range, but a model that swings wildly still reads as broken, not responsive.

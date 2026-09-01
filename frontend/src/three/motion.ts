@@ -21,6 +21,13 @@ export const FADE_LAMBDA = 4
 /** How fast the rig's yaw and pitch settle onto their target rotation. */
 export const TURN_LAMBDA = 2.6
 
+/**
+ * How fast the rig's pitch settles. Deliberately slower than TURN_LAMBDA so the
+ * head leads and the body follows, instead of the whole figure turning as one
+ * rigid piece.
+ */
+export const PITCH_LAMBDA = 2.0
+
 /** How fast the rig's vertical position settles — slower than the turn, so the figure never bobs. */
 export const LIFT_LAMBDA = 2.2
 

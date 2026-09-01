@@ -20,6 +20,14 @@ function makePose(): Pose {
 }
 
 describe('rigPose', () => {
+  it('turns far enough to read as attending to the visitor', () => {
+    // 0.18 rad is about ten degrees, which measured as shy: the figure barely
+    // acknowledged the pointer. The ceiling is where it starts reading as
+    // spinning rather than looking, which MAX_FOCUS_TURN already marks.
+    expect(MAX_TILT).toBeGreaterThan(0.2)
+    expect(MAX_TILT).toBeLessThan(MAX_FOCUS_TURN)
+  })
+
   it('is centred when the pointer is centred and there is no focus bias', () => {
     const pose = rigPose(0, 0, 0, 1, makePose())
     expect(pose.yaw).toBeCloseTo(0)
