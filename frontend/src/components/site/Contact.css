@@ -85,6 +85,12 @@
   border-radius: var(--r-base);
   padding: var(--s-2) var(--s-3);
   min-height: 44px;
+  /* The invalid state below flips this border to the error colour. Without a
+     transition it snapped, which is the one moment on the form where a visitor
+     is already being told they got something wrong — the colour should arrive,
+     not appear. Same curve and roughly the same duration as every other state
+     change on the site. */
+  transition: border-color 0.2s var(--ease);
 }
 
 .field input[aria-invalid='true'],

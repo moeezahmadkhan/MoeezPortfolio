@@ -55,26 +55,48 @@
   pointer-events: auto;
   width: min(94vw, 380px);
   height: min(70svh, 560px);
-  display: flex;
+  /* Closed, and the state the panel transitions back TO on the way out. It used
+     to arrive on a one-shot `@keyframes chat-in` and then vanish between two
+     frames, because a keyframe animation plays on mount and has nothing to say
+     about leaving — measured as zero frames at partial opacity after the close
+     button was pressed. A transition has both directions.
+
+     `transition-behavior: allow-discrete` is what lets `display: none` wait for
+     the fade instead of cutting it off, and it is declared outside the shorthand
+     so a browser that does not know it drops only this line rather than the
+     whole transition. Such a browser simply snaps, which is what the panel did
+     before, so there is nothing to fall back to. */
+  display: none;
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  transition:
+    display 0.28s var(--ease),
+    opacity 0.28s var(--ease),
+    transform 0.28s var(--ease);
+  transition-behavior: allow-discrete;
   flex-direction: column;
   background: var(--surface);
   border: 1px solid rgb(95 211 198 / 0.28);
   border-radius: var(--r-soft);
   overflow: hidden;
   box-shadow: 0 24px 60px rgb(0 0 0 / 0.55);
-  animation: chat-in 0.28s var(--ease) both;
 }
 
 /* Transform and opacity only: the panel is fixed, but a scale on a layout box
    would still re-flow its own contents every frame. */
-@keyframes chat-in {
-  from {
+.chat__panel.is-open {
+  display: flex;
+  opacity: 1;
+  transform: none;
+}
+
+/* Where the panel transitions FROM on the way in. A browser skips transitions
+   on the style change that first reveals an element, so without this the panel
+   would open instantly and only the close would animate. */
+@starting-style {
+  .chat__panel.is-open {
     opacity: 0;
     transform: translateY(12px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 

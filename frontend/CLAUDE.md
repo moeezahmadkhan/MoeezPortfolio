@@ -74,6 +74,13 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   signal itself). A bare numeric lambda in a `damp(...)` call is a number nobody can re-tune.
 - `src/test/motion-language.test.ts` asserts all of the above against the source. If a rule is wrong,
   change it there and here together; do not special-case a change through it.
+- **Anything that appears must also have a way to leave.** Two surfaces shipped with an entrance and
+  no exit, and both were invisible to every test: the mobile menu toggles `display`, which no
+  transition could reach, and the chat panel was `{open && <panel/>}` — React cannot animate an
+  element it has already unmounted. Both now stay in the DOM and hide with `display`, using
+  `@starting-style` for the way in and `transition-behavior: allow-discrete` for the way out. A
+  `@keyframes` entrance is the smell: it plays on mount and has nothing to say about leaving.
+  A panel kept mounted for this reason MUST carry `aria-hidden` and `inert` while closed.
 - Per-frame state lives in mutable module singletons (`scrollState`, `wizardState`, `focusState`, `orbitState`) read inside the frame loop. **Never** React state in a per-frame or per-pointer-event path.
 - Never key motion to hard-coded scroll fractions. Section membership comes from `useSectionObserver`; a scroll-fraction table is what got v1 deleted.
 - **The hero is an observed section, `'top'` (`SECTION_IDS` in Nav.tsx), not the absence of one.**
@@ -113,6 +120,23 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   `onDecline` must lower with `Math.min`, never assign.
 - `wizardState.intensity` is seeded at the idle level, not 0. The hero mounts with `skipInitialFade`,
   so it must LOOK settled on the first frame; a wand igniting from black over a second does not.
+
+**Motion facts, measured 2026-09-01, so they are not re-litigated by guess:**
+- A full-page scroll with the WebGL loop running: 240 frames, median 16.7ms, **zero** frames over
+  20ms, **zero** long tasks. There is no jank to chase; do not "optimise" motion without a
+  measurement showing a regression against this.
+- The smoothed scroll channel works: under discrete wheel notches the raw position moves on 12% of
+  frames and the eased channel on 64%. Measure this with `scrollTo({behavior:'instant'})` — `scrollBy`
+  obeys `scroll-behavior: smooth` and the browser pre-smooths the gesture, measuring nothing.
+- oryzo.ai for comparison: 23.4MB, 20.6s to network-idle, 3595 DOM nodes, and a 51,317px document for
+  an 844px viewport — a pinned scroll-as-timeline. Its DOM layer scrubs RAW scroll (animates on 13% of
+  frames, exactly its scroll frames), so it is not the thing to copy for smoothness. Its studio's
+  published WebGL-Scroll-Sync technique (absolute canvas offset per frame) solves canvas-to-DOM-element
+  drift; our canvas has no DOM targets to drift against, and its 25% vertical padding would undo the
+  mobile fill-rate work. Deliberately not adopted.
+- CSS scroll-driven animations (`animation-timeline: view()`) are NOT Baseline — no Firefox at all —
+  so they can only ever layer over the IntersectionObserver `Reveal` we already have. Considered and
+  declined: there is no jank to fix, and scrubbing all 14 reveals would be more motion, not better.
 
 **Payload facts, so they are not re-litigated by guess:**
 - Measured first-visit payload: ~1.89MB mobile, plus ~2.45MB more across a full desktop scroll.
