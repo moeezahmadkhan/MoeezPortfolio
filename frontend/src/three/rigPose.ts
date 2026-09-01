@@ -7,6 +7,42 @@ export const MAX_TILT = 0.18
 // range, but a model that swings wildly still reads as broken, not responsive.
 export const MAX_FOCUS_TURN = 0.4
 
+/**
+ * How far a dissolving rig drifts out of frame, in world units, and which way.
+ *
+ * The direction is not a preference — it follows from where the rig stands.
+ * The desktop rig sits mid-right of a frame whose copy occupies the left
+ * column, so drifting up carries it out through empty space. The mobile rig
+ * stands at the bottom of the screen with the whole hero copy stacked above it
+ * (rigs.ts's `mobilePosition`), so the same upward drift walked the fading
+ * figure straight up through the text it was supposed to be clearing. It sinks
+ * under the page instead.
+ */
+export const EXIT_LIFT = 1.6
+export const EXIT_LIFT_MOBILE = -1.1
+
+/**
+ * How present a fully-faded-in rig is allowed to be on mobile.
+ *
+ * This started at 0.55, which was the wrong instrument. The figure was dim
+ * because it stood behind the hero's button row, and dimming it was a way of
+ * apologising for an overlap rather than fixing one. Mobile now reserves a
+ * strip for it (`--figure-band`, spent by Hero.css exactly as the desktop hero
+ * spends `padding-right: 42%`), so the two no longer share pixels and the
+ * figure can be nearly as present as it is on desktop.
+ *
+ * Not 1, because the reserve is clamped: on a short phone the copy keeps the
+ * space it needs and the strip gives way, so the figure has to stay a shade
+ * behind the text for the case where they do meet again. `Stage.css` gives the
+ * no-WebGL still the same value at the same width — the canvas and the picture
+ * that stands in for it must agree.
+ *
+ * Applied to `opacity`, which `CharacterRig` feeds to the body materials, the
+ * wand light and the sparkle cloud alike, so the whole figure recedes together
+ * rather than a dimmed body under an undimmed wand.
+ */
+export const MOBILE_PRESENCE = 0.8
+
 export type Pose = { yaw: number; pitch: number; lift: number; opacity: number }
 
 function clamp(v: number, lo: number, hi: number): number {
@@ -32,14 +68,16 @@ export function rigPose(
   focusBias: number,
   visible: number,
   out: Pose,
+  mobile: boolean = false,
 ): Pose {
   const pointerYaw = clamp(pointerX * MAX_TILT, -MAX_TILT, MAX_TILT)
   out.yaw = clamp(pointerYaw + focusBias, -MAX_FOCUS_TURN, MAX_FOCUS_TURN)
   out.pitch = clamp(-pointerY * MAX_TILT * 0.6, -MAX_TILT, MAX_TILT)
   // As a rig fades away (scrolled off, or cross-fading out) the figure drifts
-  // up and out rather than clipping.
-  out.lift = (1 - visible) * 1.6
-  out.opacity = visible
+  // out of frame rather than clipping — up on desktop, down on mobile, for the
+  // reason on EXIT_LIFT above.
+  out.lift = (1 - visible) * (mobile ? EXIT_LIFT_MOBILE : EXIT_LIFT)
+  out.opacity = mobile ? visible * MOBILE_PRESENCE : visible
   return out
 }
 

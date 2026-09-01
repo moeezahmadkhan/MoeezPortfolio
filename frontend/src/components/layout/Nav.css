@@ -40,6 +40,16 @@
   padding: var(--s-1) var(--s-3);
   min-height: 44px;
   cursor: pointer;
+  /* The one nav control that gave no feedback at all on press or hover, beside
+     links that have had a colour transition all along. */
+  transition:
+    border-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+
+.nav__toggle:hover {
+  border-color: rgb(var(--gold-rgb) / 0.5);
+  color: var(--gold);
 }
 
 .nav__links {
@@ -50,6 +60,28 @@
    `@media (min-width: 780px) .nav__links` rule if `open` state is ever
    stale after a resize (e.g. the menu was opened at mobile width). */
 @media (max-width: 779px) {
+  /* The closed state, and the state the panel transitions back TO on the way
+     out. `display` toggles between none and flex, which for years no transition
+     could reach — the panel appeared and vanished on a single frame, and this
+     was the only interactive surface on the site with no motion at all while
+     every other one moved on the shared curve.
+
+     `transition-behavior: allow-discrete` is what lets the discrete `display`
+     flip wait for the fade instead of racing ahead of it, and it is declared
+     separately rather than inside the shorthand on purpose: put `allow-discrete`
+     in the shorthand and a browser that does not know it throws away the whole
+     declaration. One that does not know either simply snaps, which is exactly
+     what the menu did before this rule, so there is nothing to fall back to. */
+  .nav__links {
+    opacity: 0;
+    translate: 0 -8px;
+    transition:
+      display 0.28s var(--ease),
+      opacity 0.28s var(--ease),
+      translate 0.28s var(--ease);
+    transition-behavior: allow-discrete;
+  }
+
   .nav__links.is-open {
     display: flex;
     flex-direction: column;
@@ -59,6 +91,18 @@
     padding: var(--s-4) var(--s-5);
     background: var(--surface);
     border-bottom: 1px solid var(--line);
+    opacity: 1;
+    translate: none;
+  }
+
+  /* Where the panel transitions FROM on the way in. A browser skips transitions
+     on the style change that first reveals an element, so without this the open
+     direction would still be instant while only the close animated. */
+  @starting-style {
+    .nav__links.is-open {
+      opacity: 0;
+      translate: 0 -8px;
+    }
   }
 
   /* Real vertical padding turns each row into a >=44px tap target — this is

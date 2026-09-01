@@ -4,6 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   MAX_FRAME_DT,
   SCROLL_LAMBDA,
+  SCROLL_LAMBDA_TOUCH,
+  scrollLambda,
   advanceSmooth,
   heroVisibility,
   registerPinnedSection,
@@ -212,5 +214,47 @@ describe('useScrollTracker', () => {
     expect(frames).toHaveLength(0)
     expect(rect).not.toHaveBeenCalled()
     rect.mockRestore()
+  })
+})
+
+describe('scrollLambda', () => {
+  // SCROLL_LAMBDA exists to absorb the mouse wheel's discrete notch: the raw
+  // value lands on its new number in one frame, and the lag on the way there
+  // reads as weight. A finger produces no notch — touch and its momentum phase
+  // both deliver a continuous scroll position at frame rate — so against a
+  // finger still on the glass that same lag has nothing to absorb and reads as
+  // lateness instead. Faster chase on touch, same smoothing machinery.
+  it('chases harder on a coarse pointer than on a mouse', () => {
+    expect(scrollLambda(true)).toBe(SCROLL_LAMBDA_TOUCH)
+    expect(scrollLambda(false)).toBe(SCROLL_LAMBDA)
+    expect(SCROLL_LAMBDA_TOUCH).toBeGreaterThan(SCROLL_LAMBDA)
+  })
+
+  it('still lags enough on touch to smooth a jump, rather than snapping', () => {
+    // A lambda high enough to be indistinguishable from no smoothing at all
+    // would make the whole channel pointless — it must still take more than a
+    // frame to arrive. After one 60Hz frame it should be short of the target.
+    const afterOneFrame = 1 - Math.exp(-SCROLL_LAMBDA_TOUCH * (1 / 60))
+    expect(afterOneFrame).toBeLessThan(0.35)
+  })
+})
+
+describe('advanceSmooth on touch', () => {
+  it('closes more of the gap per frame at the touch rate than at the mouse rate', () => {
+    const target = { progress: 1, heroVisible: 1, pinnedProgress: 1 }
+    const mouse = { progress: 0, heroVisible: 0, pinnedProgress: 0 }
+    const touch = { progress: 0, heroVisible: 0, pinnedProgress: 0 }
+    advanceSmooth(mouse, target, 1 / 60, SCROLL_LAMBDA)
+    advanceSmooth(touch, target, 1 / 60, SCROLL_LAMBDA_TOUCH)
+    expect(touch.progress).toBeGreaterThan(mouse.progress)
+  })
+
+  it('defaults to the mouse rate when no lambda is given', () => {
+    const explicit = { progress: 0, heroVisible: 0, pinnedProgress: 0 }
+    const implied = { progress: 0, heroVisible: 0, pinnedProgress: 0 }
+    const target = { progress: 1, heroVisible: 1, pinnedProgress: 1 }
+    advanceSmooth(explicit, target, 1 / 60, SCROLL_LAMBDA)
+    advanceSmooth(implied, target, 1 / 60)
+    expect(implied.progress).toBeCloseTo(explicit.progress, 12)
   })
 })

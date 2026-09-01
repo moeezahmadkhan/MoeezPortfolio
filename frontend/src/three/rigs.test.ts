@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { NAV_ITEMS } from '../components/layout/Nav'
-import { nextRig, RIGS, rigFor, PINNED_SECTION_ID } from './rigs'
+import { SECTION_IDS } from '../components/layout/Nav'
+import {
+  nextRig,
+  RIGS,
+  rigFor,
+  PINNED_SECTION_ID,
+  HERO_RIG_ID,
+  HERO_SECTION_ID,
+} from './rigs'
 
 describe('rigFor', () => {
   const ids = ['', ...NAV_ITEMS.map((i) => i.id)]
@@ -82,5 +90,82 @@ describe('nextRig preload order', () => {
     // the id is exported from here and asserted to resolve.
     expect(RIGS[PINNED_SECTION_ID]).toBeDefined()
     expect(RIGS[PINNED_SECTION_ID].id).toBe(PINNED_SECTION_ID)
+  })
+})
+
+describe('the mobile gate', () => {
+  // The phone gets the hero's model and nothing else: a 0.2-scale figure parked
+  // at z -2.6 behind the copy was never a character on a 390px screen, and it
+  // cost a full GLB download over cellular to render a speck. Both the mount
+  // (SceneDirector's `rigFor`) and the lookahead prefetch (`nextRig`) route
+  // through these two functions, so gating here is what actually stops the
+  // download rather than just hiding the result.
+  it('keeps the hero on mobile', () => {
+    const hero = rigFor('', true)
+    expect(hero).not.toBeNull()
+    expect(hero?.id).toBe(HERO_RIG_ID)
+  })
+
+  it('drops every non-hero rig on mobile', () => {
+    for (const [sectionId, spec] of Object.entries(RIGS)) {
+      if (spec.id === HERO_RIG_ID) continue
+      expect(rigFor(sectionId, true)).toBeNull()
+    }
+  })
+
+  it('still mounts every rig on desktop', () => {
+    for (const [sectionId, spec] of Object.entries(RIGS)) {
+      expect(rigFor(sectionId, false)?.id).toBe(spec.id)
+    }
+  })
+
+  it('preloads nothing past the hero on mobile', () => {
+    // The whole point of the gate: no second or third GLB fetch on a phone.
+    for (const spec of Object.values(RIGS)) {
+      expect(nextRig(spec.id, true)).toBeNull()
+    }
+  })
+
+  it('still walks the whole preload chain on desktop', () => {
+    expect(nextRig(HERO_RIG_ID, false)).not.toBeNull()
+  })
+})
+
+describe('mobile hero framing', () => {
+  // Regression guard on the tuning, not on an exact number: at camera z 4.2 /
+  // fov 38 the viewport is ~1.34 world units wide at 390px, and the hero used
+  // to sit at scale 0.3 — a figure roughly a tenth of the screen, which read as
+  // sparkle dust rather than as a wizard (see .shots/mobile-top.png before this
+  // change). Anything below half the desktop scale is back in that territory.
+  it('sizes the hero to read as a figure, not a speck', () => {
+    const hero = RIGS['']
+    expect(hero.mobileScale).toBeGreaterThan(hero.scale * 0.4)
+  })
+
+  it('stands the hero at the bottom of the frame, centred', () => {
+    // Matches where Stage.css puts the no-WebGL fallback on mobile
+    // (`place-items: end center`), so canvas and fallback agree on where the
+    // figure is.
+    const hero = RIGS['']
+    expect(hero.mobilePosition[0]).toBe(0)
+    expect(hero.mobilePosition[1]).toBeLessThan(0)
+  })
+})
+
+describe('the hero section id', () => {
+  it('resolves the hero rig from the id the observer actually reports', () => {
+    // The hero section's DOM id is 'top' (Hero.tsx), and it is observed
+    // alongside the nav sections so that scrolling back up is a positive
+    // report rather than the absence of one — see useSectionObserver's test.
+    // The table still keys the hero on '', the pre-intersection default, so
+    // this normalisation is what joins the two.
+    expect(rigFor(HERO_SECTION_ID)?.id).toBe(HERO_RIG_ID)
+    expect(rigFor(HERO_SECTION_ID, true)?.id).toBe(HERO_RIG_ID)
+    expect(rigFor('')?.id).toBe(HERO_RIG_ID)
+  })
+
+  it('is the id Hero.tsx actually renders and Nav actually observes', () => {
+    expect(SECTION_IDS[0]).toBe(HERO_SECTION_ID)
+    expect(SECTION_IDS).toContain('about')
   })
 })

@@ -43,9 +43,41 @@
     padding: 0 0 var(--s-5);
   }
   .stage--static img {
-    max-height: 34svh;
-    /* Narrower screens have no clear column to give it, so it recedes further
-       than on desktop: the copy must win every overlap on a phone. */
-    opacity: 0.5;
+    /* The same strip the live canvas stands the figure in, and that Hero.css
+       clears the copy off — so the fallback is the same size in the same place
+       as the model it replaces, rather than a larger picture drifting up into
+       the text. */
+    max-height: var(--figure-band);
+    /* Matches rigPose's MOBILE_PRESENCE. It used to be 0.5, from when the
+       figure stood behind the copy and dimming was the only thing keeping the
+       text legible; the reserved strip does that job now. Still short of full
+       strength because that strip is clamped, so on a short phone the two can
+       still meet. */
+    opacity: 0.8;
+  }
+}
+
+/* The stand-in shown while the three chunk downloads (StageMount's
+   StagePlaceholder). A pool of warm light where the figure is about to
+   appear — right column on desktop, bottom band on mobile, matching both the
+   live rig's placement (rigs.ts) and the static fallback's above. It exists so
+   the hero does not visibly gain a light source a second after it paints; it
+   is not a picture of anything, which is the entire point: the picture it
+   replaced cost 346KB. */
+.stage--loading {
+  background: radial-gradient(
+    ellipse 34% 42% at 76% 52%,
+    rgb(var(--gold-rgb) / 0.13),
+    transparent 70%
+  );
+}
+
+@media (max-width: 899px) {
+  .stage--loading {
+    background: radial-gradient(
+      ellipse 46% 20% at 50% 88%,
+      rgb(var(--gold-rgb) / 0.13),
+      transparent 70%
+    );
   }
 }

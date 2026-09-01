@@ -41,8 +41,25 @@ type RigEntry = {
  * quick transitions produce two independently-dissolving rigs, not a
  * dropped/popped one.
  */
-export function SceneDirector({ activeId }: { activeId: string }) {
-  const target = rigFor(activeId)
+export function SceneDirector({
+  activeId,
+  mobile,
+  onMountedChange,
+}: {
+  activeId: string
+  mobile: boolean
+  /**
+   * Fires when this component goes from holding no rigs to holding at least
+   * one, or back. `Stage` uses it to decide whether the post-processing chain
+   * is worth running at all — see the composer's comment there. Called on a
+   * section change, never per frame.
+   */
+  onMountedChange?: (mounted: boolean) => void
+}) {
+  // `mobile` is a gate, not a style: on a phone `rigFor` resolves every
+  // non-hero section to null, so the work and experience models never mount
+  // and — via `nextRig` below — are never fetched either. See rigs.ts.
+  const target = rigFor(activeId, mobile)
   const nextGenId = useRef(1)
   const [rigs, setRigs] = useState<RigEntry[]>(() =>
     target
@@ -87,6 +104,16 @@ export function SceneDirector({ activeId }: { activeId: string }) {
     }
   }, [rigs])
 
+  // Report whether anything is on stage. The interesting edge is the trailing
+  // one: a rig that has started fading out is still mounted and still drawing,
+  // so this stays true until the last outgoing rig is actually removed. That
+  // is what stops the composer from being torn out from under a wand that is
+  // still mid-dissolve.
+  const mounted = rigs.length > 0
+  useEffect(() => {
+    onMountedChange?.(mounted)
+  }, [mounted, onMountedChange])
+
   // Belt-and-braces: clear every still-pending unmount timer on unmount, so
   // none of them can fire (and call setRigs on an unmounted component) after
   // the fact.
@@ -106,7 +133,7 @@ export function SceneDirector({ activeId }: { activeId: string }) {
   // real scroll event. That keeps a load-and-never-scroll visit down to
   // exactly the hero's own model, same as before this change.
   useEffect(() => {
-    const upcoming = nextRig(target?.id)
+    const upcoming = nextRig(target?.id, mobile)
     if (!upcoming) return undefined
 
     const schedule = () => whenIdle(() => preloadKtx2Gltf(upcoming.model, gl))
@@ -126,7 +153,7 @@ export function SceneDirector({ activeId }: { activeId: string }) {
       window.removeEventListener('scroll', onScroll)
       cancelIdle?.()
     }
-  }, [target?.id, gl])
+  }, [target?.id, gl, mobile])
 
   return (
     <>
@@ -136,6 +163,7 @@ export function SceneDirector({ activeId }: { activeId: string }) {
             spec={entry.spec}
             fadeIn={entry.fadeIn}
             skipInitialFade={entry.skipInitialFade}
+            mobile={mobile}
           />
         </Suspense>
       ))}

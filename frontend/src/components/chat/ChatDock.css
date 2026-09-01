@@ -3,14 +3,27 @@
 
 .chat {
   position: fixed;
-  right: var(--s-4);
-  bottom: var(--s-4);
+  right: var(--dock-inset);
+  bottom: var(--dock-inset);
   /* Above the nav (20), below the skip link (100). */
   z-index: 30;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: var(--s-3);
+  /* This element is a layout frame, not a surface. It is a fixed flex column
+     holding the launcher and, above it, the pointer trail — and the gap and the
+     trail's own height make its BOX far larger than anything in it that a
+     visitor can actually press. Measured at 390x844 that box was 343x106,
+     nearly the full width of the phone, and it hit-tested every pixel:
+     `document.elementFromPoint` over each footer link returned this element,
+     so GitHub, LinkedIn, Website and Email were all unclickable, along with
+     whatever else happened to scroll under that band.
+
+     So the frame passes clicks through and each real control takes its own
+     back. The pointer trail deliberately does NOT (see DockPointer.css) — it is
+     decoration and must never be between a visitor and the launcher. */
+  pointer-events: none;
 }
 
 .chat__launcher {
@@ -21,8 +34,11 @@
   border: none;
   border-radius: var(--r-pill);
   /* 44px is the floor for a tap target, and this is the one control a visitor
-     has to find on a phone. */
-  min-height: 44px;
+     has to find on a phone. Named in tokens.css because the footer has to
+     reserve exactly this much room to stay out from under it. */
+  min-height: var(--dock-launcher-h);
+  /* Clicks back on, against the inert frame above. */
+  pointer-events: auto;
   padding-inline: var(--s-4);
   cursor: pointer;
   box-shadow: 0 8px 30px rgb(0 0 0 / 0.45);
@@ -34,6 +50,9 @@
 }
 
 .chat__panel {
+  /* Clicks back on, against the inert frame above — for the whole subtree, so
+     every control inside the panel inherits it. */
+  pointer-events: auto;
   width: min(94vw, 380px);
   height: min(70svh, 560px);
   display: flex;

@@ -11,10 +11,12 @@ A single-page portfolio for **Moeez Ahmad Khan**, AI/ML engineer. Clean, readabl
 From `frontend/`:
 
 ```bash
-npm run dev       # Vite dev server on http://localhost:5173
-npm run build     # tsc -b (typecheck first) then vite build → dist/
-npm run preview   # serve the production build
-npm test          # vitest run — jsdom environment, @testing-library/react
+npm run dev            # Vite dev server on http://localhost:5173
+npm run build          # tsc -b (typecheck first) then vite build → dist/
+npm run preview        # serve the production build
+npm test               # vitest run — jsdom environment, @testing-library/react
+npm run shoot          # screenshot every section at both widths (needs a preview running)
+npm run check:contrast # measure body-copy contrast against the LIVE backdrop
 ```
 
 The build fails if TypeScript errors exist. Type-check without bundling: `npx tsc -b`.
@@ -74,18 +76,78 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   change it there and here together; do not special-case a change through it.
 - Per-frame state lives in mutable module singletons (`scrollState`, `wizardState`, `focusState`, `orbitState`) read inside the frame loop. **Never** React state in a per-frame or per-pointer-event path.
 - Never key motion to hard-coded scroll fractions. Section membership comes from `useSectionObserver`; a scroll-fraction table is what got v1 deleted.
+- **The hero is an observed section, `'top'` (`SECTION_IDS` in Nav.tsx), not the absence of one.**
+  `useSectionObserver` only commits a truthy id, so while the hero went unobserved there was no way
+  back to "nothing owns the screen": scrolling to About and returning to the top latched `active` on
+  `'about'` forever — the nav underlined About at the top of the page, and SceneDirector faded the
+  hero model out and never brought it back (fatal on mobile, where the gate leaves the hero as the
+  only model). `rigFor` normalises `'top'` to the table's `''` key. Anything else observing sections
+  must use `SECTION_IDS`, never `NAV_ITEMS` alone.
 - **Still screenshots cannot verify motion.** `tools/shoot.mjs` waits for `window.__modelReady`, which latches only once a rig has settled — so it is blind by construction to anything visible only mid-transition. Verify time-varying work by sampling state deliberately or asserting on it in a test.
+- `tools/shoot.mjs` waits on three things per section, and needs all three: the page to hold still for
+  several polls (`scroll-behavior: smooth` means `scrollIntoView` returns before the scroll starts),
+  the section's expected rig to report ready, and every `Reveal` in view to reach full opacity. Its
+  per-width `DESKTOP_RIG` / `MOBILE_RIG` maps encode the mobile gate above; a stale entry there shows
+  up as a 15s timeout, not a wrong picture.
+
+**3D on mobile — the gate, not a style:**
+- Below the hero's `@media (min-width: 900px)` breakpoint (or on any coarse pointer), the hero is the
+  ONLY rig that mounts. `rigFor(activeId, mobile)` resolves every other section to `null`, and
+  `nextRig(id, mobile)` returns `null`, so the work and experience models are never fetched either —
+  measured, that is 2.45MB of GLB a phone no longer downloads.
+- `useIsMobileStage()` (`three/useStageViewport.ts`) is the single source of that answer. `Stage` asks
+  once and passes it down. It decides four things that must never disagree: which rigs exist, where
+  the hero stands, which way a dissolving rig drifts (`EXIT_LIFT` vs `EXIT_LIFT_MOBILE`), and how much
+  the renderer may spend. Do not recompute it locally.
+- Mobile caps `dpr` at 1, runs the post-processing chain only while a rig is actually on stage, and
+  compiles the backdrop shader with `MOBILE` defined (2 fbm octaves, no embers — 2 noise evaluations
+  per pixel instead of 6). Desktop is untouched by all of it.
+- **The figure gets a reserved strip on mobile, it is not dimmed into the background.** `--figure-band`
+  (tokens.css) is the mobile equivalent of the desktop hero's `padding-right: 42%`: Hero.css spends it
+  as `padding-bottom` to lift the copy clear, and `Stage.css` sizes the no-WebGL still to the same
+  strip. `MOBILE_PRESENCE` (`rigPose.ts`) and that still's opacity must stay equal — the canvas and
+  the picture standing in for it are the same figure in the same place.
+- `dpr` is `stageDpr(window.devicePixelRatio, mobile)`, never a bare number. R3F's `dpr` prop is a
+  value, not a cap: passing 1.5 made every dpr-1 display render 2.25x the pixels it can show
+  (measured: a 2160x1350 backing store in a 1440x900 dpr-1 viewport). `PerformanceMonitor`'s
+  `onDecline` must lower with `Math.min`, never assign.
+- `wizardState.intensity` is seeded at the idle level, not 0. The hero mounts with `skipInitialFade`,
+  so it must LOOK settled on the first frame; a wand igniting from black over a second does not.
+
+**Payload facts, so they are not re-litigated by guess:**
+- Measured first-visit payload: ~1.89MB mobile, plus ~2.45MB more across a full desktop scroll.
+  Benchmarked against oryzo.ai (the motion reference) on the same harness: 3.1MB vs 23.4MB, 2.3s vs
+  20.6s to network-idle, 283 vs 3595 DOM nodes. Performance is not the gap; do not trade it away.
+- `wizard_improved.glb` stays Draco while the other two are meshopt. Converting it was measured:
+  849.5 KB -> 1.15 MB, three times what the 98KB Draco decoder costs. Do not "fix" the inconsistency.
+- The 515KB Basis transcoder is required — all shipped GLBs declare `KHR_texture_basisu`.
+- `StageMount`'s Suspense fallback is a CSS-only `StagePlaceholder`, NOT `StaticHeroArt`. The latter's
+  still frame is a 346KB PNG that every WebGL visitor used to download and discard.
 
 **Accessibility:**
 - Honour `prefers-reduced-motion` in all animations and transitions (check `lib/media.ts` helper).
 - Canvas is `aria-hidden` and decorative only.
 - All content is accessible via keyboard and screen reader; do not rely on 3D for meaning.
+- **Contrast is measured against the rendered backdrop, never inferred from the tokens.** The palette
+  alone says 6.9:1; a shader is painting the ground behind the copy, and on mobile that ground
+  measured 3.85x brighter than on desktop — same text, same colour, 3.73:1 versus 5.79:1 — because a
+  phone puts the copy over the middle of the screen where the backdrop's radial falloff peaks. That
+  is why `Backdrop.tsx` compiles a lower `GROUND_GAIN` for mobile, and why `npm run check:contrast`
+  exists. jsdom cannot see any of this: no layout, no compositor, no shader.
+- **Nothing fixed may hit-test space it does not occupy.** `.chat` is a fixed flex column whose box is
+  far larger than its controls; it measured 343x106 at 390 wide and swallowed every click in it,
+  leaving all four footer links unreachable on a phone. The frame is `pointer-events: none` and each
+  control takes its own back. The footer separately spends `--dock-clearance` to keep its last line
+  out from under the launcher pill.
 
 ## 3D model pipeline (salvaged)
 
-Four character models ship with KTX2 ETC1S texture compression:
-- `public/models/wizard_improved.glb` (~850 KB after meshopt + KTX2)
-- `public/models/spellcaster.glb`, `pact_pair.glb`, `cricket_improved.glb`
+Three character models ship with KTX2 ETC1S texture compression:
+- `public/models/wizard_improved.glb` (~850 KB, Draco + KTX2 — the only model a phone ever loads)
+- `public/models/spellcaster.glb`, `pact_pair.glb` (meshopt + KTX2, desktop only)
+
+`cricket_improved.glb` was deleted: `rigs.ts` never named it, so it was 817KB shipped in every deploy
+for no section. It is in git history, and `tools/build_ktx2.sh` records how to bring its row back.
 
 **Loading:** Use `useKtx2Gltf(path)` from `src/three/ktx2.ts`, not `useGLTF`. Drei's `useGLTF` auto-wires Draco and meshopt but not KTX2; this helper attaches a `KTX2Loader` pointed at `public/basis/` (self-hosted Basis transcoder, copied from three.js examples).
 

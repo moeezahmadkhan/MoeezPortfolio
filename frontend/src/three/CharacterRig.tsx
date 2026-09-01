@@ -8,8 +8,6 @@ import { projects } from '../content'
 import { damp } from '../lib/frame'
 import { focusState } from '../lib/focusState'
 import { scrollState } from '../lib/scrollState'
-import { isCoarsePointer } from '../lib/media'
-import { useMatchMedia } from '../lib/useMatchMedia'
 import { applyWizardingMaterials, cloneMaterials, disposeMaterials } from './characterMaterial'
 import { useKtx2Gltf } from './ktx2'
 import { markModelReady } from './modelReadiness'
@@ -31,12 +29,6 @@ import { HERO_RIG_ID, type RigSpec } from './rigs'
 // "wand glow" anchor across every rig — a stylistic constant for the site's
 // magic-light accent, not a per-model measurement.
 const WAND_TIP: [number, number, number] = [0.16, -0.1, 0.18]
-
-// The single source of truth, on the JS side, for the width at which the hero
-// layout gains its reserved right column — must match Hero.css's own
-// `@media (min-width: 900px)`. Read live via `useMatchMedia` so placement
-// follows an actual resize rather than freezing whatever was true at mount.
-const DESKTOP_COLUMN_QUERY = '(min-width: 900px)'
 
 // Every shipped GLB's forward axis faces away from the camera as exported —
 // rotate the whole rig 180° so the figure reads face-on rather than showing
@@ -95,10 +87,12 @@ export function CharacterRig({
   spec,
   fadeIn,
   skipInitialFade = false,
+  mobile,
 }: {
   spec: RigSpec
   fadeIn: boolean
   skipInitialFade?: boolean
+  mobile: boolean
 }) {
   const isHero = spec.id === HERO_RIG_ID
   // Only the hero section installs the drag-orbit listeners — `#top` is the hero
@@ -119,12 +113,11 @@ export function CharacterRig({
   // property write on the settling frame rather than every frame after.
   const reportedReady = useRef(false)
 
-  // Reactive: `Hero.css` reserves the right column live, on resize, via its own
-  // `@media (min-width: 900px)` — this rig's placement has to follow it live
-  // too, not freeze whatever was true at mount. `useMatchMedia` only re-renders
-  // on an actual breakpoint crossing, never on every resize pixel.
-  const hasDesktopColumn = useMatchMedia(DESKTOP_COLUMN_QUERY)
-  const mobile = isCoarsePointer() || !hasDesktopColumn
+  // `mobile` arrives from `Stage`, which asks `useIsMobileStage` once for the
+  // whole scene. It used to be recomputed here, per mounted rig — which was
+  // fine while it only chose a position, and is not now that the same answer
+  // also decides which rigs exist (rigs.ts's gate) and which way a dissolving
+  // one drifts. Those three cannot be allowed to disagree.
   const basePosition = mobile ? spec.mobilePosition : spec.position
   const baseScale = mobile ? spec.mobileScale : spec.scale
 
@@ -192,7 +185,7 @@ export function CharacterRig({
     const isWorkRig = spec.id === 'work'
     const focusedSlug = isWorkRig ? focusState.projectSlug : null
     const focusBias = focusedSlug !== null ? (FOCUS_YAW_BIAS.get(focusedSlug) ?? 0) : 0
-    rigPose(scrollState.pointerX, scrollState.pointerY, focusBias, visible, pose)
+    rigPose(scrollState.pointerX, scrollState.pointerY, focusBias, visible, pose, mobile)
     const t = state.clock.elapsedTime
 
     const orbit = isHero

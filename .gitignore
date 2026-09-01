@@ -14,3 +14,8 @@ dist/
 # web-shipped versions live in frontend/public/models/.
 /*.glb
 frontend/tools/wizard.original.glb
+.vercel
+.env*
+
+# Browser-automation scratch output (screenshots, snapshots, console logs).
+.playwright-mcp/

@@ -21,9 +21,18 @@ GT() { npx --no-install gltf-transform "$@"; }
 QUALITY="${KTX_QUALITY:-200}"   # ETC1S quality 1-255 (higher = better, larger)
 
 # model | geometry-codec (draco|meshopt) | resize-to (px, or 0 = keep)
+#
+# cricket_improved.glb was dropped from this list when it was deleted from
+# public/models/: rigs.ts never named it, so it was 817KB of GLB shipped in
+# every deploy for no section. Recover it from git history and add its row back
+# if a section ever claims it.
+#
+# wizard_improved.glb stays on draco rather than joining the other two on
+# meshopt, despite meshopt saving the 98KB draco decoder download. Converting it
+# was measured: 849.5 KB -> 1.15 MB, so the model grows by three times what the
+# decoder costs. Draco wins for this mesh.
 MODELS=(
   "wizard_improved.glb draco   1024"
-  "cricket_improved.glb draco  1024"
   "spellcaster.glb     meshopt 0"
   "pact_pair.glb       meshopt 0"
 )

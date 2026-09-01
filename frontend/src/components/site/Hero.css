@@ -75,6 +75,57 @@
   }
 }
 
+@media (max-width: 899px) {
+  /* Reserve the bottom strip for the figure, the same way the desktop rule
+     below reserves the right column for it. The hero centres its copy, so the
+     padding lifts that copy clear of the strip rather than merely adding space
+     under it — which is exactly what was wanted: the model used to stand
+     behind the button row and was dimmed to stop it competing.
+
+     `padding-bottom`, not `margin`: this is inside the hero's own box, so
+     `min-height: 100svh` still measures the whole screen and the section does
+     not grow a gap between itself and About. */
+  .hero {
+    padding-bottom: var(--figure-band);
+    /* Column, and stretch rather than centre: in a column `align-items: center`
+       would shrink the copy to its own content width instead of letting it fill
+       the measure. */
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Two spacers that split the leftover height 3:1, instead of the 1:1 that
+     `align-items: center` gives.
+
+     Centring is right on a phone, where the copy nearly fills the space and
+     there is little left over to divide. It falls apart on a tall screen with
+     short copy: at 768x1024 the thesis wraps to three lines instead of six, and
+     an even split left 190px of nothing between the last line and the figure —
+     the pair stopped reading as one composition and became two things at
+     opposite ends of a void. Slack above the headline reads as breathing room;
+     slack between the headline and the figure reads as a mistake, so most of it
+     goes above. */
+  .hero::before {
+    content: '';
+    flex: 3 0 0;
+  }
+
+  .hero::after {
+    content: '';
+    flex: 1 0 0;
+  }
+
+  /* Off the centre line, because the figure is on it. Centred, this arrow came
+     down squarely on the wizard's chest — a scroll hint drawn on top of the one
+     thing the hero is showing off. The content column's left edge is clear of
+     the figure at every width in this branch. */
+  .hero__cue {
+    left: var(--s-5);
+    translate: 0 0;
+    bottom: var(--s-3);
+  }
+}
+
 @media (min-width: 900px) {
   .hero__inner {
     /* Leave the right half clear — Plan 2 puts the wizard there. */

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { damp } from './frame'
+import { isCoarsePointer } from './media'
 
 /**
  * Per-frame state, deliberately OUTSIDE React. Scroll and pointer events fire far
@@ -37,6 +38,30 @@ export type SmoothScroll = typeof scrollState.smooth
 export const SCROLL_LAMBDA = 6
 
 /**
+ * The same chase, for a coarse pointer.
+ *
+ * `SCROLL_LAMBDA` exists to absorb the mouse wheel's notch: the raw scroll
+ * position lands on its new number in a single frame, and the lag on the way
+ * there is what turns a step into a glide. A finger has no notch. Touch
+ * scrolling — and the momentum phase after the finger lifts — already delivers
+ * a continuous position at frame rate, so on a phone that same lag has nothing
+ * to absorb and spends itself entirely on being late behind a finger that is
+ * still on the glass. Higher lambda, shorter lag: ~11 is still slow enough to
+ * take several frames to arrive (so a programmatic jump — an anchor link, a
+ * restored scroll position — still eases rather than snaps), and fast enough
+ * that the backdrop no longer trails the drag.
+ */
+export const SCROLL_LAMBDA_TOUCH = 11
+
+/**
+ * Pure: which chase rate this device's scrolling wants. Separated from the
+ * probe so the policy is testable without a matchMedia.
+ */
+export function scrollLambda(coarsePointer: boolean): number {
+  return coarsePointer ? SCROLL_LAMBDA_TOUCH : SCROLL_LAMBDA
+}
+
+/**
  * The longest frame we will ease across. A backgrounded tab hands the first
  * frame back a `dt` of seconds or minutes, and `damp` over that is
  * indistinguishable from a snap — the exact stepping we are here to remove.
@@ -70,11 +95,12 @@ export function advanceSmooth(
   smooth: SmoothScroll,
   target: { progress: number; heroVisible: number; pinnedProgress: number },
   dt: number,
+  lambda: number = SCROLL_LAMBDA,
 ): void {
   const step = Math.min(dt, MAX_FRAME_DT)
-  smooth.progress = damp(smooth.progress, target.progress, SCROLL_LAMBDA, step)
-  smooth.heroVisible = damp(smooth.heroVisible, target.heroVisible, SCROLL_LAMBDA, step)
-  smooth.pinnedProgress = damp(smooth.pinnedProgress, target.pinnedProgress, SCROLL_LAMBDA, step)
+  smooth.progress = damp(smooth.progress, target.progress, lambda, step)
+  smooth.heroVisible = damp(smooth.heroVisible, target.heroVisible, lambda, step)
+  smooth.pinnedProgress = damp(smooth.pinnedProgress, target.pinnedProgress, lambda, step)
 }
 
 let pinnedId: string | null = null
@@ -85,6 +111,9 @@ export function registerPinnedSection(id: string | null): void {
 export function useScrollTracker(): void {
   useEffect(() => {
     const hero = document.getElementById('top')
+    // Read once, here, rather than per frame: a device does not grow a mouse
+    // mid-visit, and this is a matchMedia call inside a rAF loop otherwise.
+    const lambda = scrollLambda(isCoarsePointer())
     // The scroll listener sets this and does nothing else. Scroll can fire many
     // times between two frames — a single wheel gesture does — and each of the
     // reads below forces layout, so doing them in the listener made the browser
@@ -140,7 +169,7 @@ export function useScrollTracker(): void {
       // Unconditional: if the smooth pass only ran on dirty frames it would
       // stop the instant the wheel did, freezing part-way to the target instead
       // of coasting into it.
-      advanceSmooth(scrollState.smooth, scrollState, dt)
+      advanceSmooth(scrollState.smooth, scrollState, dt, lambda)
     }
 
     // Read once synchronously so a rig mounting alongside this hook doesn't see

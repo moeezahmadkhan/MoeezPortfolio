@@ -11,8 +11,27 @@ export const NAV_ITEMS = [
   { id: 'contact', label: 'Contact' },
 ]
 
+/**
+ * Every section the page observes, in page order — the hero first, then the
+ * nav's own.
+ *
+ * The hero has no nav item, which is why it was originally left out; that was
+ * the bug. `useSectionObserver` only commits a truthy id, so with the hero
+ * unobserved there was no way back to "no section owns the screen": scrolling
+ * to About and returning to the top left `active` stuck on 'about'. The nav
+ * kept About underlined at the top of the page, and SceneDirector — reading a
+ * section that has no rig — faded the hero model out and never brought it
+ * back. On mobile, where the gate leaves the hero as the only model, one
+ * scroll emptied the scene for the rest of the visit.
+ *
+ * Observing the hero makes returning to it a positive report rather than the
+ * absence of one. It matches no nav item, so nothing is highlighted while the
+ * visitor is up there — which is correct.
+ */
+export const SECTION_IDS = ['top', ...NAV_ITEMS.map((i) => i.id)]
+
 export function Nav() {
-  const ids = useMemo(() => NAV_ITEMS.map((i) => i.id), [])
+  const ids = useMemo(() => SECTION_IDS, [])
   const active = useSectionObserver(ids)
   const [open, setOpen] = useState(false)
 

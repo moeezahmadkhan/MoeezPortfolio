@@ -1,6 +1,16 @@
 .footer {
   border-top: 1px solid var(--line);
-  padding-block: var(--s-5);
+  padding-top: var(--s-5);
+  /* The footer's last line and the chat launcher want the same corner, and at
+     the foot of the page the footer's bottom edge IS the viewport's — so the
+     links end up underneath the pill. Measured: at 390 the whole link row was
+     covered, at 768 "Website" and "Email" were.
+
+     Unconditional rather than under a media query: the overlap survives as long
+     as the content column's right edge reaches the dock's corner, which is
+     everything up to roughly 1400px. A breakpoint here would be one more number
+     to get wrong, and a little extra room under a footer costs nothing. */
+  padding-bottom: calc(var(--s-5) + var(--dock-clearance));
   font-size: var(--t-small);
   color: var(--muted);
 }

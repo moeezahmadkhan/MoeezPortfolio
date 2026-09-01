@@ -61,4 +61,33 @@
   --ease-loop: cubic-bezier(0.65, 0, 0.35, 1);
   --nav-h: 64px;
   --maxw: 1120px;
+
+  /* The strip at the bottom of a narrow hero that belongs to the 3D figure and
+     to nothing else.
+
+     Desktop reserves a COLUMN for the figure (Hero.css's `padding-right: 42%`)
+     so copy and model never share a pixel. Mobile had no equivalent: the figure
+     stood underneath the copy and was dimmed until it stopped competing, which
+     is a worse trade — a dim figure behind a button is not a composition, it is
+     a compromise. This is the mobile column, lying down.
+
+     Clamped rather than a bare `svh` because a short phone must give the copy
+     the space first: the band cannot grow past 240px, and below 150px the
+     figure would not read as a figure anyway. Used by Hero.css to push the copy
+     up off it, and by Stage.css to size the no-WebGL still that stands in the
+     same strip. */
+  --figure-band: clamp(150px, 25svh, 240px);
+
+  /* The chat dock's footprint in the bottom-right corner, in one place so the
+     dock and everything that has to keep out of its way agree.
+
+     Measured, not assumed: at 390x844 the dock's fixed box came back 343x106
+     and hit-tested all of it, so every footer link returned the dock from
+     `elementFromPoint`. Making the box inert fixes that, but the launcher pill
+     itself still lands on the footer's right-hand links at every width below
+     roughly 1400px — the footer's last line and the dock's corner are the same
+     corner. `--dock-clearance` is what the footer spends to get out of it. */
+  --dock-inset: var(--s-4);
+  --dock-launcher-h: 44px;
+  --dock-clearance: calc(var(--dock-launcher-h) + var(--dock-inset) * 2);
 }
