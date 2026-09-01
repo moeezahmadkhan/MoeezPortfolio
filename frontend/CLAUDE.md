@@ -161,6 +161,18 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
 - `StageMount`'s Suspense fallback is a CSS-only `StagePlaceholder`, NOT `StaticHeroArt`. The latter's
   still frame is a 346KB PNG that every WebGL visitor used to download and discard.
 
+**WebGL context loss is a real, routine failure on phones — and it used to take the hero with it.**
+- Measured with `WEBGL_lose_context`: losing the context threw `Cannot read properties of null
+  (reading 'alpha')` from inside three's renderer, and React tore down the entire `.stage` subtree —
+  the wrapper div included. The hero went empty and stayed empty for the rest of the visit. That is
+  the failure a visitor reports as "the model vanished and never came back".
+- `StageBoundary` in `StageMount.tsx` catches it and renders `StaticHeroArt`, so the hero always shows
+  a figure. `three/contextLoss.ts` additionally calls `preventDefault()` on the loss event, which is
+  what permits `webglcontextrestored` to fire at all — without it, a transient blip is permanent.
+- **No desktop harness can see this**: SwiftShader never loses a context. The
+  `hero survives losing the GPU` scenario in `check_motion.mjs` forces it deliberately, and was
+  verified to fail when the boundary's fallback is removed.
+
 **Accessibility:**
 - Honour `prefers-reduced-motion` in all animations and transitions (check `lib/media.ts` helper).
 - Canvas is `aria-hidden` and decorative only.

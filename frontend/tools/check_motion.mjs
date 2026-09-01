@@ -106,6 +106,18 @@ const SCENARIOS = [
     watch: '.card',
   },
   {
+    // Not a transition — a survival check. Losing the GPU context threw from
+    // inside three's renderer and React tore down the whole stage subtree, so
+    // the hero went empty and stayed empty. Phones lose contexts routinely and
+    // SwiftShader never does, which is why nothing had ever caught it. The
+    // `watch` is the still frame: it must EXIST after the context dies.
+    name: 'hero survives losing the GPU',
+    viewport: [390, 844],
+    act: [{ loseWebglContext: '.stage canvas' }],
+    watch: '.stage--static',
+    expect: 'appears',
+  },
+  {
     name: 'nav marker moves between sections',
     viewport: [1440, 900],
     setup: [{ scrollTo: '#about' }, { wait: 1400 }],
@@ -134,7 +146,11 @@ async function runScenario(page, scenario) {
       /** Runs a declarative step list. Async so `setup` may wait; `act` may not. */
       const perform = async (steps) => {
         for (const step of steps) {
-          if (step.click !== undefined) need(step.click).click()
+          if (step.loseWebglContext !== undefined) {
+            const canvas = need(step.loseWebglContext)
+            const gl = canvas.getContext('webgl2') || canvas.getContext('webgl')
+            gl.getExtension('WEBGL_lose_context').loseContext()
+          } else if (step.click !== undefined) need(step.click).click()
           else if (step.scrollTo !== undefined) need(step.scrollTo).scrollIntoView()
           else if (step.style !== undefined) {
             Object.assign(need(step.style.selector).style, step.style.set)
@@ -243,7 +259,16 @@ for (const scenario of SCENARIOS) {
   const longest = result.running.reduce((max, a) => Math.max(max, a.duration), 0)
   const properties = [...new Set(result.running.map((a) => a.property))].join(', ') || 'nothing'
 
-  if (!result.changed && longest === 0) {
+  if (scenario.expect === 'appears') {
+    // 'gone' is the signature the sampler records for an absent element.
+    const present = result.last !== 'gone'
+    if (!present) {
+      failures.push(`${scenario.name}: ${scenario.watch} never appeared`)
+      console.log(`✗ ${scenario.name.padEnd(34)} ${scenario.watch} never appeared`)
+    } else {
+      console.log(`✓ ${scenario.name.padEnd(34)} ${scenario.watch} present after the act`)
+    }
+  } else if (!result.changed && longest === 0) {
     failures.push(
       `${scenario.name}: nothing changed at all — the scenario no longer exercises anything`,
     )

@@ -17,6 +17,7 @@ import { useSectionObserver } from '../lib/useSectionObserver'
 import { Backdrop } from './Backdrop'
 import { HeroLights } from './lights'
 import { SceneDirector } from './SceneDirector'
+import { watchContextLoss } from './contextLoss'
 import { stageDpr, useIsMobileStage } from './useStageViewport'
 // Cursor affordance for the hero's drag-to-orbit — split out of Stage.css (which
 // StageMount imports eagerly for the static-art fallback) so a reduced-motion or
@@ -24,7 +25,14 @@ import { stageDpr, useIsMobileStage } from './useStageViewport'
 // cursor either. See StageCursor.css for the full rationale.
 import './StageCursor.css'
 
-export function Stage() {
+export function Stage({
+  onContextLost,
+  onContextRestored,
+}: {
+  /** The GPU took the canvas away — show something else until it comes back. */
+  onContextLost: () => void
+  onContextRestored: () => void
+}) {
   // Includes the hero, so scrolling back up reports 'top' rather than reporting
   // nothing and leaving the last section latched. See SECTION_IDS.
   const ids = useMemo(() => SECTION_IDS, [])
@@ -59,6 +67,13 @@ export function Stage() {
   return (
     <div className="stage" aria-hidden="true">
       <Canvas
+        // The canvas element, not the renderer, is what fires these — and the
+        // listeners must be attached the moment it exists, because a context
+        // can be lost before the first frame is ever drawn.
+        onCreated={({ gl }) => watchContextLoss(gl.domElement, {
+          lost: onContextLost,
+          restored: onContextRestored,
+        })}
         // 'never' stops the loop outright while the tab is in the background.
         // R3F renders one frame on the way back, so returning to the tab shows
         // the scene where it left off rather than a blank canvas.
