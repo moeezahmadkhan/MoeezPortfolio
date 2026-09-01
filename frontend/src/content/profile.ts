@@ -30,7 +30,7 @@ export const profile: Profile = {
   stats: [
     { value: 'AI Engineer', label: 'Currently at Ecommerce Steem' },
     { value: 'BSCS, ITU', label: '2021 – 2025' },
-    { value: 'Lahore, PK', label: 'Based in' },
+    { value: 'Lahore, PK', label: 'Home base' },
   ],
   socials: [
     { label: 'GitHub', href: 'https://github.com/moeezahmadkhan' },
