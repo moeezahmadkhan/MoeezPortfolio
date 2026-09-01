@@ -19,6 +19,7 @@ import {
   advanceFade,
   rigVisibility,
 } from './motion'
+import { entryOffsets, type EntryOffsets } from './choreography'
 import { pinnedYaw, rigPose, type Pose } from './rigPose'
 import { targetIntensity, wizardState } from './wizardState'
 import { advanceOrbit, orbitState, useDragOrbit } from './useDragOrbit'
@@ -109,6 +110,8 @@ export function CharacterRig({
   // Reused every frame instead of a fresh `{ yaw, pitch, lift, opacity }`
   // object literal per call — `rigPose` writes into this in place.
   const pose = useRef<Pose>({ yaw: 0, pitch: 0, lift: 0, opacity: 0 }).current
+  // Reused every frame for the same reason `pose` is — see rigPose.
+  const entry = useRef<EntryOffsets>({ lift: 0, yaw: 0, scale: 0 }).current
   // Latches once this rig's `markModelReady` fires, so the check is a single
   // property write on the settling frame rather than every frame after.
   const reportedReady = useRef(false)
@@ -186,6 +189,8 @@ export function CharacterRig({
     const focusedSlug = isWorkRig ? focusState.projectSlug : null
     const focusBias = focusedSlug !== null ? (FOCUS_YAW_BIAS.get(focusedSlug) ?? 0) : 0
     rigPose(scrollState.pointerX, scrollState.pointerY, focusBias, visible, pose, mobile)
+    // The rig's own cross-fade is the only input: no scroll fraction, no timer.
+    entryOffsets(spec.id, fade.current, entry)
     const t = state.clock.elapsedTime
 
     // Written as a statement, not a nested ternary with an inline call: this
@@ -211,17 +216,20 @@ export function CharacterRig({
 
     g.rotation.y = damp(
       g.rotation.y,
-      BASE_YAW + pose.yaw + orbit + pinnedTurn + Math.sin(t * 0.18) * 0.06,
+      BASE_YAW + pose.yaw + orbit + pinnedTurn + entry.yaw + Math.sin(t * 0.18) * 0.06,
       TURN_LAMBDA,
       dt,
     )
     g.rotation.x = damp(g.rotation.x, pose.pitch, PITCH_LAMBDA, dt)
     g.position.y = damp(
       g.position.y,
-      basePosition[1] + pose.lift + Math.sin(t * 0.7) * 0.045,
+      basePosition[1] + pose.lift + entry.lift + Math.sin(t * 0.7) * 0.045,
       LIFT_LAMBDA,
       dt,
     )
+    // `scale` was a fixed prop until now. Setting it here as well is safe —
+    // three reads the object's own scale each frame, and the prop only seeds it.
+    g.scale.setScalar(damp(g.scale.x, baseScale * (1 + entry.scale), LIFT_LAMBDA, dt))
 
     for (let i = 0; i < materials.length; i++) {
       materials[i].opacity = pose.opacity
