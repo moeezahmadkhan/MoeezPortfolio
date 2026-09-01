@@ -27,6 +27,16 @@ export const LIFT_LAMBDA = 2.2
 /** How fast a released drag-orbit unwinds back to the rig's resting yaw. */
 export const ORBIT_RETURN_LAMBDA = 1.4
 
+/**
+ * How fast a released flick's velocity bleeds away.
+ *
+ * Slower than ORBIT_RETURN_LAMBDA on purpose: the return spring and the
+ * friction run at the same time, and if friction were the faster of the two the
+ * velocity would be spent before it had moved anything — which is exactly the
+ * behaviour momentum was added to replace.
+ */
+export const ORBIT_FRICTION_LAMBDA = 2.2
+
 /** How fast the wand light's brightness follows a change of mood. */
 export const INTENSITY_LAMBDA = 3
 
