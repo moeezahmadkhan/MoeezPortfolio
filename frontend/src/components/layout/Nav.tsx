@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { profile } from '../../content'
 import { useSectionObserver } from '../../lib/useSectionObserver'
+import { markerGeometry, markerTransform } from './navMarker'
 import './Nav.css'
 
 export const NAV_ITEMS = [
@@ -34,6 +35,30 @@ export function Nav() {
   const ids = useMemo(() => SECTION_IDS, [])
   const active = useSectionObserver(ids)
   const [open, setOpen] = useState(false)
+  const listRef = useRef<HTMLElement>(null)
+  const markerRef = useRef<HTMLSpanElement>(null)
+
+  // Place the marker whenever the active section changes, and on resize.
+  //
+  // NOT per frame: the active item changes on section crossings, not
+  // continuously, so a rAF loop here would burn a frame's work rewriting the
+  // transform it wrote last time. The travel between items is the CSS
+  // transition's job, not this effect's.
+  useEffect(() => {
+    const place = () => {
+      const marker = markerRef.current
+      if (!marker) return
+      const link = listRef.current?.querySelector<HTMLElement>('[aria-current="true"]') ?? null
+      const geometry = markerGeometry(
+        link ? { offsetLeft: link.offsetLeft, offsetWidth: link.offsetWidth } : null,
+      )
+      marker.style.transform = markerTransform(geometry)
+      marker.style.opacity = geometry.visible ? '1' : '0'
+    }
+    place()
+    window.addEventListener('resize', place, { passive: true })
+    return () => window.removeEventListener('resize', place)
+  }, [active])
 
   // Close the mobile menu on Escape and whenever a link is followed.
   useEffect(() => {
@@ -61,7 +86,12 @@ export function Nav() {
         >
           {open ? 'Close' : 'Menu'}
         </button>
-        <nav id="nav-links" aria-label="Primary" className={`nav__links${open ? ' is-open' : ''}`}>
+        <nav
+          id="nav-links"
+          aria-label="Primary"
+          className={`nav__links${open ? ' is-open' : ''}`}
+          ref={listRef}
+        >
           {NAV_ITEMS.map((item) => (
             <a
               key={item.id}
@@ -76,6 +106,7 @@ export function Nav() {
           <a className="nav__cv" href={profile.cvUrl} target="_blank" rel="noreferrer">
             Résumé
           </a>
+          <span className="nav__marker" ref={markerRef} aria-hidden="true" />
         </nav>
       </div>
     </header>

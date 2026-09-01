@@ -126,22 +126,41 @@
   color: var(--text);
 }
 
-.nav__link[aria-current='true'] {
-  position: relative;
-}
-
-.nav__link[aria-current='true']::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -6px;
-  height: 1px;
-  background: var(--gold);
-}
-
 .nav__cv {
   color: var(--gold);
+}
+
+/* One marker that slides, not five that blink.
+   The old version was a `::after` on whichever link was current, so the
+   underline never moved between items — it ceased to exist on one and began on
+   the next. Measured during a scroll: the handover happened at opacity 1 to 1
+   in a single frame, five times per pass, at the top of the viewport.
+
+   Laid out at MARKER_BASE_WIDTH (navMarker.ts) and scaled to each link's real
+   width, because `width` is layout-triggering and animating it would re-flow
+   the nav on every section crossing. `transform-origin: left` is what makes the
+   scale grow rightward from the link's left edge rather than from its middle. */
+.nav__marker {
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100px; /* MARKER_BASE_WIDTH */
+  height: 1px;
+  background: var(--gold);
+  transform-origin: left;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.32s var(--ease),
+    opacity 0.32s var(--ease);
+}
+
+@media (max-width: 779px) {
+  /* The mobile menu is a vertical panel; a sliding underline across it reads as
+     noise. Colour alone carries the active item there. */
+  .nav__marker {
+    display: none;
+  }
 }
 
 @media (min-width: 780px) {
@@ -152,5 +171,7 @@
     display: flex;
     align-items: center;
     gap: var(--s-5);
+    /* The marker is absolutely positioned against this. */
+    position: relative;
   }
 }
