@@ -470,4 +470,24 @@ describe('the cascade has a wall clock, not just per-model timeouts', () => {
     expect(CASCADE_BUDGET_MS).toBeLessThan(30_000)
     expect(MODEL_TIMEOUT_MS).toBeLessThan(CASCADE_BUDGET_MS)
   })
+
+  it('gives the primary model longer than it actually takes to answer', () => {
+    // Measured 2026-09-02 over 101 live replies: the primary answered in 3.3s at
+    // the median and 6.1s at p90, and its slowest RECORDED success was 7.76s —
+    // against a per-model deadline of 8s. Every model in the run topped out just
+    // under that number, which is not a coincidence: the deadline was cutting the
+    // tail off and the aborted calls left no trace, so the reports read as "the
+    // free tier is flaky" while the primary was quietly being cancelled.
+    //
+    // A timeout has to sit clear of the distribution it is bounding, not inside
+    // it. The visible cost was real: "Where are you based?" and "What is your
+    // LinkedIn?" — questions the notes answer perfectly — returned "the model
+    // behind this chat is down", because the primary was cancelled and the free
+    // tier behind it was returning 429.
+    expect(MODEL_TIMEOUT_MS).toBeGreaterThanOrEqual(12_000)
+
+    // And the budget must still afford a second attempt after a slow primary,
+    // or raising the deadline would just trade one failure mode for another.
+    expect(Math.floor(CASCADE_BUDGET_MS / MODEL_TIMEOUT_MS)).toBeGreaterThanOrEqual(2)
+  })
 })

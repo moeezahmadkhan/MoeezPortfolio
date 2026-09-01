@@ -51,9 +51,24 @@ export const MODELS = [
 ]
 export const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 
-// Per-model deadline. Without it one hung upstream stalls the whole cascade and the
-// visitor watches a typing indicator until the platform kills the function.
-export const MODEL_TIMEOUT_MS = 8_000
+/**
+ * Per-model deadline. Without it one hung upstream stalls the whole cascade and
+ * the visitor watches a typing indicator until the platform kills the function.
+ *
+ * Raised from 8s on measurement, 2026-09-02. Over 101 live replies the primary
+ * answered in 3.3s at the median and 6.1s at p90 — but its slowest RECORDED
+ * success was 7.76s, and every other model in the run also topped out just under
+ * 8s. That ceiling was this constant, not the providers: the deadline was
+ * cancelling the tail of a distribution it sat inside, and an aborted fetch
+ * leaves no trace in the report, so four eval runs read as "the free tier is
+ * flaky" while the primary was quietly being cut off.
+ *
+ * The cost was visible to a visitor. "Where are you based?" and "What is your
+ * LinkedIn?" — questions the notes answer completely — came back as "the model
+ * behind this chat is down", because the primary was cancelled and the free tier
+ * behind it was returning 429.
+ */
+export const MODEL_TIMEOUT_MS = 12_000
 
 /**
  * The whole cascade's budget, not one model's.
@@ -64,10 +79,15 @@ export const MODEL_TIMEOUT_MS = 8_000
  * reply at all. So the loop stops trying once this is spent and returns the
  * fallback itself, while it still can.
  *
- * Kept comfortably under the function's own `maxDuration` in vercel.json, so
- * ours is always the limit that fires.
+ * Kept comfortably under the function's own `maxDuration` in vercel.json (30s),
+ * so ours is always the limit that fires.
+ *
+ * Raised with MODEL_TIMEOUT_MS above: at 20s a 12s primary left only 8s behind
+ * it, so a slow-but-healthy primary would have bought its own headroom out of
+ * the one retry that covers it failing. 25s affords two full attempts and still
+ * fires five seconds before the platform would.
  */
-export const CASCADE_BUDGET_MS = 20_000
+export const CASCADE_BUDGET_MS = 25_000
 
 // --- Caps (bound token spend) ---
 export const MAX_MESSAGE_CHARS = 1000 // single user message; longer is truncated

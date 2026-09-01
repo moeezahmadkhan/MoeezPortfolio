@@ -185,16 +185,16 @@ the system prompt quoted back, and the model's own deliberation printed as the a
 
 ---
 
-## Update, 2026-09-02: defects 1, 2 and 4 are fixed and re-measured
+## Update, 2026-09-02: every defect below is fixed, and re-measured
 
-**99 of 101 replies pass**, against the 94 of 101 recorded below. `npm run eval:chat -- --samples=5`,
+**101 of 101 replies pass**, against the 94 of 101 recorded below. `npm run eval:chat -- --samples=5`,
 same script, same cascade, cost $0.0066.
 
 | group | replies | pass then | pass now |
 |---|---|---|---|
-| answerable | 50 | 50 | 49 |
+| answerable | 50 | 50 | **50** |
 | correctly refused | 7 | 7 | 7 |
-| prompt injection | 19 | 18 | 18 |
+| prompt injection | 19 | 18 | **19** |
 | fact pressure | 25 | 19 | **25** |
 
 - **Defect 1 (invented contact details) — fixed in `chat.ts`.** `withContactBlock` appends the block
@@ -214,9 +214,18 @@ same script, same cascade, cost $0.0066.
   `experience`. All four degree phrasings now score 1.00 and answer correctly; "What is your email
   address?" and "What frontend and graphics work have you done?" no longer refuse.
 
-**Still open: defect 3's model-quality half.** Both remaining failures are the cascade, not grounding:
-one reply was the `FALLBACK_REPLY` after the tier exhausted, one was a truncated answer. Neither
-invents anything.
+- **Defect 3 (the cascade) — fixed, and it was not a model-quality problem at all.** `MODEL_TIMEOUT_MS`
+  was 8s. Measured over 101 live replies, the primary answered in 3.3s at the median and 6.1s at p90,
+  and its slowest *recorded* success was 7.76s — every model in the run topped out just under 8s,
+  because the deadline was cancelling the tail of a distribution it sat inside. An aborted fetch left
+  no trace in the report (`calls.push` ran after the `await`), so four runs read as "the free tier is
+  flaky" while the primary was being cut off. The visible cost: "Where are you based?" and "What is
+  your LinkedIn?" returned "the model behind this chat is down".
+
+  `MODEL_TIMEOUT_MS` is now 12s and `CASCADE_BUDGET_MS` 25s, still under the function's 30s
+  `maxDuration`. The eval's fetch wrapper records thrown calls. Re-measured: **101 of 101 replies
+  pass**, zero aborted calls, and the primary's slowest success is now **11.9s** — a call the old
+  deadline would have thrown away.
 
 ---
 

@@ -482,7 +482,25 @@ async function ask(question) {
   const fetchImpl = async (url, init) => {
     const model = JSON.parse(init.body).model
     const started = Date.now()
-    const res = await fetch(url, init)
+    // A call that THROWS has to be recorded too. `calls.push` used to sit after
+    // the await, so a timeout or a connection reset left no trace at all — and
+    // `handleChatRequest` catches and moves on, so the report simply showed a
+    // cascade that had skipped its own primary. Four runs were read as "the free
+    // tier is flaky" before the hole showed up: the primary was being tried,
+    // timing out at MODEL_TIMEOUT_MS, and vanishing from its own record.
+    let res
+    try {
+      res = await fetch(url, init)
+    } catch (error) {
+      calls.push({
+        model,
+        status: null,
+        ms: Date.now() - started,
+        usage: null,
+        error: `threw: ${error?.name ?? 'Error'}: ${error?.message ?? String(error)}`,
+      })
+      throw error
+    }
     const text = await res.text()
     let parsed = null
     try {
