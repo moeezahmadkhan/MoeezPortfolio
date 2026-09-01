@@ -14,77 +14,91 @@
     "tokens": 69
   },
   {
-    "id": "facts#project:-project-horus#2",
+    "id": "facts#education,-my-degree-and-where-i-studied#2",
+    "source": "src/content/index.ts",
+    "heading": "Education, my degree and where I studied",
+    "text": "My field of study was Computer Science: I studied for a BSCS at Information Technology University (ITU) in Lahore, starting in 2021 and graduating in 2025. My degree specialized in agentic AI, computer vision, and reinforcement learning. That university education is the whole of my formal academic background.",
+    "tokens": 65
+  },
+  {
+    "id": "facts#projects,-all-of-them-and-how-many-there-are#3",
+    "source": "src/content/index.ts",
+    "heading": "Projects, all of them and how many there are",
+    "text": "There are seven projects written up here in total, 7 of them: Project Horus, Silmaril AI, Wearable AI chat, CV intelligence platform, Query Sphere, Stay-booking platform, Interactive 3D Portfolio. That is the complete list of the projects on this site.",
+    "tokens": 54
+  },
+  {
+    "id": "facts#project:-project-horus#4",
     "source": "src/content/index.ts",
     "heading": "Project: Project Horus",
     "text": "An automated pipeline that identifies students from live video, matching faces against an enrolled index in real time. Detects faces in real time with YOLO and SCRFD, then generates ArcFace embeddings for each detection. Matches those embeddings against a FAISS vector index to assign identity. Tuned for reliability across varied edge-case environments and high-throughput processing. Built with YOLO, SCRFD, ArcFace, FAISS.",
     "tokens": 83
   },
   {
-    "id": "facts#project:-silmaril-ai#3",
+    "id": "facts#project:-silmaril-ai#5",
     "source": "src/content/index.ts",
     "heading": "Project: Silmaril AI",
     "text": "A strategic platform for venture capital that extracts financial metrics from pitch decks and turns them into structured insight. Parses pitch decks with an AI-driven engine that extracts financial metrics automatically. Delivers automated growth recommendations alongside Company Scores and Founder insights. Built with AI-driven parsing engine, Financial metric extraction.",
     "tokens": 67
   },
   {
-    "id": "facts#project:-wearable-ai-chat#4",
+    "id": "facts#project:-wearable-ai-chat#6",
     "source": "src/content/index.ts",
     "heading": "Project: Wearable AI chat",
     "text": "AI chat software for high-end wearables (Whoop), built for ultra-low-latency, lightweight inference at the edge. Focused on ultra-low-latency responses so the chat experience keeps pace with live wearable data. Runs lightweight edge inference suited to wearable hardware constraints. Built with Edge inference, Low-latency AI chat.",
     "tokens": 61
   },
   {
-    "id": "facts#project:-cv-intelligence-platform#5",
+    "id": "facts#project:-cv-intelligence-platform#7",
     "source": "src/content/index.ts",
     "heading": "Project: CV intelligence platform",
     "text": "A full-stack computer vision platform that tracks humans and animals in real time and turns the feed into dashboard analytics. Delivers context-aware AI insights drawn from the live video feed. Surfaces results through real-time dashboard analytics. Built with Computer vision, Real-time dashboards.",
     "tokens": 57
   },
   {
-    "id": "facts#project:-query-sphere#6",
+    "id": "facts#project:-query-sphere#8",
     "source": "src/content/index.ts",
     "heading": "Project: Query Sphere",
     "text": "A Flutter-based AI community app with real-time messaging and smart search, backed by Firebase. Real-time messaging layer synced across devices. Smart search querying across the community content. Built with Flutter, Firebase. Source: https://github.com/moeezahmadkhan/querysphere",
     "tokens": 45
   },
   {
-    "id": "facts#project:-stay-booking-platform#7",
+    "id": "facts#project:-stay-booking-platform#9",
     "source": "src/content/index.ts",
     "heading": "Project: Stay-booking platform",
     "text": "A full MERN-stack booking application with property listing, dashboard management, and secure session authentication. Dynamic property booking pipelines from listing through checkout. Dashboard management layers for hosts, secured with JWT session authentication. Built with MongoDB, Express, React, Node.js, JWT.",
     "tokens": 53
   },
   {
-    "id": "facts#project:-interactive-3d-portfolio#8",
+    "id": "facts#project:-interactive-3d-portfolio#10",
     "source": "src/content/index.ts",
     "heading": "Project: Interactive 3D Portfolio",
     "text": "A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender.",
     "tokens": 59
   },
   {
-    "id": "facts#role:-ai-engineer-at-ecommerce-steem#9",
+    "id": "facts#role:-ai-engineer-at-ecommerce-steem#11",
     "source": "src/content/index.ts",
     "heading": "Role: AI Engineer at Ecommerce Steem",
     "text": "May 2026 – Present. Architecting core AI chat software for high-end wearables (Whoop), focused on ultra-low-latency and lightweight edge inference. Engineering a full-stack computer vision platform that tracks humans and animals in real time, with context-aware AI insights and real-time dashboard analytics. Designing interactive full-stack application modules integrated with custom RAG frameworks. Building automation pipelines with the Model Context Protocol (MCP) to bridge LLMs with external developer tools.",
     "tokens": 92
   },
   {
-    "id": "facts#role:-ai-&-computer-vision-developer-at-quidsol#10",
+    "id": "facts#role:-ai-&-computer-vision-developer-at-quidsol#12",
     "source": "src/content/index.ts",
     "heading": "Role: AI & Computer Vision Developer at QUIDSol",
     "text": "Nov 2025 – June 2026. Project Horus (student identification): built an automated CV pipeline using YOLO/SCRFD for real-time face detection and ArcFace for identity assignment via FAISS vector matching. Silmaril AI: built a platform for venture capital with an AI-driven parsing engine that extracts financial metrics from pitch decks and delivers growth recommendations, Company Scores, and Founder insights. Improved pipeline reliability by optimizing asynchronous data flows across varied edge-case environments. Managed database logging and results triage for high-speed processing.",
     "tokens": 107
   },
   {
-    "id": "facts#role:-teacher's-assistant-at-information-technology-university#11",
+    "id": "facts#role:-teacher's-assistant-at-information-technology-university#13",
     "source": "src/content/index.ts",
     "heading": "Role: Teacher's Assistant at Information Technology University",
     "text": "Nov 2025 – Feb 2026. Mentored graduate-level students in agentic AI, including autonomous multi-agent systems and RAG deployment. Facilitated technical workshops on agent orchestration and evaluated student-led workflows for production-level scalability.",
     "tokens": 42
   },
   {
-    "id": "facts#skills#12",
+    "id": "facts#skills#14",
     "source": "src/content/index.ts",
     "heading": "Skills",
     "text": "AI/ML & Orchestration: Agentic AI, RAG Pipelines, Model Context Protocol (MCP), LLM Fine-Tuning (QLoRA), Workflow Automation (n8n), LLM Serving & Quantization, FAISS Vector DB. Backend Development: Node.js, Express, NestJS, TypeScript, Python, FastAPI, C++, SQL, RESTful APIs, WebSocket. Cloud & Deployment: AWS (EC2, Bedrock), GCP, Docker, Kafka, Nginx, CI/CD Pipelines, Linux/Ubuntu System Administration. Frontend & Graphics: React, Next.js, Flutter, Three.js, Blender, UI/UX Micro-Interactions, State Management.",

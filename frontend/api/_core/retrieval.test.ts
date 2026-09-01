@@ -200,7 +200,11 @@ describe('retrieve answers the questions qa.md was written to cover', () => {
   it('puts the named project first when one is named', () => {
     expect(top('What is Project Horus, in plain terms?')).toBe('Project: Project Horus')
     expect(top('What was actually hard about Horus?')).toBe('Project: Project Horus')
-    expect(top('What did you do at ITU?')).toBe('Who I am')
+    // "ITU" is in his bio and in the education block, and nowhere else — the TA
+    // role names the university in full. Both blocks answer it, and which one
+    // ranks first is a length-normalisation detail rather than a contract, so
+    // this asserts the right material is in the context (as above).
+    expect(retrieve('What did you do at ITU?', real).map((c) => c.heading)).toContain('Who I am')
   })
 
   it('hands out the links, however the question is phrased', () => {
@@ -337,5 +341,54 @@ describe('the relevance floor is calibrated, not guessed', () => {
   it('scores a query of pure stopwords as zero, not as a match', () => {
     expect(scoreCorpus('what about the it and so on', real).coverage).toBe(0)
     expect(retrieve('what about the it and so on', real)).toEqual([])
+  })
+})
+
+// Defects 4 and 2 from docs/redesign/chat-eval.md, measured against real models.
+// Each of these was a live failure, not a hypothetical: the eval either refused a
+// question the notes plainly answer, or let the model state a number the notes
+// never carried.
+describe('the defects the live evaluation found', () => {
+  it('answers questions whose only uncommon word is ordinary English', () => {
+    // "What is your email address?" scored 0.40 and was refused. The single word
+    // dragging it under was "address" — absent from his notes, and charged
+    // against the question at full weight as though it were "Kubernetes".
+    // A missing ordinary word is evidence of phrasing, never of substance.
+    expect(retrieve('What is your email address?', real).length).toBeGreaterThan(0)
+    expect(retrieve('What frontend and graphics work have you done?', real).length).toBeGreaterThan(0)
+  })
+
+  it('answers a question about his degree, however it is phrased', () => {
+    // Scored 0.00 — not because the notes lack the fact (they carry "BSCS from
+    // ITU, 2021-2025") but because they never used the visitor's words. A fact
+    // the notes hold and the retriever cannot find is a fact the bot does not have.
+    for (const q of [
+      'What did you study?',
+      'What is your education background?',
+      'Where did you get your degree?',
+      'Which university did you go to?',
+    ]) {
+      const headings = retrieve(q, real).map((c) => c.heading)
+      expect(headings.length, q).toBeGreaterThan(0)
+      expect(headings.join(' '), q).toMatch(/Education|Who I am/)
+    }
+  })
+
+  it('never hands over a partial list of his projects', () => {
+    // The failure this closes: asked how many projects he has, the model answered
+    // "six" in 5 of 5 samples and listed six, silently omitting Project Horus.
+    // It was counting honestly — `k` had truncated seven project chunks to six.
+    // The overview block names every one of them, so a truncated retrieval can no
+    // longer hide a project or invent a total.
+    const overview = real.find((c) => /^Projects/.test(c.heading))
+    expect(overview, 'the corpus needs a block that names every project').toBeTruthy()
+    for (const p of real.filter((c) => c.heading.startsWith('Project: '))) {
+      expect(overview!.text).toContain(p.heading.replace('Project: ', ''))
+    }
+  })
+
+  it('puts that overview in front of the model when asked for a count', () => {
+    const headings = retrieve('How many projects have you shipped?', real).map((c) => c.heading)
+    expect(headings.some((h) => /^Projects/.test(h))).toBe(true)
   })
 })

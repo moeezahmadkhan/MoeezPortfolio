@@ -58,6 +58,22 @@ function chunkMarkdown(source, markdown) {
   return chunks
 }
 
+/**
+ * The count in words as well as digits.
+ *
+ * Both forms go into the block on purpose. The evaluation's grader — and the
+ * honesty rule behind it — treats any number in a reply that is not in the notes
+ * as an invention, and a model asked "how many" answers "seven" far more often
+ * than "7". A total that is true but only written one way still reads as made up.
+ */
+function numberWord(n) {
+  const words = [
+    'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight',
+    'nine', 'ten', 'eleven', 'twelve',
+  ]
+  return words[n] ?? String(n)
+}
+
 /** The href for one of profile.socials, by label. Undefined if he removed it. */
 function socialHref(profile, label) {
   return profile.socials.find((s) => s.label === label)?.href
@@ -88,6 +104,43 @@ function factsFromContent({ profile, projects, skills, experience }) {
     ]
       .filter((line) => !line.includes('undefined'))
       .join(' '),
+  })
+
+  // The visitor's words for a fact the bio already carries. Retrieval scores
+  // vocabulary, not meaning, so "What did you study?" shared not one token with
+  // "I hold a BSCS from ITU" and was refused at coverage 0.00 in the live
+  // evaluation — four different phrasings of it, while the fact sat in the
+  // corpus. Sourced from profile.education, so it cannot drift from the page.
+  blocks.push({
+    heading: 'Education, my degree and where I studied',
+    text: profile.education,
+  })
+
+  // Every project in one block, with the total stated.
+  //
+  // This is the fix for the single most reproducible failure the live evaluation
+  // found: asked how many projects he had, the model answered "six" in 5 of 5
+  // samples and listed six, silently dropping Project Horus. It was counting
+  // honestly — `retrieve`'s k = 6 had truncated seven project chunks to six, so
+  // "six" was a fact about the retrieval cap, not about his career.
+  //
+  // The lever is here rather than in the prompt because the prompt was already
+  // tried and measured: "never total anything up" moved it 10/10 failing to 8/10
+  // and made the model start referring to "my notes", which the prompt forbids
+  // (docs/redesign/chat-eval.md, "the prompt change that did not work"). A model
+  // cannot be talked out of counting what it was handed. It can be handed the
+  // whole list and the true total.
+  //
+  // Deliberately says "written up here" rather than "shipped" or "built": the
+  // count is a fact about this portfolio, which is the only thing the notes can
+  // honestly support.
+  const projectNames = projects.map((p) => p.name)
+  blocks.push({
+    heading: 'Projects, all of them and how many there are',
+    text:
+      `There are ${numberWord(projectNames.length)} projects written up here in total, ` +
+      `${projectNames.length} of them: ${projectNames.join(', ')}. ` +
+      'That is the complete list of the projects on this site.',
   })
 
   for (const p of projects) {

@@ -7,6 +7,16 @@ export type Profile = {
   thesis: string
   bio: string[]
   location: string
+  /**
+   * His degree, as a sentence. Duplicated from the closing line of `bio` on
+   * purpose: `bio` is prose the About section renders, and the chat's retriever
+   * scores words, not meaning. A visitor asking "what did you study?" shares no
+   * vocabulary with "I hold a BSCS from ITU" — the live evaluation refused that
+   * question, and three phrasings of it, at coverage 0.00 while the fact sat in
+   * the corpus the whole time. This is the same fact wearing the words people
+   * ask it in.
+   */
+  education: string
   email: string
   cvUrl: string
   portrait: string
@@ -24,6 +34,8 @@ export const profile: Profile = {
     "Before that, I worked as an AI & Computer Vision Developer at QUIDSol, building face-identification and pitch-deck-analysis pipelines, and as a Teacher's Assistant at Information Technology University, mentoring graduate students in agentic AI. I hold a BSCS from ITU (2021–2025), specializing in agentic AI, computer vision, and reinforcement learning.",
   ],
   location: 'Lahore, Pakistan',
+  education:
+    'My field of study was Computer Science: I studied for a BSCS at Information Technology University (ITU) in Lahore, starting in 2021 and graduating in 2025. My degree specialized in agentic AI, computer vision, and reinforcement learning. That university education is the whole of my formal academic background.',
   email: 'kmoeez2018@gmail.com',
   cvUrl: '/Moeez_Ahmad_Khan_CV.pdf',
   portrait: '/moeez.jpeg',

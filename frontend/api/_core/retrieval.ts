@@ -90,6 +90,12 @@ const COMMON_WORDS = [
   'name', 'word', 'term', 'note', 'detail', 'fact', 'sense', 'view', 'opinion',
   'advice', 'goal', 'aim', 'habit', 'routine', 'background', 'history', 'title',
   'shipping', 'ship', 'touch', 'head', 'hand', 'eye', 'face', 'body', 'mind',
+  // Added after the live evaluation refused questions the notes plainly answer:
+  // "What is your email address?" scored 0.40 and "What frontend and graphics
+  // work have you done?" 0.65, each dragged under the floor by ONE of these.
+  // Both are words a visitor wraps a question in; neither is a thing he could
+  // have written down.
+  'address', 'done', 'fit', 'experience',
   // connectives, quantifiers, time words
   'over', 'under', 'after', 'before', 'during', 'between', 'among', 'through',
   'across', 'around', 'without', 'within', 'into', 'onto', 'upon', 'since',
