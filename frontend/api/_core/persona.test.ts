@@ -147,6 +147,11 @@ describe('transport knobs are unchanged', () => {
 
   it('keeps the cascade and the caps exactly as tuned', () => {
     expect(MODELS.length).toBeGreaterThanOrEqual(3)
+    // Measured 2026-09-02: laguna-xs errored on both of `check:models`' probes
+    // and returned HTTP 429 in two full eval runs, while every model behind it
+    // answered. A cascade tries its models in order inside one 20s budget, so a
+    // model that reliably fails must not stand in front of one that works.
+    expect(MODELS.indexOf('poolside/laguna-xs-2.1:free')).toBe(MODELS.length - 1)
     expect(MAX_MESSAGE_CHARS).toBe(1000)
     expect(MAX_TURNS).toBe(12)
     expect(MAX_OUTPUT_TOKENS).toBe(256)

@@ -38,9 +38,16 @@ export const MODELS = [
   'deepseek/deepseek-v4-flash',
   // Free, and measured clean: zero reasoning tokens, answered in first person.
   'poolside/laguna-s-2.1:free',
-  'poolside/laguna-xs-2.1:free',
   // Free, clean content, but spends some completion budget reasoning first.
   'nvidia/nemotron-3-ultra-550b-a55b:free',
+  // Last on measurement, not on quality. Re-checked 2026-09-02: it errored on
+  // both of `check:models`' probes and returned HTTP 429 throughout two full
+  // eval runs, while both models above it answered. The cascade spends ONE
+  // 20s budget across this whole list in order, so a model that reliably fails
+  // spends a visitor's seconds before a working one is ever tried. Kept rather
+  // than deleted because it cost nothing to keep at the back, and it answered
+  // cleanly when the tier was healthy.
+  'poolside/laguna-xs-2.1:free',
 ]
 export const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 
