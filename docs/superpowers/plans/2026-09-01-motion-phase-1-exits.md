@@ -36,7 +36,7 @@ Copied verbatim from the spec and `frontend/CLAUDE.md`. Every task's requirement
 - Consumes: nothing from earlier tasks.
 - Produces: `tools/check_motion.mjs` exporting nothing (it is a CLI), and an `npm run check:motion` script. Later tasks add entries to its `SCENARIOS` array, whose shape is `{ name, viewport: [number, number], setup?: string, act: string, watch: string, minIntermediateFrames?: number }` where `setup` and `act` are **source strings of in-page functions**.
 
-- [ ] **Step 1: Read the model this is built on**
+- [x] **Step 1: Read the model this is built on**
 
 Read `frontend/tools/check_contrast.mjs` end to end. The new tool follows its shape exactly: launch system Chrome via puppeteer-core, loop viewports, collect failures into an array, print one line per check, `process.exit(1)` if any failed.
 
@@ -47,7 +47,7 @@ executablePath: '/usr/bin/google-chrome-stable',
 args: ['--use-gl=angle', '--use-angle=swiftshader', '--no-sandbox'],
 ```
 
-- [ ] **Step 2: Write the tool**
+- [x] **Step 2: Write the tool**
 
 Create `frontend/tools/check_motion.mjs`:
 
@@ -201,7 +201,7 @@ if (failures.length) {
 console.log(`\nall ${SCENARIOS.length} scenario(s) animate`)
 ```
 
-- [ ] **Step 3: Wire the npm script**
+- [x] **Step 3: Wire the npm script**
 
 In `frontend/package.json`, add to `scripts`, immediately after `check:contrast`:
 
@@ -209,7 +209,7 @@ In `frontend/package.json`, add to `scripts`, immediately after `check:contrast`
 "check:motion": "node tools/check_motion.mjs"
 ```
 
-- [ ] **Step 4: Verify it passes against the current code**
+- [x] **Step 4: Verify it passes against the current code**
 
 ```bash
 cd frontend
@@ -221,7 +221,7 @@ npm run check:motion
 
 Expected: `✓ chat panel closes   9 intermediate frames` (the exact count may vary by a frame or two) and `all 1 scenario(s) animate`.
 
-- [ ] **Step 5: Verify it FAILS when the transition is removed**
+- [x] **Step 5: Verify it FAILS when the transition is removed**
 
 A gate that has never failed is not known to work. Temporarily break it:
 
@@ -244,7 +244,7 @@ npm run build && npm run check:motion
 
 Expected: passing again.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/moeez/Documents/projects/3jsPortfolio/MoeezPortfolio
@@ -271,7 +271,7 @@ the panel's transition is commented out."
 - Consumes: the `SCENARIOS` shape and `runScenario` from Task 1.
 - Produces: five further guarded surfaces. No new exports.
 
-- [ ] **Step 1: Add the scenarios**
+- [x] **Step 1: Add the scenarios**
 
 Replace the `SCENARIOS` array in `frontend/tools/check_motion.mjs` with:
 
@@ -340,7 +340,7 @@ const SCENARIOS = [
 ]
 ```
 
-- [ ] **Step 2: Confirm the submit-button selector is right**
+- [x] **Step 2: Confirm the submit-button selector is right**
 
 The `field turns invalid` scenario depends on the contact form's markup. Verify before running:
 
@@ -351,7 +351,7 @@ grep -n "type=\"submit\"\|className=\"contact__form\"\|<form" src/components/sit
 
 If the class or button differs, correct the `act` string to match what is actually there. Do not guess.
 
-- [ ] **Step 3: Run the gate**
+- [x] **Step 3: Run the gate**
 
 ```bash
 cd frontend
@@ -363,7 +363,7 @@ Expected: six lines. `chat panel opens`, `chat panel closes`, `mobile menu opens
 
 **`field turns invalid` is expected to FAIL only if the form does not mark fields invalid on empty submit.** If it fails with `no state change`, the scenario is wrong, not the site: fix the scenario (check what `aria-invalid` is actually set on and when) rather than changing the site.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd /home/moeez/Documents/projects/3jsPortfolio/MoeezPortfolio
@@ -382,7 +382,7 @@ git commit -m "test: guard every interactive surface, not just the one that brok
 - Consumes: the file's existing `cssFiles` array and `stripComments` helper.
 - Produces: one further assertion in the `CSS motion` describe block. No new exports.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Add inside the existing `describe('CSS motion', ...)` block in `frontend/src/test/motion-language.test.ts`:
 
@@ -414,7 +414,7 @@ Add inside the existing `describe('CSS motion', ...)` block in `frontend/src/tes
   })
 ```
 
-- [ ] **Step 2: Run it and see where it stands**
+- [x] **Step 2: Run it and see where it stands**
 
 ```bash
 cd frontend
@@ -423,7 +423,7 @@ npx vitest run src/test/motion-language.test.ts
 
 Expected: **PASS.** `chat-in` was already removed, and the only remaining one-shot animations should be none. If it FAILS, it has found a real fourth instance — read the offender, fix that surface the way the chat panel was fixed (`@starting-style` + `transition-behavior: allow-discrete`), and add a `check_motion` scenario for it before continuing.
 
-- [ ] **Step 3: Verify the lint actually catches the original bug**
+- [x] **Step 3: Verify the lint actually catches the original bug**
 
 ```bash
 cd frontend
@@ -446,7 +446,7 @@ npx vitest run src/test/motion-language.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd /home/moeez/Documents/projects/3jsPortfolio/MoeezPortfolio
@@ -474,7 +474,7 @@ Verified against a deliberately planted offender, then removed."
 
 Task 5 consumes both functions and the constant.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `frontend/src/components/layout/navMarker.test.ts`:
 
@@ -523,7 +523,7 @@ describe('markerTransform', () => {
 })
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 ```bash
 cd frontend
@@ -532,7 +532,7 @@ npx vitest run src/components/layout/navMarker.test.ts
 
 Expected: FAIL — `Failed to resolve import "./navMarker"`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `frontend/src/components/layout/navMarker.ts`:
 
@@ -574,7 +574,7 @@ export function markerTransform(geometry: MarkerGeometry): string {
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 ```bash
 cd frontend
@@ -583,7 +583,7 @@ npx vitest run src/components/layout/navMarker.test.ts
 
 Expected: PASS, 5 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /home/moeez/Documents/projects/3jsPortfolio/MoeezPortfolio
@@ -603,7 +603,7 @@ git commit -m "feat: pure geometry for a nav underline that can actually move"
 - Consumes: `MARKER_BASE_WIDTH`, `markerGeometry`, `markerTransform` from Task 4; the existing `SECTION_IDS` and `active` value in `Nav.tsx`.
 - Produces: a `.nav__marker` element inside `.nav__links`. Task 6 watches this selector.
 
-- [ ] **Step 1: Add the marker element and its positioning effect**
+- [x] **Step 1: Add the marker element and its positioning effect**
 
 In `frontend/src/components/layout/Nav.tsx`:
 
@@ -648,7 +648,7 @@ Add `ref={listRef}` to the existing `<nav id="nav-links" ...>` element, and add 
 
 Ensure `useRef` is in the React import at the top of the file.
 
-- [ ] **Step 2: Remove the old underline and style the marker**
+- [x] **Step 2: Remove the old underline and style the marker**
 
 In `frontend/src/components/layout/Nav.css`, DELETE these two rules entirely:
 
@@ -709,7 +709,7 @@ Finally, hide it below the breakpoint — the mobile menu is a vertical panel wh
 }
 ```
 
-- [ ] **Step 3: Verify types and the existing suite**
+- [x] **Step 3: Verify types and the existing suite**
 
 ```bash
 cd frontend
@@ -718,7 +718,7 @@ npx tsc -b && npm test
 
 Expected: types clean, all tests pass. `Nav.test.tsx` asserts `aria-current` on links, which is untouched.
 
-- [ ] **Step 4: Verify the marker actually slides**
+- [x] **Step 4: Verify the marker actually slides**
 
 ```bash
 cd frontend
@@ -729,7 +729,7 @@ sleep 4
 
 Then in a browser at 1440x900, scroll from the hero through Work and watch the underline. It must travel between items, not blink. Confirm the hero shows no marker at all.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /home/moeez/Documents/projects/3jsPortfolio/MoeezPortfolio
@@ -753,7 +753,7 @@ in a single frame, five times per scroll."
 - Consumes: the `.nav__marker` element from Task 5; the `SCENARIOS` shape from Task 1.
 - Produces: the completed Phase 1 gate. Nothing downstream consumes this.
 
-- [ ] **Step 1: Add the marker scenario**
+- [x] **Step 1: Add the marker scenario**
 
 Append to the `SCENARIOS` array in `frontend/tools/check_motion.mjs`:
 
@@ -773,7 +773,7 @@ Append to the `SCENARIOS` array in `frontend/tools/check_motion.mjs`:
   },
 ```
 
-- [ ] **Step 2: Run the full gate**
+- [x] **Step 2: Run the full gate**
 
 ```bash
 cd frontend
@@ -783,7 +783,7 @@ npm run check:motion
 
 Expected: seven scenarios, all passing.
 
-- [ ] **Step 3: Record the verdicts so the next audit does not re-litigate them**
+- [x] **Step 3: Record the verdicts so the next audit does not re-litigate them**
 
 Add to `frontend/CLAUDE.md`, inside the "Motion — the rules that keep being rediscovered" section:
 
@@ -797,7 +797,7 @@ Add to `frontend/CLAUDE.md`, inside the "Motion — the rules that keep being re
   properties (they change together with `display`, under the panel's own fade).
 ```
 
-- [ ] **Step 4: Full verification**
+- [x] **Step 4: Full verification**
 
 ```bash
 cd frontend
@@ -806,7 +806,7 @@ npm test && npx tsc -b && npm run build && npm run check:contrast && npm run che
 
 Expected: every command exits zero.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /home/moeez/Documents/projects/3jsPortfolio/MoeezPortfolio
@@ -815,6 +815,32 @@ git commit -m "test: guard the nav marker, and record which suspects were innoce
 ```
 
 ---
+
+## Deviations found during execution
+
+The plan survived contact, but three of its decisions were wrong and were corrected while running it.
+Recorded here rather than silently rewritten above, because each was found by evidence and the
+reasoning is worth more than the original text.
+
+1. **Interactions are declarative step lists, not JavaScript source.** The plan had scenarios carry
+   their `act`/`setup` as source strings rebuilt in the page with `new Function`. Every string is a
+   literal written in that file, so it was not exploitable — but it is a code-injection shape, and a
+   dozen lines of interpreter (`{ click }`, `{ scrollTo }`, `{ style }`, `{ wait }`) removes the class
+   outright.
+2. **The gate asserts on `getAnimations()`, not on a frame count.** The plan's
+   `minIntermediateFrames: 4` was measuring the harness: puppeteer under SwiftShader runs rAF at
+   **12Hz**, not 60, and the anti-throttling flags change nothing because it is software rendering. A
+   0.28s transition spans barely three frames there. `field turns invalid` proves the point — it
+   reports zero sampled frames mid-change and passes anyway, because the Web Animations API saw the
+   200ms transition the sampler stepped over.
+3. **Animations are sampled on every frame of the window, not one chosen frame.** The nav marker
+   scenario failed on first run and the gate was wrong, not the marker: the marker only starts moving
+   once a smooth scroll has settled and the section observer has fired, several frames after the
+   interaction.
+
+The lint also needed one exclusion the plan did not anticipate: `animation: none`, which is how the
+reduced-motion block TAKES an animation away. Flagging it is exactly backwards, and it was the lint's
+first two false positives.
 
 ## Phase 1 acceptance
 
