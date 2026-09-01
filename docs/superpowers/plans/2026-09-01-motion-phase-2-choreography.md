@@ -47,7 +47,7 @@ Copied verbatim from the spec and `frontend/CLAUDE.md`. Every task's requirement
 
 Task 2 calls `advanceOrbit` from the frame loop.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `frontend/src/three/useDragOrbit.test.ts` already exists with two tests. Add these imports **at the top of the file**, beside the ones already there — not at the bottom, where the `describe` block goes:
 
@@ -128,7 +128,7 @@ describe('advanceOrbit', () => {
 })
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 ```bash
 cd frontend
@@ -137,7 +137,7 @@ npx vitest run src/three/useDragOrbit.test.ts
 
 Expected: FAIL — `advanceOrbit` and `ORBIT_FRICTION_LAMBDA` are not exported.
 
-- [ ] **Step 3: Add the friction constant**
+- [x] **Step 3: Add the friction constant**
 
 In `frontend/src/three/motion.ts`, add after `ORBIT_RETURN_LAMBDA`:
 
@@ -153,7 +153,7 @@ In `frontend/src/three/motion.ts`, add after `ORBIT_RETURN_LAMBDA`:
 export const ORBIT_FRICTION_LAMBDA = 2.2
 ```
 
-- [ ] **Step 4: Implement `advanceOrbit` and track velocity while dragging**
+- [x] **Step 4: Implement `advanceOrbit` and track velocity while dragging**
 
 In `frontend/src/three/useDragOrbit.ts`:
 
@@ -224,7 +224,7 @@ Then make the pointer handlers record velocity. Replace the `down` and `move` ha
     }
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 ```bash
 cd frontend
@@ -233,7 +233,7 @@ npx vitest run src/three/useDragOrbit.test.ts && npx tsc -b
 
 Expected: PASS, types clean.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /home/moeez/Documents/projects/3jsPortfolio/MoeezPortfolio
@@ -258,7 +258,7 @@ written, so a flick and a slow drag ended identically."
 - Consumes: `advanceOrbit` and `orbitState` from Task 1.
 - Produces: `export const PITCH_LAMBDA` in `three/motion.ts`; `MAX_TILT` retuned in `rigPose.ts`. No signature changes.
 
-- [ ] **Step 1: Write the failing test for the deeper tilt**
+- [x] **Step 1: Write the failing test for the deeper tilt**
 
 Add to the `describe('rigPose', ...)` block in `frontend/src/three/rigPose.test.ts`:
 
@@ -272,7 +272,7 @@ Add to the `describe('rigPose', ...)` block in `frontend/src/three/rigPose.test.
   })
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 ```bash
 cd frontend
@@ -281,7 +281,7 @@ npx vitest run src/three/rigPose.test.ts
 
 Expected: FAIL — `expected 0.18 to be greater than 0.2`.
 
-- [ ] **Step 3: Retune the tilt and add the pitch rate**
+- [x] **Step 3: Retune the tilt and add the pitch rate**
 
 In `frontend/src/three/rigPose.ts`, replace the `MAX_TILT` declaration:
 
@@ -304,7 +304,7 @@ In `frontend/src/three/motion.ts`, add after `TURN_LAMBDA`:
 export const PITCH_LAMBDA = 2.0
 ```
 
-- [ ] **Step 4: Wire both into the frame loop**
+- [x] **Step 4: Wire both into the frame loop**
 
 In `frontend/src/three/CharacterRig.tsx`:
 
@@ -332,7 +332,7 @@ Then change the pitch line to use its own rate:
     g.rotation.x = damp(g.rotation.x, pose.pitch, PITCH_LAMBDA, dt)
 ```
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 ```bash
 cd frontend
@@ -341,7 +341,7 @@ npm test && npx tsc -b && npm run build
 
 Expected: all pass. `motion-language.test.ts` will confirm `PITCH_LAMBDA` is a named constant rather than a literal.
 
-- [ ] **Step 6: Look at it**
+- [x] **Step 6: Look at it**
 
 ```bash
 cd frontend
@@ -352,7 +352,7 @@ npm run shoot
 
 Review `.shots/desktop-top.png` and `.shots/mobile-top.png`. The figure should read as attending, not spinning. If 0.28 is too much, lower toward 0.24 and re-shoot — the test's bound (`> 0.2`) leaves room.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /home/moeez/Documents/projects/3jsPortfolio/MoeezPortfolio
@@ -377,7 +377,7 @@ git commit -m "feat: the hero attends to the visitor, and the head leads the bod
 
 Task 4 calls `entryOffsets` from the frame loop with a hoisted `out` object.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `frontend/src/three/choreography.test.ts`:
 
@@ -442,7 +442,7 @@ describe('entryOffsets', () => {
 })
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 ```bash
 cd frontend
@@ -451,7 +451,7 @@ npx vitest run src/three/choreography.test.ts
 
 Expected: FAIL — `Failed to resolve import "./choreography"`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `frontend/src/three/choreography.ts`:
 
@@ -515,7 +515,7 @@ export function entryOffsets(rigId: string, progress: number, out: EntryOffsets)
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 ```bash
 cd frontend
@@ -524,7 +524,7 @@ npx vitest run src/three/choreography.test.ts
 
 Expected: PASS, 7 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /home/moeez/Documents/projects/3jsPortfolio/MoeezPortfolio
@@ -543,7 +543,7 @@ git commit -m "feat: pure per-rig entry choreography, driven by the rig's own fa
 - Consumes: `entryOffsets`, `EntryOffsets` from Task 3; the existing `fade` ref and `baseScale` in `CharacterRig`.
 - Produces: nothing new. This is the final wiring.
 
-- [ ] **Step 1: Hoist the offsets object and apply it**
+- [x] **Step 1: Hoist the offsets object and apply it**
 
 In `frontend/src/three/CharacterRig.tsx`:
 
@@ -597,7 +597,7 @@ And animate scale, which is currently only a static prop:
     g.scale.setScalar(damp(g.scale.x, baseScale * (1 + entry.scale), LIFT_LAMBDA, dt))
 ```
 
-- [ ] **Step 2: Verify nothing regressed**
+- [x] **Step 2: Verify nothing regressed**
 
 ```bash
 cd frontend
@@ -606,7 +606,7 @@ npm test && npx tsc -b && npm run build
 
 Expected: all pass.
 
-- [ ] **Step 3: Verify the transition by sampling it, not by screenshotting it**
+- [x] **Step 3: Verify the transition by sampling it, not by screenshotting it**
 
 `tools/shoot.mjs` waits for a settled scene and is blind by construction to anything visible only mid-transition — this is recorded in `frontend/CLAUDE.md`. So confirm the entry by watching the model settle in a browser:
 
@@ -618,7 +618,7 @@ sleep 4
 
 Then in a browser at 1440x900, scroll from About into Work and watch the model take its place. It should arrive with a short turn-and-settle, not simply brighten. Scroll back and forth several times: two quick crossings must produce two independently settling figures, never a popped or dropped one — `SceneDirector` already guarantees this and the change must not break it.
 
-- [ ] **Step 4: Confirm the whole gate set**
+- [x] **Step 4: Confirm the whole gate set**
 
 ```bash
 cd frontend
@@ -634,7 +634,7 @@ grep -n "mobile" src/three/rigs.ts | head -5
 
 Expected: the mobile gate in `rigFor`/`nextRig` is untouched.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /home/moeez/Documents/projects/3jsPortfolio/MoeezPortfolio
@@ -653,7 +653,7 @@ git commit -m "feat: a section's model arrives rather than merely brightening"
 - Consumes: everything above.
 - Produces: documentation only.
 
-- [ ] **Step 1: Document the new rules**
+- [x] **Step 1: Document the new rules**
 
 Add to `frontend/CLAUDE.md`, in the "Motion — the rules that keep being rediscovered" section:
 
@@ -667,7 +667,7 @@ Add to `frontend/CLAUDE.md`, in the "Motion — the rules that keep being redisc
 - Pitch settles at `PITCH_LAMBDA`, deliberately slower than `TURN_LAMBDA`, so the head leads the body.
 ```
 
-- [ ] **Step 2: Final verification**
+- [x] **Step 2: Final verification**
 
 ```bash
 cd frontend
@@ -676,7 +676,7 @@ npm test && npx tsc -b && npm run build && npm run check:contrast && npm run che
 
 Expected: every command exits zero.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd /home/moeez/Documents/projects/3jsPortfolio/MoeezPortfolio

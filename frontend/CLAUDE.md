@@ -103,6 +103,15 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   hero model out and never brought it back (fatal on mobile, where the gate leaves the hero as the
   only model). `rigFor` normalises `'top'` to the table's `''` key. Anything else observing sections
   must use `SECTION_IDS`, never `NAV_ITEMS` alone.
+- **Choreography reads the rig's own fade and nothing else** (`three/choreography.ts`). It is
+  deliberately not scroll-driven: a table keyed on scroll fractions is what got v1 deleted. If a
+  section's model needs to move differently, add a row to `ENTRIES`, never a scroll input. The
+  entry decays linearly in the fade because the fade is already damped — easing it again stacks a
+  second curve on a value that has one.
+- `orbitState.velocity` is live now — `advanceOrbit` spends it on release momentum. It sat declared
+  and unread from the day the file was written, which is why a flick and a slow drag used to end
+  identically.
+- Pitch settles at `PITCH_LAMBDA`, deliberately slower than `TURN_LAMBDA`, so the head leads the body.
 - **Still screenshots cannot verify motion.** `tools/shoot.mjs` waits for `window.__modelReady`, which latches only once a rig has settled — so it is blind by construction to anything visible only mid-transition. Verify time-varying work by sampling state deliberately or asserting on it in a test.
 - `tools/shoot.mjs` waits on three things per section, and needs all three: the page to hold still for
   several polls (`scroll-behavior: smooth` means `scrollIntoView` returns before the scroll starts),
