@@ -25,13 +25,18 @@ const DESKTOP_RIG = {
   contact: null,
 }
 
+// Every section, not just the hero. The mobile gate in rigs.ts still allows a
+// phone exactly one GLB, but it no longer throws the figure away below the
+// hero: `rigFor(id, true)` returns the same hero spec for every section, so one
+// rig stays mounted and travels between MOBILE_STATIONS. `__modelReady` is
+// keyed on the rig id, which is `hero` the whole way down.
 const MOBILE_RIG = {
   top: 'hero',
-  about: null,
-  work: null,
-  skills: null,
-  experience: null,
-  contact: null,
+  about: 'hero',
+  work: 'hero',
+  skills: 'hero',
+  experience: 'hero',
+  contact: 'hero',
 }
 
 const WIDTHS = [

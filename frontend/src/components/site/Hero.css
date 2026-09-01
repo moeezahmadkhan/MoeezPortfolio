@@ -45,6 +45,72 @@
   color: var(--muted);
 }
 
+
+/* The opening stagger.
+
+   One-shot `animation`, not a transition, and that is a deliberate exception to
+   "anything that appears must also have a way to leave" (see CLAUDE.md and
+   `ENTRANCE_EXCEPTIONS` in src/test/motion-language.test.ts). The rule exists
+   for surfaces that come and go — the mobile menu, the chat panel — where a
+   keyframe entrance leaves nothing to animate on the way out. The hero's own
+   copy is on the page from first paint to last; there is no exit to describe.
+
+   An animation is also the only form of this that survives its own failure. A
+   transition would need JS to add a class after mount, and if that JS never ran
+   the copy would stay at `opacity: 0` forever. `animation-fill-mode: both` on a
+   declarative keyframe cannot strand the text: worst case the browser skips
+   straight to the end state, which is the readable one.
+
+   `translateY`, never a layout property, so nothing here re-flows the document.
+   The site-wide reduced-motion block in base.css collapses the duration to
+   0.01ms, so a visitor who asked for stillness gets the settled hero on frame
+   one — `both` guarantees the end state is what they land on. */
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The order the eye is meant to travel in: what he is, then who, then what he
+   does, then what to press. The model's own push-in (three/choreography.ts's
+   HERO_INTRO) starts alongside the name and settles last, so the figure is
+   still arriving as the buttons land. */
+.hero__role,
+.hero__name,
+.hero__thesis,
+.hero__actions,
+.hero__meta {
+  animation: hero-in 0.7s var(--ease) both;
+}
+
+.hero__role {
+  animation-delay: 120ms;
+}
+.hero__name {
+  animation-delay: 220ms;
+}
+.hero__thesis {
+  animation-delay: 380ms;
+}
+.hero__actions {
+  animation-delay: 520ms;
+}
+.hero__meta {
+  animation-delay: 620ms;
+}
+
+/* The scroll cue is deliberately NOT in the stagger. It already owns an
+   `infinite` animation, and the only way to give it an entrance too is a
+   comma-separated pair — which would put `var(--ease)` and `infinite` in one
+   shorthand and trip the "looping animation on the one-shot entrance curve"
+   rule for a reason that is not the reason that rule exists. It is a 44px
+   arrow; it can simply be there. */
+
 .hero__cue {
   position: absolute;
   left: 50%;

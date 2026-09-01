@@ -31,6 +31,26 @@ export const PITCH_LAMBDA = 2.0
 /** How fast the rig's vertical position settles — slower than the turn, so the figure never bobs. */
 export const LIFT_LAMBDA = 2.2
 
+/**
+ * How fast the mobile rig travels between two of `rigs.ts`'s `MOBILE_STATIONS`.
+ *
+ * Deliberately the slowest thing that moves the figure — slower than
+ * `LIFT_LAMBDA`, which settles a pose. This is not a settle: it is one figure
+ * crossing the screen from one corner to another as a section hands over, and
+ * at `LIFT_LAMBDA` it arrived before the section it belonged to had finished
+ * scrolling into place, which reads as a snap rather than as a journey.
+ */
+export const STATION_LAMBDA = 1.5
+
+/**
+ * How fast the hero's opening push-in settles.
+ *
+ * Slower than `STATION_LAMBDA` because it runs exactly once, on the first
+ * screen a visitor ever sees, and it is the only motion on the page at that
+ * moment — nothing else is competing for the eye, so it can afford the time.
+ */
+export const INTRO_LAMBDA = 1.2
+
 /** How fast a released drag-orbit unwinds back to the rig's resting yaw. */
 export const ORBIT_RETURN_LAMBDA = 1.4
 
@@ -92,8 +112,26 @@ export function advanceFade(fade: number, fadeIn: boolean, dt: number): number {
  * this one number drives the body's material opacity, the wand light and the
  * sparkle cloud together — so reading raw here made all three step at once
  * while the rotation and lift beside them glided (D1).
+ *
+ * `atHeroStation` is what keeps that measure from destroying the mobile
+ * stations. On mobile the hero rig no longer belongs to the hero alone — it
+ * stays mounted and travels the whole page (see `rigs.ts`'s `rigFor`), and
+ * `heroVisible` decays to zero one screen below the top. Applied unconditionally
+ * it would fade the figure out at precisely the moment it should be setting off
+ * for the About station. So the measure applies only while the hero station is
+ * the one that owns the screen; past that, the rig's own cross-fade is the
+ * whole answer and the station's `presence` (applied in `rigPose`) decides how
+ * far forward it stands.
+ *
+ * Desktop passes `true` — it has no stations, its hero rig only ever presides
+ * over the hero, and it is unchanged by all of this.
  */
-export function rigVisibility(rigId: string, fade: number, scroll: ScrollChannels): number {
-  const sectionVisible = rigId === HERO_RIG_ID ? scroll.smooth.heroVisible : 1
+export function rigVisibility(
+  rigId: string,
+  fade: number,
+  scroll: ScrollChannels,
+  atHeroStation: boolean = true,
+): number {
+  const sectionVisible = rigId === HERO_RIG_ID && atHeroStation ? scroll.smooth.heroVisible : 1
   return fade * sectionVisible
 }

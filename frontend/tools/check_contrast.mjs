@@ -67,8 +67,34 @@ const ratio = (l1, l2) => (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)
 const MIN_RATIO = 4.5
 
 // Each sample is a selector whose text must stay legible over whatever the
-// canvas is drawing behind it.
-const SAMPLES = ['.hero__thesis', '.hero__meta']
+// canvas is drawing behind it, and the section that has to be on screen for it
+// to be laid out where a visitor sees it.
+//
+// The hero was the only thing sampled here until mobile stations existed, and
+// that was defensible while the mobile gate left the hero as the only rig a
+// phone ever drew: below the hero there was, literally, nothing behind the
+// copy. There is now. `rigs.ts`'s MOBILE_STATIONS keeps one lit figure on
+// screen for the whole page, so every section below the hero acquired exactly
+// the hazard this file was written to catch — and this file could not see it.
+//
+// One selector per section, chosen as the smallest body copy in it (small type
+// is where a marginal ground shows up first), plus the two hero samples that
+// were already here.
+const SAMPLES = [
+  { section: 'top', selector: '.hero__thesis' },
+  { section: 'top', selector: '.hero__meta' },
+  { section: 'about', selector: '.about__copy p' },
+  { section: 'work', selector: '.card__outcome' },
+  { section: 'skills', selector: '.skills__title' },
+  { section: 'experience', selector: '.timeline__bullets li' },
+  { section: 'contact', selector: '.contact__meta' },
+]
+
+// How long the figure needs to arrive at a station after a scroll.
+// STATION_LAMBDA is 1.5 reciprocal seconds (src/three/motion.ts), so a journey
+// is within a percent of settled after ~3s. Sampling before that measures the
+// figure mid-flight, which is a frame, not a resting state.
+const STATION_SETTLE_MS = 3200
 
 const URL = process.env.SHOOT_URL ?? 'http://localhost:4174/'
 const failures = []
@@ -85,20 +111,46 @@ for (const [name, w, h] of [['mobile', 390, 844], ['desktop', 1440, 900]]) {
   await p.waitForFunction(() => window.__modelReady && window.__modelReady.hero, { timeout: 20000 })
   await new Promise((r) => setTimeout(r, 2000))
 
-  for (const selector of SAMPLES) {
+  let onScreen = null
+  for (const { section, selector } of SAMPLES) {
+    if (section !== onScreen) {
+      // `scroll-behavior: smooth` means scrollIntoView returns before the
+      // scroll starts, so this is an instant jump followed by a settle rather
+      // than a wait on the scroll itself.
+      await p.evaluate((id) => {
+        const el = document.getElementById(id)
+        window.scrollTo({ top: el ? el.getBoundingClientRect().top + window.scrollY : 0, behavior: 'instant' })
+      }, section)
+      await new Promise((r) => setTimeout(r, STATION_SETTLE_MS))
+      onScreen = section
+    }
+
     const box = await p.evaluate((sel) => {
-      const el = document.querySelector(sel)
-      if (!el) return null
-      const r = el.getBoundingClientRect()
-      const ink = getComputedStyle(el).color.match(/[\d.]+/g).slice(0, 3).map(Number)
-      return {
-        x: Math.round(r.left), y: Math.round(r.top),
-        width: Math.round(r.width), height: Math.round(r.height),
-        ink,
+      // The FIRST match with a usable amount of itself on screen, clipped to
+      // the viewport. These selectors match many elements down a long section,
+      // and a box scrolled off screen screenshots as whatever happens to be at
+      // those coordinates now. Requiring FULL containment was the first
+      // attempt and it is too strict: a project card's paragraph is taller
+      // than what remains below the fold, so nothing matched at all.
+      // Low enough to admit a single line of --t-micro mono (`.hero__meta` is ~14px
+      // tall), high enough to reject a sliver clipped at the fold.
+      const MIN_VISIBLE = 8
+      for (const e of document.querySelectorAll(sel)) {
+        const r = e.getBoundingClientRect()
+        const top = Math.max(r.top, 0)
+        const bottom = Math.min(r.bottom, window.innerHeight)
+        if (bottom - top < MIN_VISIBLE || r.width < 2) continue
+        const ink = getComputedStyle(e).color.match(/[\d.]+/g).slice(0, 3).map(Number)
+        return {
+          x: Math.round(r.left), y: Math.round(top),
+          width: Math.round(r.width), height: Math.round(bottom - top),
+          ink,
+        }
       }
+      return null
     }, selector)
     if (!box || box.width < 2 || box.height < 2) {
-      throw new Error(`${name} ${selector}: nothing to sample — the selector matched no laid-out element`)
+      throw new Error(`${name} ${selector}: nothing to sample — no match was laid out inside the viewport`)
     }
 
     const clip = { x: box.x, y: box.y, width: box.width, height: box.height }
@@ -128,7 +180,7 @@ for (const [name, w, h] of [['mobile', 390, 844], ['desktop', 1440, 900]]) {
     const ok = r >= MIN_RATIO
     if (!ok) failures.push(`${name} ${selector}: ${r.toFixed(2)}:1`)
     console.log(
-      `${ok ? '\u2713' : '\u2717'} ${name.padEnd(8)} ${selector.padEnd(16)} ${r.toFixed(2)}:1` +
+      `${ok ? '\u2713' : '\u2717'} ${name.padEnd(8)} ${selector.padEnd(20)} ${r.toFixed(2)}:1` +
         `  (ground ${ground.toFixed(4)}, glyph ${glyph.toFixed(4)})`,
     )
   }

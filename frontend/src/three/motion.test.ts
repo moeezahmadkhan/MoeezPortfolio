@@ -5,13 +5,16 @@ import {
   BACKDROP_TINT_LAMBDA,
   FADE_LAMBDA,
   INTENSITY_LAMBDA,
+  INTRO_LAMBDA,
   LIFT_LAMBDA,
   ORBIT_RETURN_LAMBDA,
+  STATION_LAMBDA,
   TURN_LAMBDA,
   advanceFade,
   rigVisibility,
   type ScrollChannels,
 } from './motion'
+import { HERO_RIG_ID } from './rigs'
 
 /** A scrollState-shaped double, raw and smoothed starting in agreement. */
 function channels(heroVisible = 1): ScrollChannels {
@@ -131,5 +134,50 @@ describe('rigVisibility', () => {
 
     expect(rawStep).toBeCloseTo(NOTCH, 6)
     expect(visibleStep).toBeLessThan(rawStep * 0.6)
+  })
+})
+
+describe('rigVisibility and the mobile stations', () => {
+  const scroll = {
+    heroVisible: 0,
+    progress: 0,
+    pinnedProgress: 0,
+    smooth: { heroVisible: 0, progress: 0, pinnedProgress: 0 },
+  }
+
+  it('still fades the hero out with its section when the hero station owns the screen', () => {
+    scroll.smooth.heroVisible = 0.25
+    expect(rigVisibility(HERO_RIG_ID, 1, scroll, true)).toBeCloseTo(0.25)
+  })
+
+  it('keeps the hero rig fully present once it has left the hero station', () => {
+    // The whole reason the parameter exists. On mobile this rig outlives the
+    // hero section and travels the page; heroVisible is 0 a screen down, and
+    // applied there it would fade the figure out at exactly the moment it
+    // should be arriving at the About station.
+    scroll.smooth.heroVisible = 0
+    expect(rigVisibility(HERO_RIG_ID, 1, scroll, false)).toBe(1)
+  })
+
+  it('leaves desktop alone by defaulting to the hero-station reading', () => {
+    scroll.smooth.heroVisible = 0.4
+    expect(rigVisibility(HERO_RIG_ID, 1, scroll)).toBeCloseTo(0.4)
+  })
+
+  it('never applies the hero measure to another rig, at any station', () => {
+    scroll.smooth.heroVisible = 0
+    expect(rigVisibility('work', 1, scroll, true)).toBe(1)
+    expect(rigVisibility('work', 1, scroll, false)).toBe(1)
+  })
+
+  it('travels between stations more slowly than it settles a pose', () => {
+    // A journey across the screen, not a settle. At LIFT_LAMBDA the figure
+    // arrived before its section had finished scrolling into place, which reads
+    // as a snap.
+    expect(STATION_LAMBDA).toBeLessThan(LIFT_LAMBDA)
+  })
+
+  it('runs the one-shot opening push-in slower still', () => {
+    expect(INTRO_LAMBDA).toBeLessThan(STATION_LAMBDA)
   })
 })

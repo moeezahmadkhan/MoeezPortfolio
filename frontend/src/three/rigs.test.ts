@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { NAV_ITEMS } from '../components/layout/Nav'
 import { SECTION_IDS } from '../components/layout/Nav'
 import {
+  MOBILE_STATIONS,
   nextRig,
   RIGS,
   rigFor,
+  stationFor,
   PINNED_SECTION_ID,
   HERO_RIG_ID,
   HERO_SECTION_ID,
@@ -44,17 +46,7 @@ describe('rigFor', () => {
     }
   })
 
-  it('every rig defines a desktop and mobile scale, and mobile is smaller', () => {
-    for (const id of ids) {
-      const rig = rigFor(id)
-      if (!rig) continue
-      expect(typeof rig.scale).toBe('number')
-      expect(typeof rig.mobileScale).toBe('number')
-      expect(rig.mobileScale).toBeLessThan(rig.scale)
-    }
-  })
-
-  it('leaves an unmapped section without a model', () => {
+  it('leaves an unmapped section without a model on desktop', () => {
     expect(rigFor('about')).toBeNull()
   })
 })
@@ -106,11 +98,25 @@ describe('the mobile gate', () => {
     expect(hero?.id).toBe(HERO_RIG_ID)
   })
 
-  it('drops every non-hero rig on mobile', () => {
-    for (const [sectionId, spec] of Object.entries(RIGS)) {
-      if (spec.id === HERO_RIG_ID) continue
-      expect(rigFor(sectionId, true)).toBeNull()
+  it('never names a model other than the hero on mobile', () => {
+    // The payload invariant, stated as what it actually is. Mobile used to
+    // return null below the hero, which stopped the download AND threw away the
+    // figure; it now returns the hero spec for every section so one rig can
+    // travel the page. What must not change is the set of files a phone can be
+    // asked to fetch: exactly one.
+    const heroModel = RIGS[''].model
+    for (const id of [...SECTION_IDS, '', 'not-a-section']) {
+      expect(rigFor(id, true)?.model).toBe(heroModel)
     }
+  })
+
+  it('keeps one rig identity across every section on mobile, so it is never remounted', () => {
+    // Load-bearing: SceneDirector bails when the incoming rig's id matches the
+    // current one. A changing id here would cross-fade and remount the rig at
+    // every section boundary — six dissolves instead of one travelling figure,
+    // and a fresh material clone each time.
+    const ids = new Set(SECTION_IDS.map((id) => rigFor(id, true)?.id))
+    expect(ids).toEqual(new Set([HERO_RIG_ID]))
   })
 
   it('still mounts every rig on desktop', () => {
@@ -131,24 +137,58 @@ describe('the mobile gate', () => {
   })
 })
 
-describe('mobile hero framing', () => {
-  // Regression guard on the tuning, not on an exact number: at camera z 4.2 /
+describe('mobile stations', () => {
+  // Regression guard on the tuning, not on exact numbers: at camera z 4.2 /
   // fov 38 the viewport is ~1.34 world units wide at 390px, and the hero used
   // to sit at scale 0.3 — a figure roughly a tenth of the screen, which read as
-  // sparkle dust rather than as a wizard (see .shots/mobile-top.png before this
+  // sparkle dust rather than as a wizard (see .shots/mobile-top.png before that
   // change). Anything below half the desktop scale is back in that territory.
-  it('sizes the hero to read as a figure, not a speck', () => {
-    const hero = RIGS['']
-    expect(hero.mobileScale).toBeGreaterThan(hero.scale * 0.4)
+  it('sizes the hero station to read as a figure, not a speck', () => {
+    expect(MOBILE_STATIONS[HERO_SECTION_ID].scale).toBeGreaterThan(RIGS[''].scale * 0.4)
   })
 
-  it('stands the hero at the bottom of the frame, centred', () => {
+  it('stands the hero station at the bottom of the frame, centred', () => {
     // Matches where Stage.css puts the no-WebGL fallback on mobile
     // (`place-items: end center`), so canvas and fallback agree on where the
     // figure is.
-    const hero = RIGS['']
-    expect(hero.mobilePosition[0]).toBe(0)
-    expect(hero.mobilePosition[1]).toBeLessThan(0)
+    const hero = MOBILE_STATIONS[HERO_SECTION_ID]
+    expect(hero.position[0]).toBe(0)
+    expect(hero.position[1]).toBeLessThan(0)
+  })
+
+  it('gives every observed section a station of its own', () => {
+    // A missing row is not an error anywhere — `stationFor` falls back to the
+    // hero — so the figure would simply stop moving for that section with
+    // nothing to show for it.
+    for (const id of SECTION_IDS) {
+      expect(MOBILE_STATIONS[id], id).toBeDefined()
+    }
+  })
+
+  it('falls back to the hero station for the pre-intersection state', () => {
+    // useSectionObserver reports '' before it commits anything, and that state
+    // IS the hero.
+    expect(stationFor('')).toBe(MOBILE_STATIONS[HERO_SECTION_ID])
+    expect(stationFor('not-a-section')).toBe(MOBILE_STATIONS[HERO_SECTION_ID])
+  })
+
+  it('keeps every station below the hero smaller and dimmer than the hero itself', () => {
+    // Below the hero the figure has no reserved strip: it holds a corner while
+    // body copy owns the middle, behind .stage__scrim. A station that crept back
+    // up toward the hero's size or presence is the drift that puts a lit figure
+    // behind a paragraph and moves check:contrast the wrong way.
+    const hero = MOBILE_STATIONS[HERO_SECTION_ID]
+    for (const [id, station] of Object.entries(MOBILE_STATIONS)) {
+      if (id === HERO_SECTION_ID) continue
+      expect(station.scale, id).toBeLessThan(hero.scale)
+      expect(station.presence, id).toBeLessThan(hero.presence)
+    }
+  })
+
+  it('leaves the pinned section no station yaw of its own', () => {
+    // pinnedYaw already turns that rig from the smoothed pinnedProgress. A
+    // station yaw here would be a constant fighting a scroll-driven term.
+    expect(MOBILE_STATIONS[PINNED_SECTION_ID].yaw).toBe(0)
   })
 })
 

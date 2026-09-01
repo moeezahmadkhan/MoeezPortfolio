@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { ENTRIES, entryOffsets, type EntryOffsets } from './choreography'
+import {
+  ENTRIES,
+  HERO_INTRO,
+  HERO_INTRO_DOLLY,
+  entryOffsets,
+  introOffsets,
+  type EntryOffsets,
+} from './choreography'
 import { HERO_RIG_ID } from './rigs'
 
 const out = (): EntryOffsets => ({ lift: 0, yaw: 0, scale: 0 })
@@ -54,5 +61,46 @@ describe('entryOffsets', () => {
     const o = out()
     expect(entryOffsets('work', 0.5, o)).toBe(o)
     expect(o.yaw).not.toBe(0)
+  })
+})
+
+describe('the hero opening push-in', () => {
+  const out = { lift: 0, yaw: 0, scale: 0 }
+
+  it('starts the figure back and smaller, and lands it exactly on its mark', () => {
+    const dolly = introOffsets(0, out)
+    expect(out.scale).toBe(HERO_INTRO.scale)
+    expect(out.lift).toBe(HERO_INTRO.lift)
+    expect(dolly).toBe(HERO_INTRO_DOLLY)
+
+    // toBeCloseTo, not toBe: these are products of a negative amplitude and a
+    // zero remainder, so they land on -0, which toBe(0) rejects.
+    const settled = introOffsets(1, out)
+    expect(out.lift).toBeCloseTo(0)
+    expect(out.yaw).toBeCloseTo(0)
+    expect(out.scale).toBeCloseTo(0)
+    expect(settled).toBeCloseTo(0)
+  })
+
+  it('never touches opacity', () => {
+    // The hero mounts with skipInitialFade and must LOOK settled and lit on the
+    // first frame — a wand igniting out of black over a second is the failure
+    // this entrance is written to avoid. It moves the figure and nothing else.
+    expect(Object.keys(HERO_INTRO).sort()).toEqual(['lift', 'scale', 'yaw'])
+  })
+
+  it('decays linearly, sharing the one arrival curve with entryOffsets', () => {
+    // The progress feeding it is already damped; easing it again would stack a
+    // second curve on a value that has one.
+    introOffsets(0.5, out)
+    expect(out.scale).toBeCloseTo(HERO_INTRO.scale * 0.5)
+    expect(introOffsets(0.5, out)).toBeCloseTo(HERO_INTRO_DOLLY * 0.5)
+  })
+
+  it('clamps a progress outside 0..1 rather than overshooting the mark', () => {
+    expect(introOffsets(1.4, out)).toBeCloseTo(0)
+    expect(out.lift).toBeCloseTo(0)
+    introOffsets(-0.3, out)
+    expect(out.lift).toBe(HERO_INTRO.lift)
   })
 })

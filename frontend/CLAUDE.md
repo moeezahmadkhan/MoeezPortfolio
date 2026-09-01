@@ -16,7 +16,9 @@ npm run build          # tsc -b (typecheck first) then vite build → dist/
 npm run preview        # serve the production build
 npm test               # vitest run — jsdom environment, @testing-library/react
 npm run shoot          # screenshot every section at both widths (needs a preview running)
-npm run check:contrast # measure body-copy contrast against the LIVE backdrop
+npm run check:contrast # measure body-copy contrast against the LIVE backdrop, every section
+npm run check:motion   # assert every state change actually animates, in a real browser
+npm run check:stations # assert the push-in and the mobile station travel actually move
 ```
 
 The build fails if TypeScript errors exist. Type-check without bundling: `npx tsc -b`.
@@ -70,10 +72,26 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   on a discrete hover or focus is fine, but nothing on the scroll path may re-flow the document.
   One recorded exception, `base.css`'s `.skip-link` sliding down on `top`: it is positioned off-screen
   by `top`, it runs at most once a visit, and it is nowhere near the scroll path.
+- `STATION_LAMBDA` (station travel) is the slowest rate that moves the figure, below `LIFT_LAMBDA`:
+  a journey across the screen, not a settle. `INTRO_LAMBDA` is slower still — it runs once, on the
+  first screen, with nothing competing for the eye.
 - Every damping rate is a named constant in `three/motion.ts` (or `lib/scrollState.ts` for the scroll
   signal itself). A bare numeric lambda in a `damp(...)` call is a number nobody can re-tune.
 - `src/test/motion-language.test.ts` asserts all of the above against the source. If a rule is wrong,
   change it there and here together; do not special-case a change through it.
+- **One recorded entrance exception: the hero's opening stagger.** `hero-in` (Hero.css) is a one-shot
+  `@keyframes` with no matching transition, listed in `ENTRANCE_EXCEPTIONS` in
+  `motion-language.test.ts`. The rule below is about surfaces that come and go; the hero's copy is on
+  the page from first paint to last, so there is no exit to describe. It is also the only form that
+  survives its own failure — a transition would need JS to add a class after mount, and if that JS
+  never ran the copy would sit at `opacity: 0` forever, where `animation-fill-mode: both` cannot
+  strand it. The exception is keyed on the animation NAME, so it cannot quietly widen.
+- **The hero's model enters by moving, never by fading.** `HERO_INTRO` / `HERO_INTRO_DOLLY`
+  (`choreography.ts`) start the figure back along z and smaller, at FULL opacity, driven by a one-shot
+  damped `intro` ref rather than by the rig's fade (the hero mounts at `fade = 1`, which is why
+  `ENTRIES` has no hero row). It **mounts already displaced** — mounting on its mark made the frame
+  loop damp backwards to the dolly first, a pull-back nobody asked for, and `check:stations` read it
+  as no travel at all.
 - **Anything that appears must also have a way to leave.** Two surfaces shipped with an entrance and
   no exit, and both were invisible to every test: the mobile menu toggles `display`, which no
   transition could reach, and the chat panel was `{open && <panel/>}` — React cannot animate an
@@ -113,17 +131,46 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   identically.
 - Pitch settles at `PITCH_LAMBDA`, deliberately slower than `TURN_LAMBDA`, so the head leads the body.
 - **Still screenshots cannot verify motion.** `tools/shoot.mjs` waits for `window.__modelReady`, which latches only once a rig has settled — so it is blind by construction to anything visible only mid-transition. Verify time-varying work by sampling state deliberately or asserting on it in a test.
+- **`npm run check:stations` is that sampling, made permanent.** The rig publishes its live transform
+  into `three/rigTelemetry.ts` (a per-frame singleton, like `scrollState`; exposed as `window.__rig`
+  only once a real frame has been written into it, so a probe cannot sample the untouched object and
+  read it as "never moved"). `tools/check_stations.mjs` asserts the push-in travels forward and stays
+  LIT throughout, and that a section change catches the figure in flight rather than at its
+  destination. Assertions are on values and wall-clock, never on frame counts — SwiftShader's rAF is
+  12Hz and a frame-count floor measures the harness.
 - `tools/shoot.mjs` waits on three things per section, and needs all three: the page to hold still for
   several polls (`scroll-behavior: smooth` means `scrollIntoView` returns before the scroll starts),
   the section's expected rig to report ready, and every `Reveal` in view to reach full opacity. Its
   per-width `DESKTOP_RIG` / `MOBILE_RIG` maps encode the mobile gate above; a stale entry there shows
-  up as a 15s timeout, not a wrong picture.
+  up as a 15s timeout, not a wrong picture. Every `MOBILE_RIG` row is now `'hero'`, because that one
+  rig is on stage for every section.
 
-**3D on mobile — the gate, not a style:**
-- Below the hero's `@media (min-width: 900px)` breakpoint (or on any coarse pointer), the hero is the
-  ONLY rig that mounts. `rigFor(activeId, mobile)` resolves every other section to `null`, and
-  `nextRig(id, mobile)` returns `null`, so the work and experience models are never fetched either —
-  measured, that is 2.45MB of GLB a phone no longer downloads.
+**3D on mobile — one model, six stations:**
+- Below the hero's `@media (min-width: 900px)` breakpoint (or on any coarse pointer), the hero's is
+  the ONLY model that loads. That gate has not moved: `nextRig(id, mobile)` still returns `null`, so
+  the work and experience models are never fetched — measured, 2.45MB of GLB a phone never downloads.
+- What DID move: `rigFor(activeId, mobile)` no longer returns `null` below the hero. It returns the
+  hero spec, **with the same `spec.id`**, for every section. That identity is load-bearing —
+  `SceneDirector` bails when the incoming id matches the current one, so the rig is never cross-faded,
+  never unmounted, never re-cloned. One rig stays mounted and travels the whole page.
+- Returning `null` there was throwing away a model that had already been downloaded and decoded, at
+  the first section boundary: 7,877px of page with no figure on it at all.
+- Where it travels to is `MOBILE_STATIONS` (`rigs.ts`), keyed on the ids `useSectionObserver` reports
+  — never scroll fractions. Each row carries `position`, `scale`, `yaw` and `presence`.
+- **Those offsets are frustum arithmetic, not taste.** Camera fixed at z 4.2, fov 38, 390x844: at
+  distance `d` the frame is `0.6886 * d` tall and `0.318 * d` wide. At z 0 that is 2.89 x 1.34; at
+  z -1.2, 3.72 x 1.72 (half-width 0.86). The first pass used x = ±0.42 believing that was a corner —
+  it is a fifth of the way off centre, and the figure landed squarely on the Skills chips. Re-derive
+  against the row's own distance, then re-shoot.
+- Sides alternate down the page (right, left, right, left, centre). That crossing IS the mobile
+  transition; there is no second model to hand over to.
+- **The wand's `distance` does not scale with the rig.** It is a world-space radius, and three scales
+  a child light's position with the parent group but not its reach — so a 0.66-scale station kept a
+  halo sized for the 1.3-scale desktop hero and the figure read as sparkle dust inside its own glow.
+  `CharacterRig` divides `GLOW_DISTANCE` by the hero's desktop scale every frame.
+- `rigVisibility` takes `atHeroStation`. The hero rig's `smooth.heroVisible` measure now applies only
+  while the hero station owns the screen: applied unconditionally it faded the travelling figure out
+  one screen down, exactly where it should have been arriving at About.
 - `useIsMobileStage()` (`three/useStageViewport.ts`) is the single source of that answer. `Stage` asks
   once and passes it down. It decides four things that must never disagree: which rigs exist, where
   the hero stands, which way a dissolving rig drifts (`EXIT_LIFT` vs `EXIT_LIFT_MOBILE`), and how much
@@ -131,11 +178,19 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
 - Mobile caps `dpr` at 1, runs the post-processing chain only while a rig is actually on stage, and
   compiles the backdrop shader with `MOBILE` defined (2 fbm octaves, no embers — 2 noise evaluations
   per pixel instead of 6). Desktop is untouched by all of it.
-- **The figure gets a reserved strip on mobile, it is not dimmed into the background.** `--figure-band`
-  (tokens.css) is the mobile equivalent of the desktop hero's `padding-right: 42%`: Hero.css spends it
-  as `padding-bottom` to lift the copy clear, and `Stage.css` sizes the no-WebGL still to the same
-  strip. `MOBILE_PRESENCE` (`rigPose.ts`) and that still's opacity must stay equal — the canvas and
-  the picture standing in for it are the same figure in the same place.
+- **The HERO figure gets a reserved strip on mobile, it is not dimmed into the background.**
+  `--figure-band` (tokens.css) is the mobile equivalent of the desktop hero's `padding-right: 42%`:
+  Hero.css spends it as `padding-bottom` to lift the copy clear, and `Stage.css` sizes the no-WebGL
+  still to the same strip. `MOBILE_PRESENCE` (`rigPose.ts`) and that still's opacity must stay equal
+  — the canvas and the picture standing in for it are the same figure in the same place.
+- The band is `clamp(220px, 38svh, 340px)`. It was 25svh, which made the figure a sliver under the
+  copy. **The band and the hero station's scale move together**: growing the token alone lifted the
+  copy and left 17% of empty screen above an unchanged head. The hero station is scale 1.15 for a
+  band of that size.
+- **Below the hero there is no reserved strip.** The figure stays low and to one side at a much lower
+  `presence` behind `.stage__scrim` (Stage.css), a fixed mobile-only gradient between canvas and copy.
+  Reserving a band per section instead would have added roughly 1000px to a 7,877px page. The scrim
+  is not a substitute for measuring: `npm run check:contrast` is the gate.
 - `dpr` is `stageDpr(window.devicePixelRatio, mobile)`, never a bare number. R3F's `dpr` prop is a
   value, not a cap: passing 1.5 made every dpr-1 display render 2.25x the pixels it can show
   (measured: a 2160x1350 backing store in a 1440x900 dpr-1 viewport). `PerformanceMonitor`'s
@@ -192,6 +247,11 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   phone puts the copy over the middle of the screen where the backdrop's radial falloff peaks. That
   is why `Backdrop.tsx` compiles a lower `GROUND_GAIN` for mobile, and why `npm run check:contrast`
   exists. jsdom cannot see any of this: no layout, no compositor, no shader.
+- **That check samples every section, not just the hero.** Hero-only was defensible while the mobile
+  gate left nothing behind the copy below it; `MOBILE_STATIONS` put a lit figure on screen for the
+  whole page, and the check could not see it. It now scrolls each section into view, waits out
+  `STATION_LAMBDA`, and samples the smallest body copy in each. Measured after the stations landed:
+  every sample 5.73:1 or better at both widths.
 - **Nothing fixed may hit-test space it does not occupy.** `.chat` is a fixed flex column whose box is
   far larger than its controls; it measured 343x106 at 390 wide and swallowed every click in it,
   leaving all four footer links unreachable on a phone. The frame is `pointer-events: none` and each

@@ -14,7 +14,8 @@
     "shoot:hero": "node tools/shoot_hero.mjs && (cwebp -q 82 public/shots/hero-wizard.png -o public/shots/hero-wizard.webp && rm public/shots/hero-wizard.png || echo 'cwebp not installed (sudo apt install webp) \u2014 keeping public/shots/hero-wizard.png as the fallback asset')",
     "check:models": "node tools/check_models.mjs",
     "check:contrast": "node tools/check_contrast.mjs",
-    "check:motion": "node tools/check_motion.mjs"
+    "check:motion": "node tools/check_motion.mjs",
+    "check:stations": "node tools/check_stations.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.0",

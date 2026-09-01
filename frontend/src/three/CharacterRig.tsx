@@ -11,25 +11,38 @@ import { scrollState } from '../lib/scrollState'
 import { applyWizardingMaterials, cloneMaterials, disposeMaterials } from './characterMaterial'
 import { useKtx2Gltf } from './ktx2'
 import { markModelReady } from './modelReadiness'
+import { exposeRigTelemetry, rigTelemetry } from './rigTelemetry'
 import {
   INTENSITY_LAMBDA,
+  INTRO_LAMBDA,
   LIFT_LAMBDA,
   PITCH_LAMBDA,
+  STATION_LAMBDA,
   TURN_LAMBDA,
   advanceFade,
   rigVisibility,
 } from './motion'
-import { entryOffsets, type EntryOffsets } from './choreography'
+import {
+  HERO_INTRO,
+  HERO_INTRO_DOLLY,
+  entryOffsets,
+  introOffsets,
+  type EntryOffsets,
+} from './choreography'
 import { pinnedYaw, rigPose, type Pose } from './rigPose'
 import { targetIntensity, wizardState } from './wizardState'
 import { advanceOrbit, orbitState, useDragOrbit } from './useDragOrbit'
-import { HERO_RIG_ID, type RigSpec } from './rigs'
+import { HERO_RIG_ID, HERO_SECTION_ID, RIGS, stationFor, type RigSpec } from './rigs'
 
 // Model-space position of the wand tip, tuned against the hero wizard's own
 // geometry (see task-5-report.md from the predecessor plan). Reused as a shared
 // "wand glow" anchor across every rig — a stylistic constant for the site's
 // magic-light accent, not a per-model measurement.
 const WAND_TIP: [number, number, number] = [0.16, -0.1, 0.18]
+
+// How far the wand's light carries, in world units, at the hero's own desktop
+// scale. Scaled by the rig's current scale every frame — see the frame loop.
+const GLOW_DISTANCE = 1.1
 
 // Every shipped GLB's forward axis faces away from the camera as exported —
 // rotate the whole rig 180° so the figure reads face-on rather than showing
@@ -89,11 +102,19 @@ export function CharacterRig({
   fadeIn,
   skipInitialFade = false,
   mobile,
+  activeId = HERO_SECTION_ID,
 }: {
   spec: RigSpec
   fadeIn: boolean
   skipInitialFade?: boolean
   mobile: boolean
+  /**
+   * The section that owns the screen right now. Only mobile reads it: there,
+   * this one rig stays mounted for the whole page and travels between
+   * `MOBILE_STATIONS`, so the active section is what decides where it stands.
+   * Desktop hands each section its own rig and ignores this entirely.
+   */
+  activeId?: string
 }) {
   const isHero = spec.id === HERO_RIG_ID
   // Only the hero section installs the drag-orbit listeners — `#top` is the hero
@@ -112,6 +133,15 @@ export function CharacterRig({
   const pose = useRef<Pose>({ yaw: 0, pitch: 0, lift: 0, opacity: 0 }).current
   // Reused every frame for the same reason `pose` is — see rigPose.
   const entry = useRef<EntryOffsets>({ lift: 0, yaw: 0, scale: 0 }).current
+  // A second reusable offsets object, because the intro's offsets are ADDED to
+  // the entry's rather than replacing them, and one object cannot be both the
+  // destination and an addend without the first write clobbering the second.
+  const introEntry = useRef<EntryOffsets>({ lift: 0, yaw: 0, scale: 0 }).current
+  // The one-shot opening push-in's progress, 0 to 1. Only ever advanced by the
+  // rig that mounted already materialised — see the frame loop.
+  const intro = useRef(0)
+  // Latches once the telemetry singleton has had a real frame written into it.
+  const exposed = useRef(false)
   // Latches once this rig's `markModelReady` fires, so the check is a single
   // property write on the settling frame rather than every frame after.
   const reportedReady = useRef(false)
@@ -121,8 +151,32 @@ export function CharacterRig({
   // fine while it only chose a position, and is not now that the same answer
   // also decides which rigs exist (rigs.ts's gate) and which way a dissolving
   // one drifts. Those three cannot be allowed to disagree.
-  const basePosition = mobile ? spec.mobilePosition : spec.position
-  const baseScale = mobile ? spec.mobileScale : spec.scale
+  // On mobile the figure's placement comes from the active section's station,
+  // not from the spec — one rig, six stations, travelling between them. On
+  // desktop the spec is still the whole answer, exactly as before.
+  const station = stationFor(activeId)
+  const atHeroStation = activeId === HERO_SECTION_ID || activeId === ''
+  const basePosition = mobile ? station.position : spec.position
+  const baseScale = mobile ? station.scale : spec.scale
+  const stationYaw = mobile ? station.yaw : 0
+  // Where the rig is mounted, which is only ever the FIRST station it sees.
+  // Everything after that is damped toward `basePosition` in the frame loop, so
+  // the mount position must not follow the active section or a rig would
+  // teleport to each new station and then damp from there.
+  //
+  // The rig that opens the page mounts already displaced by its push-in, not on
+  // its mark. Measured with `npm run check:stations` before this: mounting on
+  // the mark made the frame loop damp the figure BACKWARDS to the dolly and
+  // then forwards again — a pull-back the entrance was never supposed to have,
+  // and the probe read it as `z 0.000 -> -0.009`, no travel at all.
+  const mountPosition = useRef<[number, number, number]>(
+    skipInitialFade
+      ? [basePosition[0], basePosition[1] + HERO_INTRO.lift, basePosition[2] + HERO_INTRO_DOLLY]
+      : basePosition,
+  ).current
+  const mountScale = useRef(
+    skipInitialFade ? baseScale * (1 + HERO_INTRO.scale) : baseScale,
+  ).current
 
   // `scene.clone(true)` deep-clones the node hierarchy, but three's Mesh#copy()
   // assigns the *same* material reference(s) as the source — it does not clone
@@ -176,7 +230,12 @@ export function CharacterRig({
     // visitor scrolls past. `rigVisibility` owns which scroll channel that
     // reads — the smoothed one, so this fade glides with the scroll instead of
     // stepping with the wheel like the raw field does.
-    const visible = rigVisibility(spec.id, fade.current, scrollState)
+    // The hero's scroll-driven `heroVisible` measure applies only while the
+    // hero station owns the screen. On mobile this rig outlives the hero
+    // section (see rigs.ts's rigFor), and applied unconditionally the measure
+    // would fade it out one screen down — exactly where it should instead be
+    // setting off for the About station. Desktop always passes true.
+    const visible = rigVisibility(spec.id, fade.current, scrollState, !mobile || atHeroStation)
     g.visible = visible > 0.01
     // Once a rig has fully faded out it costs one visibility check per frame,
     // nothing more.
@@ -188,9 +247,32 @@ export function CharacterRig({
     const isWorkRig = spec.id === 'work'
     const focusedSlug = isWorkRig ? focusState.projectSlug : null
     const focusBias = focusedSlug !== null ? (FOCUS_YAW_BIAS.get(focusedSlug) ?? 0) : 0
-    rigPose(scrollState.pointerX, scrollState.pointerY, focusBias, visible, pose, mobile)
+    rigPose(
+      scrollState.pointerX,
+      scrollState.pointerY,
+      focusBias,
+      visible,
+      pose,
+      mobile,
+      mobile ? station.presence : undefined,
+    )
     // The rig's own cross-fade is the only input: no scroll fraction, no timer.
     entryOffsets(spec.id, fade.current, entry)
+
+    // The one-shot opening push-in, on top of whatever the entry above asked
+    // for. Only the rig that mounted already materialised has one — every other
+    // rig arrives by cross-fade and gets its move from `ENTRIES`. Advancing
+    // this ref is the only timer-like state on the rig, and it is a damp toward
+    // 1, not a clock: a 144Hz display and a 60Hz one see the same arrival.
+    let introDolly = 0
+    if (skipInitialFade) {
+      intro.current = damp(intro.current, 1, INTRO_LAMBDA, dt)
+      introDolly = introOffsets(intro.current, introEntry)
+      entry.lift += introEntry.lift
+      entry.yaw += introEntry.yaw
+      entry.scale += introEntry.scale
+    }
+
     const t = state.clock.elapsedTime
 
     // Written as a statement, not a nested ternary with an inline call: this
@@ -216,7 +298,13 @@ export function CharacterRig({
 
     g.rotation.y = damp(
       g.rotation.y,
-      BASE_YAW + pose.yaw + orbit + pinnedTurn + entry.yaw + Math.sin(t * 0.18) * 0.06,
+      BASE_YAW +
+        stationYaw +
+        pose.yaw +
+        orbit +
+        pinnedTurn +
+        entry.yaw +
+        Math.sin(t * 0.18) * 0.06,
       TURN_LAMBDA,
       dt,
     )
@@ -227,12 +315,48 @@ export function CharacterRig({
       LIFT_LAMBDA,
       dt,
     )
+    // x and z were fixed by the mount prop until stations existed: a desktop
+    // rig never moves sideways, it hands over to another rig. The mobile rig
+    // does move — it is the same figure crossing the screen — so both axes are
+    // damped toward the active station at STATION_LAMBDA, the slowest of the
+    // rig's rates, because this is a journey rather than a settle. On desktop
+    // the target is the spec's own constant, so these two damps are no-ops.
+    g.position.x = damp(g.position.x, basePosition[0], STATION_LAMBDA, dt)
+    g.position.z = damp(g.position.z, basePosition[2] + introDolly, STATION_LAMBDA, dt)
     // `scale` was a fixed prop until now. Setting it here as well is safe —
     // three reads the object's own scale each frame, and the prop only seeds it.
-    g.scale.setScalar(damp(g.scale.x, baseScale * (1 + entry.scale), LIFT_LAMBDA, dt))
+    // STATION_LAMBDA on mobile so size travels with position; a scale that
+    // arrived at LIFT_LAMBDA while the figure was still crossing read as the
+    // model growing in place and then sliding.
+    g.scale.setScalar(
+      damp(g.scale.x, baseScale * (1 + entry.scale), mobile ? STATION_LAMBDA : LIFT_LAMBDA, dt),
+    )
 
     for (let i = 0; i < materials.length; i++) {
       materials[i].opacity = pose.opacity
+    }
+
+    // Published for `tools/check_stations.mjs`, which is the only thing that can
+    // see the push-in and the station travel — both are mid-transition states,
+    // and a screenshot only ever catches a settled one. Six writes into a
+    // preallocated object; nothing allocates. Only the rig that is fading IN
+    // publishes, so an outgoing rig mid-dissolve cannot overwrite the readings
+    // of the one that has taken over.
+    if (fadeIn) {
+      rigTelemetry.x = g.position.x
+      rigTelemetry.y = g.position.y
+      rigTelemetry.z = g.position.z
+      rigTelemetry.scale = g.scale.x
+      rigTelemetry.opacity = pose.opacity
+      rigTelemetry.intro = intro.current
+      // Published only once there is something real to read. Exposing it from an
+      // effect instead let a probe sample the untouched singleton — all zeros —
+      // as if it were the rig's first frame, which read as "the figure never
+      // moved and was never lit".
+      if (!exposed.current) {
+        exposed.current = true
+        exposeRigTelemetry()
+      }
     }
 
     // A focused project card brightens the wand on top of whatever the chat
@@ -251,6 +375,15 @@ export function CharacterRig({
       // A slow flicker on top of the mood level, so the wand never looks like a lamp.
       glowRef.current.intensity =
         (2 + wizardState.intensity * 9) * (0.88 + Math.sin(t * 5.3) * 0.12) * pose.opacity
+      // The halo has to shrink with the figure. `distance` is a world-space
+      // radius: three does not scale it with the parent group the way it scales
+      // the light's position, so a rig standing at a 0.66-scale mobile station
+      // kept a halo sized for the 1.3-scale desktop hero. Measured in
+      // .shots/mobile-skills.png at the first pass: the body was a smudge
+      // inside its own glow, and what read on screen was sparkle dust, not a
+      // figure. Divided by the hero's own desktop scale so the desktop hero,
+      // the case GLOW_DISTANCE was tuned against, comes out unchanged.
+      glowRef.current.distance = GLOW_DISTANCE * (g.scale.x / RIGS[''].scale)
     }
     if (sparklesRef.current) {
       // Sparkles' own particle shader has no per-frame opacity uniform to
@@ -267,9 +400,15 @@ export function CharacterRig({
     // which would dispose the geometries still shared with the GLTF cache. The
     // `useEffect` above disposes the (now-owned) materials by hand instead, and
     // leaves geometry alone.
-    <group ref={group} position={basePosition} scale={baseScale} dispose={null}>
+    <group ref={group} position={mountPosition} scale={mountScale} dispose={null}>
       <primitive object={model} />
-      <pointLight ref={glowRef} position={WAND_TIP} color="#ffd79a" distance={1.1} decay={2} />
+      <pointLight
+        ref={glowRef}
+        position={WAND_TIP}
+        color="#ffd79a"
+        distance={GLOW_DISTANCE}
+        decay={2}
+      />
       <Sparkles
         ref={sparklesRef}
         count={16}

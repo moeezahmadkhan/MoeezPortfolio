@@ -31,6 +31,38 @@ export const ENTRIES: Readonly<Record<string, EntryOffsets>> = {
   experience: { lift: -0.28, yaw: 0.44, scale: -0.06 },
 }
 
+/**
+ * The hero's opening push-in: how far back and how much smaller the figure
+ * starts on the first frame of a visit, before settling forward.
+ *
+ * Separate from `ENTRIES` because it is driven by a different progress. Every
+ * row in `ENTRIES` decays in its rig's own cross-fade, and the hero has no
+ * cross-fade to decay in — it mounts with `skipInitialFade`, at `fade = 1`,
+ * which is exactly why `ENTRIES` has no hero row. `CharacterRig` runs a
+ * one-shot damped `intro` progress for this instead.
+ *
+ * Crucially this moves the figure and never touches its opacity. The hero must
+ * LOOK settled and lit on the first frame — a wand igniting out of black over a
+ * second is the failure this is written to avoid — so the entrance is a figure
+ * arriving from slightly back, at full brightness, not a figure materialising.
+ *
+ * `yaw` is a few degrees, not a spin: enough that the head is still turning as
+ * it comes to rest.
+ */
+export const HERO_INTRO: EntryOffsets = { lift: -0.18, yaw: 0.22, scale: -0.12 }
+
+/**
+ * How far back along z the hero starts its push-in, in world units.
+ *
+ * `EntryOffsets` carries no z term because no other entrance needs one — a rig
+ * handing over to another moves within the frame. An arrival from nothing is
+ * the one case that reads as depth, and the camera is fixed (z 4.2, fov 38), so
+ * this is the only lever that changes the figure's distance rather than its
+ * size on screen. Paired with `HERO_INTRO.scale` rather than replacing it:
+ * dolly alone at this distance is nearly imperceptible.
+ */
+export const HERO_INTRO_DOLLY = -0.55
+
 function clamp01(v: number): number {
   return v < 0 ? 0 : v > 1 ? 1 : v
 }
@@ -49,6 +81,24 @@ function clamp01(v: number): number {
  */
 export function entryOffsets(rigId: string, progress: number, out: EntryOffsets): EntryOffsets {
   const entry = rigId === HERO_RIG_ID ? NONE : (ENTRIES[rigId] ?? NONE)
+  return decay(entry, progress, out)
+}
+
+/**
+ * The hero's push-in offsets at `progress` (its one-shot intro, 0 to 1),
+ * written into `out`. Returns the z dolly separately, since `EntryOffsets` has
+ * no z term — see `HERO_INTRO_DOLLY`.
+ *
+ * Shares `decay` with `entryOffsets` on purpose: there is one arrival curve on
+ * this site, and the reason it is linear (the progress feeding it is already
+ * damped) applies identically here.
+ */
+export function introOffsets(progress: number, out: EntryOffsets): number {
+  decay(HERO_INTRO, progress, out)
+  return HERO_INTRO_DOLLY * (1 - clamp01(progress))
+}
+
+function decay(entry: EntryOffsets, progress: number, out: EntryOffsets): EntryOffsets {
   const remaining = 1 - clamp01(progress)
   out.lift = entry.lift * remaining
   out.yaw = entry.yaw * remaining

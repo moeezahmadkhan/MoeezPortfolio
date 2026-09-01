@@ -89,6 +89,13 @@ function LiveStage() {
     <StageBoundary>
       <Suspense fallback={<StagePlaceholder />}>
         <Stage onContextLost={onContextLost} onContextRestored={onContextRestored} />
+        {/* Sits between the canvas and the copy on mobile, where the figure
+            travels the whole page (rigs.ts's MOBILE_STATIONS) instead of
+            standing in the hero's reserved strip. Rendered after the canvas so
+            it wins the tie at the same z-index, and only alongside a LIVE
+            canvas — the reduced-motion and no-WebGL paths never reach here, and
+            there is nothing behind their copy to scrim. See Stage.css. */}
+        <div className="stage__scrim" aria-hidden="true" />
         {lost && <StaticHeroArt />}
       </Suspense>
     </StageBoundary>

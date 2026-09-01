@@ -148,3 +148,30 @@ describe('rigPose', () => {
     })
   })
 })
+
+describe('per-station presence', () => {
+  const out = () => ({ yaw: 0, pitch: 0, lift: 0, opacity: 0 })
+
+  it('defaults to the hero station, which is what desktop-shaped callers get', () => {
+    const p = rigPose(0, 0, 0, 1, out(), true)
+    expect(p.opacity).toBeCloseTo(MOBILE_PRESENCE)
+  })
+
+  it('honours a lower station presence below the hero', () => {
+    // Below the hero the figure holds a corner behind .stage__scrim while body
+    // copy owns the middle, so it stands further back than it does in the
+    // hero's reserved strip.
+    const p = rigPose(0, 0, 0, 1, out(), true, 0.36)
+    expect(p.opacity).toBeCloseTo(0.36)
+  })
+
+  it('still scales presence by how visible the rig is', () => {
+    const p = rigPose(0, 0, 0, 0.5, out(), true, 0.4)
+    expect(p.opacity).toBeCloseTo(0.2)
+  })
+
+  it('ignores presence entirely on desktop', () => {
+    const p = rigPose(0, 0, 0, 1, out(), false, 0.2)
+    expect(p.opacity).toBe(1)
+  })
+})

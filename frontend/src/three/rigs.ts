@@ -3,8 +3,6 @@ export type RigSpec = {
   model: string
   position: [number, number, number]
   scale: number
-  mobilePosition: [number, number, number]
-  mobileScale: number
 }
 
 /**
@@ -19,10 +17,15 @@ export type RigSpec = {
  * the pre-intersection default, i.e. what shows before the observer has reported
  * anything.
  *
+ * Desktop only. A phone resolves every section to the hero row (see `rigFor`)
+ * and takes its placement from `MOBILE_STATIONS` below, so these positions and
+ * scales are now purely the desktop composition — the `mobilePosition` /
+ * `mobileScale` fields this type used to carry were removed rather than left as
+ * a second table that could disagree with the stations.
+ *
  * Hero position/scale are HeroWizard's original tuned constants, carried over
- * verbatim (see CharacterRig) — not to be adjusted here. Work and Experience were
- * tuned against `.shots/desktop-work.png`, `.shots/desktop-experience.png`, and
- * their mobile counterparts.
+ * verbatim (see CharacterRig) — not to be adjusted here. Work and Experience
+ * were tuned against `.shots/desktop-work.png` and `.shots/desktop-experience.png`.
  *
  * Preload order (see `nextRig`) is this table's own key order, hero first —
  * relies on the JS spec guaranteeing that non-numeric-string object keys
@@ -67,56 +70,117 @@ export const RIGS: Record<string, RigSpec> = {
     model: '/models/wizard_improved.glb',
     position: [1.4, -0.21, 0],
     scale: 1.3,
-    // Retuned against .shots/mobile-top.png. The old 0.3 put the figure at
-    // roughly a tenth of a 390px screen — that shot showed sparkle dust and no
-    // wizard at all. The camera is fixed (z 4.2, fov 38), so at 390x844 the
-    // frame is ~1.34 world units wide by ~2.89 tall, and this model is a bust
-    // about 1 unit tall per unit of scale, centred on its own origin. 0.82
-    // therefore fills a bit over a quarter of the screen's height, and
-    // y -1.25 stands it on the bottom edge, low enough that the head clears the
-    // hero's button row and the crop falls at the chest, as it does on desktop.
-    // Centred and bottom-anchored to match where Stage.css puts the no-WebGL
-    // fallback at this width (`place-items: end center`), so canvas and
-    // fallback agree about where the figure is. Kept at z 0: pushing it forward
-    // shrinks the frame it is measured against, and on a portrait screen that
-    // makes width, not height, the binding constraint.
-    mobilePosition: [0, -1.25, 0],
-    mobileScale: 0.82,
   },
   work: {
     id: 'work',
     model: '/models/spellcaster.glb',
     position: [1.9, 0.72, -0.95],
     scale: 0.78,
-    mobilePosition: [0.45, 1.15, -2.6],
-    mobileScale: 0.2,
   },
   experience: {
     id: 'experience',
     model: '/models/pact_pair.glb',
     position: [1.55, -0.75, -0.9],
     scale: 0.95,
-    mobilePosition: [0.45, 1.15, -2.6],
-    mobileScale: 0.2,
   },
+}
+
+/**
+ * Where the hero's model stands on mobile for a given section, and how present
+ * it is allowed to be while it stands there.
+ *
+ * This is the mobile equivalent of the desktop rig table above, with one
+ * decisive difference: every row wears the SAME model. A phone downloads
+ * `wizard_improved.glb` and nothing else (see `rigFor`), so the figure that
+ * presides over Work is the figure that presided over the hero, moved. That is
+ * the whole reason mobile can have a travelling figure at all without the
+ * 2.45MB the work and experience models would cost.
+ *
+ * Keyed on the section ids `useSectionObserver` reports (`SECTION_IDS` in
+ * Nav.tsx), NEVER on scroll fractions — a table keyed on scroll fractions is
+ * what got v1 deleted.
+ *
+ * `presence` is the ceiling on the figure's opacity in that station. Below the
+ * hero the figure shares the screen with body copy rather than standing in a
+ * reserved strip, so it stays low and to one side at low presence behind
+ * `.stage__scrim` — never centred behind a paragraph. The hero's own 0.80 is
+ * the value `Stage.css` gives the no-WebGL still at the same width; the canvas
+ * and the picture standing in for it must agree.
+ *
+ * **The offsets are frustum arithmetic, not taste.** The camera is fixed at
+ * z 4.2, fov 38, and a 390x844 viewport, so at distance d the frame is
+ * `0.6886 * d` tall and `0.318 * d` wide. At z 0 that is 2.89 by 1.34; at
+ * z -1.2 it is 3.72 by 1.72, half-width 0.86. The first pass at these stations
+ * used x = +/-0.42 believing that was a corner — at these distances it is a
+ * fifth of the way off centre, which is why the figure landed squarely on the
+ * Skills chips and the Contact copy. Anything edited here must be re-derived
+ * against the distance the row actually uses, and then re-shot: `npm run shoot`
+ * writes `.shots/mobile-<section>.png` for exactly this.
+ *
+ * Sides alternate down the page (right, left, right, left, centre) so a section
+ * change reads as the figure crossing the screen. That crossing IS the mobile
+ * transition — there is no second model to hand over to.
+ *
+ * `experience` holds `yaw: 0` deliberately. `pinnedYaw` already turns that
+ * section's rig from the smoothed `pinnedProgress`; a station yaw there would
+ * be a second, constant term fighting a scroll-driven one.
+ */
+export type Station = {
+  position: [number, number, number]
+  scale: number
+  yaw: number
+  presence: number
+}
+
+export const MOBILE_STATIONS: Readonly<Record<string, Station>> = {
+  // scale 1.15, not the 0.82 this row carried while `--figure-band` was 25svh.
+  // The band grew to 38svh and the copy moved up off it; the figure did not
+  // grow to follow, so the entrance simply gained 17% of empty screen above the
+  // head. At z 0 the frame is 2.89 world units tall, the band is ~1.1 of them,
+  // and this bust is about one unit tall per unit of scale — so 1.15 puts the
+  // head near the top of the band while staying inside the 1.34-unit width.
+  [HERO_SECTION_ID]: { position: [0, -1.25, 0], scale: 1.15, yaw: 0, presence: 0.8 },
+  about: { position: [0.52, -1.35, -1.1], scale: 0.68, yaw: -0.45, presence: 0.34 },
+  work: { position: [-0.55, -1.4, -1.2], scale: 0.66, yaw: 0.42, presence: 0.32 },
+  skills: { position: [0.56, -1.45, -1.3], scale: 0.64, yaw: -0.55, presence: 0.3 },
+  experience: { position: [-0.52, -1.35, -1.1], scale: 0.7, yaw: 0, presence: 0.36 },
+  contact: { position: [0, -1.3, -1.9], scale: 0.56, yaw: 0.25, presence: 0.24 },
+}
+
+/**
+ * The station for a section, falling back to the hero's.
+ *
+ * The fallback is not defensive padding: `useSectionObserver` reports `''`
+ * before it has committed anything, and that pre-intersection state IS the
+ * hero, exactly as `RIGS`'s `''` key is.
+ */
+export function stationFor(activeId: string): Station {
+  return MOBILE_STATIONS[activeId] ?? MOBILE_STATIONS[HERO_SECTION_ID]
 }
 
 /**
  * The rig for a section, or `null` for a section that has none.
  *
- * `mobile` is the gate, not a style: a phone gets the hero's model and nothing
- * else. The work and experience rigs were tuned to `mobileScale: 0.2` at
- * `z: -2.6`, which on a 390px screen rendered a speck behind the copy — and
- * cost a whole GLB over cellular to do it. Gating here rather than at the
- * renderer is deliberate: `SceneDirector` reaches both the mount and the
- * lookahead prefetch (`nextRig`) through this table, so a `null` here is what
- * actually stops the download instead of hiding what arrived.
+ * `mobile` is still the payload gate it always was — a phone gets the hero's
+ * model and nothing else — but it no longer gates the figure's *presence*.
+ * Returning `null` below the hero left a phone with 7,877px of page and no
+ * figure at all; the model was already downloaded and decoded, and we were
+ * throwing it away at the first section boundary.
+ *
+ * So on mobile every section resolves to the hero spec, **including its
+ * `spec.id`**. That identity is load-bearing: `SceneDirector` compares the
+ * incoming rig's id against the current one and bails when they match, so a
+ * stable id means the rig is never cross-faded, never unmounted, and never
+ * re-cloned. One mounted rig travels between `MOBILE_STATIONS` for the whole
+ * page instead of six rigs dissolving into each other.
+ *
+ * The download gate is unchanged and is enforced in two places that agree:
+ * here, where mobile can only ever name the hero's model, and in `nextRig`,
+ * which still refuses to prefetch anything on mobile.
  */
 export function rigFor(activeId: string, mobile: boolean = false): RigSpec | null {
-  const spec = RIGS[activeId === HERO_SECTION_ID ? '' : activeId] ?? null
-  if (!spec) return null
-  if (mobile && spec.id !== HERO_RIG_ID) return null
-  return spec
+  if (mobile) return RIGS['']
+  return RIGS[activeId === HERO_SECTION_ID ? '' : activeId] ?? null
 }
 
 /**

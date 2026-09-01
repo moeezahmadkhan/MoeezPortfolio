@@ -84,6 +84,22 @@ function isExcepted(file: string, property: string): boolean {
   return LAYOUT_EXCEPTIONS.some((e) => file.endsWith(e.file) && e.property === property)
 }
 
+/**
+ * The one sanctioned one-shot entrance with no matching transition, recorded
+ * rather than hidden.
+ *
+ * The rule below exists for surfaces that come and go — the mobile menu, the
+ * chat panel — where a `@keyframes` entrance plays on mount and has nothing to
+ * say about leaving. The hero's copy is on the page from first paint to last.
+ * There is no exit to describe, and a transition would need JS to add a class
+ * after mount: if that JS never ran, the copy would sit at `opacity: 0`
+ * forever. `animation-fill-mode: both` cannot strand it that way.
+ *
+ * Named by the animation, not by the selector, so this cannot quietly widen to
+ * cover the next keyframe entrance somebody adds to the same file.
+ */
+const ENTRANCE_EXCEPTIONS = ['hero-in']
+
 describe('CSS motion', () => {
   it('never hardcodes a timing function — every curve is a shared token', () => {
     const offenders: string[] = []
@@ -184,6 +200,7 @@ describe('CSS motion', () => {
         if (value === 'none') continue
         if (/\binfinite\b/.test(value)) continue
         if (/(?:^|[;\s])transition\s*:/.test(body)) continue
+        if (ENTRANCE_EXCEPTIONS.some((name) => value.split(/\s+/).includes(name))) continue
         offenders.push(`${file}: ${selector} has a one-shot animation and no transition`)
       }
     }

@@ -25,20 +25,26 @@ export const EXIT_LIFT = 1.6
 export const EXIT_LIFT_MOBILE = -1.1
 
 /**
- * How present a fully-faded-in rig is allowed to be on mobile.
+ * How present a fully-faded-in rig is allowed to be in the mobile HERO station.
  *
  * This started at 0.55, which was the wrong instrument. The figure was dim
  * because it stood behind the hero's button row, and dimming it was a way of
- * apologising for an overlap rather than fixing one. Mobile now reserves a
- * strip for it (`--figure-band`, spent by Hero.css exactly as the desktop hero
- * spends `padding-right: 42%`), so the two no longer share pixels and the
- * figure can be nearly as present as it is on desktop.
+ * apologising for an overlap rather than fixing one. Mobile reserves a strip
+ * for it (`--figure-band`, spent by Hero.css exactly as the desktop hero spends
+ * `padding-right: 42%`), so the two no longer share pixels and the figure can
+ * be nearly as present as it is on desktop.
  *
  * Not 1, because the reserve is clamped: on a short phone the copy keeps the
  * space it needs and the strip gives way, so the figure has to stay a shade
  * behind the text for the case where they do meet again. `Stage.css` gives the
  * no-WebGL still the same value at the same width — the canvas and the picture
  * that stands in for it must agree.
+ *
+ * Every OTHER mobile station carries its own, lower value in
+ * `rigs.ts`'s `MOBILE_STATIONS`, because below the hero the figure has no
+ * reserved strip: it holds a corner behind `.stage__scrim` while body copy owns
+ * the middle. This constant remains the single number the hero station and the
+ * no-WebGL still both quote, which is the agreement that matters.
  *
  * Applied to `opacity`, which `CharacterRig` feeds to the body materials, the
  * wand light and the sparkle cloud alike, so the whole figure recedes together
@@ -72,6 +78,7 @@ export function rigPose(
   visible: number,
   out: Pose,
   mobile: boolean = false,
+  presence: number = MOBILE_PRESENCE,
 ): Pose {
   const pointerYaw = clamp(pointerX * MAX_TILT, -MAX_TILT, MAX_TILT)
   out.yaw = clamp(pointerYaw + focusBias, -MAX_FOCUS_TURN, MAX_FOCUS_TURN)
@@ -80,7 +87,10 @@ export function rigPose(
   // out of frame rather than clipping — up on desktop, down on mobile, for the
   // reason on EXIT_LIFT above.
   out.lift = (1 - visible) * (mobile ? EXIT_LIFT_MOBILE : EXIT_LIFT)
-  out.opacity = mobile ? visible * MOBILE_PRESENCE : visible
+  // `presence` is the active mobile station's own ceiling (rigs.ts's
+  // MOBILE_STATIONS), defaulting to the hero station's so a caller that has no
+  // station to offer gets the behaviour this function has always had.
+  out.opacity = mobile ? visible * presence : visible
   return out
 }
 

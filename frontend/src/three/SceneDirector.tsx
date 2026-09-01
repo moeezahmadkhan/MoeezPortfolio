@@ -164,6 +164,12 @@ export function SceneDirector({
             fadeIn={entry.fadeIn}
             skipInitialFade={entry.skipInitialFade}
             mobile={mobile}
+            // The section that currently owns the screen, forwarded so the one
+            // persistent mobile rig knows which of `rigs.ts`'s MOBILE_STATIONS
+            // to travel to. A prop, not a module singleton: this changes on
+            // section boundaries, not per frame, so it is ordinary React state
+            // and belongs in the render path like any other.
+            activeId={activeId}
           />
         </Suspense>
       ))}

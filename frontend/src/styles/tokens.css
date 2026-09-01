@@ -72,11 +72,19 @@
      a compromise. This is the mobile column, lying down.
 
      Clamped rather than a bare `svh` because a short phone must give the copy
-     the space first: the band cannot grow past 240px, and below 150px the
+     the space first: the band cannot grow past 340px, and below 220px the
      figure would not read as a figure anyway. Used by Hero.css to push the copy
      up off it, and by Stage.css to size the no-WebGL still that stands in the
-     same strip. */
-  --figure-band: clamp(150px, 25svh, 240px);
+     same strip.
+
+     Raised from `clamp(150px, 25svh, 240px)`. At 25svh the figure was a sliver
+     across the bottom of a 844px screen, and the scroll cue and the chat
+     launcher both landed in it — measured against oryzo.ai on the same
+     emulation, which gives its subject 50-70% of the screen, ours was reading
+     as a decorative smudge under the copy rather than as the thing the hero is
+     showing off. 38svh is about 320px of an 844px screen. The hero copy pays
+     for it out of the slack `.hero::before`/`::after` were already dividing. */
+  --figure-band: clamp(220px, 38svh, 340px);
 
   /* The chat dock's footprint in the bottom-right corner, in one place so the
      dock and everything that has to keep out of its way agree.

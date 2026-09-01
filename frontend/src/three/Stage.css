@@ -81,3 +81,44 @@
     );
   }
 }
+
+/* The scrim between the canvas and the copy, mobile only.
+
+   Below the hero the figure no longer stands in a reserved strip — it holds a
+   corner of the viewport while body copy owns the middle (rigs.ts's
+   MOBILE_STATIONS). Reserving a band per section instead would have added
+   roughly 1000px to a 7877px page, which is a worse trade than a gradient.
+
+   This is why the trade is safe: contrast on this site is measured against the
+   RENDERED backdrop, not inferred from the palette, and on mobile that ground
+   already measured 3.73:1 before `Backdrop.tsx` lowered GROUND_GAIN for the
+   width. A lit figure drifting behind a paragraph is exactly the kind of thing
+   that pushes it back down. `npm run check:contrast` is the gate on this rule,
+   not the numbers below.
+
+   Darkest across the middle third, where copy sits, and clear at top and bottom
+   where the stations put the figure — so it protects the text without flattening
+   the thing it is protecting the text from. `pointer-events: none` because the
+   stage layer above it is already inert and this must not become the one fixed
+   element that swallows a tap. */
+.stage__scrim {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .stage__scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgb(var(--ink-rgb) / 0.34) 26%,
+      rgb(var(--ink-rgb) / 0.44) 50%,
+      rgb(var(--ink-rgb) / 0.34) 74%,
+      transparent 100%
+    );
+  }
+}
