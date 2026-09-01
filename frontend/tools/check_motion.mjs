@@ -105,6 +105,13 @@ const SCENARIOS = [
     ],
     watch: '.card',
   },
+  {
+    name: 'nav marker moves between sections',
+    viewport: [1440, 900],
+    setup: [{ scrollTo: '#about' }, { wait: 1400 }],
+    act: [{ scrollTo: '#work' }],
+    watch: '.nav__marker',
+  },
 ]
 
 /**
@@ -168,21 +175,24 @@ async function runScenario(page, scenario) {
           // state rather than whatever the click itself produced.
           // `act` is synchronous by contract, so it lands inside this frame.
           if (f === 3) perform(act)
-          // One frame later, ask what is actually animating. A transition that
-          // has already finished reports nothing, so this cannot be sampled
-          // late — and at this harness's 12Hz one frame is ~83ms, comfortably
-          // inside every transition on the site.
-          if (f === 4) {
+          // Ask what is animating on EVERY frame after the act, not one chosen
+          // frame. A transition that has finished reports nothing, so a single
+          // late sample misses it — but so does a single early one, and that is
+          // the trap: the nav marker only starts moving once a smooth scroll
+          // has settled and the section observer has fired, several frames
+          // after the interaction. Accumulating across the window catches a
+          // transition wherever in it the transition happens to live.
+          if (f > 3) {
             const el = document.querySelector(watch)
-            running = el
-              ? el.getAnimations().map((a) => {
-                  const timing = a.effect ? a.effect.getComputedTiming() : {}
-                  return {
-                    duration: typeof timing.duration === 'number' ? timing.duration : 0,
-                    property: a.transitionProperty ?? a.animationName ?? 'unknown',
-                  }
+            if (el) {
+              for (const a of el.getAnimations()) {
+                const timing = a.effect ? a.effect.getComputedTiming() : {}
+                running.push({
+                  duration: typeof timing.duration === 'number' ? timing.duration : 0,
+                  property: a.transitionProperty ?? a.animationName ?? 'unknown',
                 })
-              : []
+              }
+            }
           }
           rows.push(signature())
           if (f < frames) requestAnimationFrame(tick)
@@ -231,7 +241,7 @@ for (const scenario of SCENARIOS) {
 
   const result = await runScenario(page, scenario)
   const longest = result.running.reduce((max, a) => Math.max(max, a.duration), 0)
-  const properties = result.running.map((a) => a.property).join(', ') || 'nothing'
+  const properties = [...new Set(result.running.map((a) => a.property))].join(', ') || 'nothing'
 
   if (!result.changed && longest === 0) {
     failures.push(

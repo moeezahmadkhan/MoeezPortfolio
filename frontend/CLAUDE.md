@@ -83,6 +83,19 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   A panel kept mounted for this reason MUST carry `aria-hidden` and `inert` while closed.
 - Per-frame state lives in mutable module singletons (`scrollState`, `wizardState`, `focusState`, `orbitState`) read inside the frame loop. **Never** React state in a per-frame or per-pointer-event path.
 - Never key motion to hard-coded scroll fractions. Section membership comes from `useSectionObserver`; a scroll-fraction table is what got v1 deleted.
+- **`npm run check:motion` is the gate for this, and it runs in a browser on purpose.** A source-level
+  lint was prototyped and flagged 12 of 22 state rules with roughly 10 false positives, because the
+  cascade decides the answer. Confirmed NOT snapping, verified in the browser — do not re-report
+  these: `.btn--solid:hover` and `.btn--ghost:hover` (the `.btn` base transitions `background`,
+  `border-color` and `color`), `.field input[aria-invalid]` (base transitions `border-color`; the
+  `field turns invalid` scenario covers it), `.nav__link[aria-current]` (`.nav__link` transitions
+  `color`), and `.nav__links.is-open`'s layout properties (they change together with `display`, under
+  the panel's own fade; both menu scenarios cover it).
+- **The gate asserts on `getAnimations()`, not on a frame count, and samples every frame of its
+  window.** Both were learned the hard way. Puppeteer under SwiftShader runs rAF at **12Hz**, not 60
+  — anti-throttling flags change nothing, it is software rendering — so a frame-count floor measures
+  the harness. And sampling animations at one chosen frame misses any transition that starts late:
+  the nav marker only begins moving once a smooth scroll has settled and the observer has fired.
 - **The hero is an observed section, `'top'` (`SECTION_IDS` in Nav.tsx), not the absence of one.**
   `useSectionObserver` only commits a truthy id, so while the hero went unobserved there was no way
   back to "nothing owns the screen": scrolling to About and returning to the top latched `active` on
