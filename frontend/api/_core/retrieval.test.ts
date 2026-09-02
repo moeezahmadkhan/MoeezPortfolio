@@ -105,7 +105,7 @@ describe('retrieve over the real corpus', () => {
   it('finds the project a visitor names', () => {
     expect(top('How does Project Horus match faces?')).toBe('Project: Project Horus')
     expect(top('What is Silmaril AI?')).toBe('Project: Silmaril AI')
-    expect(top('Tell me about Query Sphere')).toBe('Project: Query Sphere')
+    expect(top('Tell me about Query Sphere')).toBe('Project: QuerySphere')
   })
 
   it('finds the role, the skills, and the profile', () => {

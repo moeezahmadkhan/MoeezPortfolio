@@ -79,6 +79,11 @@ function socialHref(profile, label) {
   return profile.socials.find((s) => s.label === label)?.href
 }
 
+/** "QuerySphere" -> "Query Sphere"; a name with no internal capital is unchanged. */
+function spacedName(name) {
+  return name.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+}
+
 /** Turns the typed content into prose the retriever can score. */
 function factsFromContent({ profile, projects, skills, experience }) {
   const blocks = []
@@ -158,6 +163,11 @@ function factsFromContent({ profile, projects, skills, experience }) {
         // site's copy is written. One clause in front of that copy gives it
         // something of his own to mirror instead.
         `${p.name} is a project I built.`,
+        // A compound name is one token to a lexical retriever, so a visitor who
+        // types the spaced form ("Query Sphere") scores zero against the chunk
+        // that is entirely about it. The spelling people use is a fact about the
+        // project, so it belongs in the notes rather than in a stopword table.
+        spacedName(p.name) === p.name ? '' : `Some people write it ${spacedName(p.name)}.`,
         p.outcome,
         p.metric ?? '',
         ...p.detail,

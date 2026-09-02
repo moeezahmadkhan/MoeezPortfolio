@@ -24,81 +24,88 @@
     "id": "facts#projects,-all-of-them-and-how-many-there-are#3",
     "source": "src/content/index.ts",
     "heading": "Projects, all of them and how many there are",
-    "text": "There are seven projects written up here in total, 7 of them: Project Horus, Silmaril AI, Wearable AI chat, CV intelligence platform, Query Sphere, Stay-booking platform, Interactive 3D Portfolio. That is the complete list of the projects on this site.",
+    "text": "There are eight projects written up here in total, 8 of them: Relay, Project Horus, Silmaril AI, Wearable AI chat, CV intelligence platform, QuerySphere, Stay-booking platform, Interactive 3D Portfolio. That is the complete list of the projects on this site.",
     "tokens": 54
   },
   {
-    "id": "facts#project:-project-horus#4",
+    "id": "facts#project:-relay#4",
+    "source": "src/content/index.ts",
+    "heading": "Project: Relay",
+    "text": "Relay is a project I built. A self-healing pull-request pipeline built for the LabLab AMD \"Band of Agents\" AI developer hackathon: hand it a GitHub issue and four AI agents carry it from triage to a human-approved merge. Four agents, each built in a different framework — LangGraph, PydanticAI, CrewAI, and a deterministic no-LLM Python security agent — share no code and no memory between them. They collaborate entirely through a single Band chatroom: every handoff is an @mention, and the review-and-fix loop runs in the room until the reviewer and the security agent both clear. The security gate is deliberately LLM-free — secret scan, dependency diff, and the full test suite in plain Python — so nothing about it can be hallucinated. The live demo fixes a real pricing bug, taking six failing tests to green to a merged PR. Built and running live on GCP behind FastAPI and Caddy over HTTPS. Built with LangGraph, PydanticAI, CrewAI, FastAPI, GCP, Caddy. Source: https://github.com/moeezahmadkhan/relay-demo",
+    "tokens": 221
+  },
+  {
+    "id": "facts#project:-project-horus#5",
     "source": "src/content/index.ts",
     "heading": "Project: Project Horus",
     "text": "Project Horus is a project I built. An automated pipeline that identifies students from live video, matching faces against an enrolled index in real time. Detects faces in real time with YOLO and SCRFD, then generates ArcFace embeddings for each detection. Matches those embeddings against a FAISS vector index to assign identity. Tuned for reliability across varied edge-case environments and high-throughput processing. Built with YOLO, SCRFD, ArcFace, FAISS.",
     "tokens": 92
   },
   {
-    "id": "facts#project:-silmaril-ai#5",
+    "id": "facts#project:-silmaril-ai#6",
     "source": "src/content/index.ts",
     "heading": "Project: Silmaril AI",
     "text": "Silmaril AI is a project I built. A strategic platform for venture capital that extracts financial metrics from pitch decks and turns them into structured insight. Parses pitch decks with an AI-driven engine that extracts financial metrics automatically. Delivers automated growth recommendations alongside Company Scores and Founder insights. Built with AI-driven parsing engine, Financial metric extraction.",
     "tokens": 76
   },
   {
-    "id": "facts#project:-wearable-ai-chat#6",
+    "id": "facts#project:-wearable-ai-chat#7",
     "source": "src/content/index.ts",
     "heading": "Project: Wearable AI chat",
     "text": "Wearable AI chat is a project I built. AI chat software for high-end wearables (Whoop), built for ultra-low-latency, lightweight inference at the edge. Focused on ultra-low-latency responses so the chat experience keeps pace with live wearable data. Runs lightweight edge inference suited to wearable hardware constraints. Built with Edge inference, Low-latency AI chat.",
     "tokens": 72
   },
   {
-    "id": "facts#project:-cv-intelligence-platform#7",
+    "id": "facts#project:-cv-intelligence-platform#8",
     "source": "src/content/index.ts",
     "heading": "Project: CV intelligence platform",
     "text": "CV intelligence platform is a project I built. A full-stack computer vision platform that tracks humans and animals in real time and turns the feed into dashboard analytics. Delivers context-aware AI insights drawn from the live video feed. Surfaces results through real-time dashboard analytics. Built with Computer vision, Real-time dashboards.",
     "tokens": 68
   },
   {
-    "id": "facts#project:-query-sphere#8",
+    "id": "facts#project:-querysphere#9",
     "source": "src/content/index.ts",
-    "heading": "Project: Query Sphere",
-    "text": "Query Sphere is a project I built. A Flutter-based AI community app with real-time messaging and smart search, backed by Firebase. Real-time messaging layer synced across devices. Smart search querying across the community content. Built with Flutter, Firebase. Source: https://github.com/moeezahmadkhan/querysphere",
-    "tokens": 54
+    "heading": "Project: QuerySphere",
+    "text": "QuerySphere is a project I built. Some people write it Query Sphere. A real-time community messaging platform, built at ITU, wrapped in a soft neumorphic (tactile 3D) interface and backed by an AI microservice that cleans up and summarizes what people write. Carries messages over WebSockets so a conversation stays live across every connected client. Routes text through an Express-based AI microservice that formats grammar automatically and summarizes long threads. Designed around a soft neumorphic design language applied consistently across the whole interface. Built with Flutter, Firebase, WebSockets, Express. Source: https://github.com/moeezahmadkhan/querysphere",
+    "tokens": 123
   },
   {
-    "id": "facts#project:-stay-booking-platform#9",
+    "id": "facts#project:-stay-booking-platform#10",
     "source": "src/content/index.ts",
     "heading": "Project: Stay-booking platform",
     "text": "Stay-booking platform is a project I built. A full MERN-stack booking application with property listing, dashboard management, and secure session authentication. Dynamic property booking pipelines from listing through checkout. Dashboard management layers for hosts, secured with JWT session authentication. Built with MongoDB, Express, React, Node.js, JWT.",
     "tokens": 63
   },
   {
-    "id": "facts#project:-interactive-3d-portfolio#10",
+    "id": "facts#project:-interactive-3d-portfolio#11",
     "source": "src/content/index.ts",
     "heading": "Project: Interactive 3D Portfolio",
-    "text": "Interactive 3D Portfolio is a project I built. A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender.",
-    "tokens": 69
+    "text": "Interactive 3D Portfolio is a project I built. Some people write it Interactive 3 D Portfolio. A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender.",
+    "tokens": 80
   },
   {
-    "id": "facts#role:-ai-engineer-at-ecommerce-steem#11",
+    "id": "facts#role:-ai-engineer-at-ecommerce-steem#12",
     "source": "src/content/index.ts",
     "heading": "Role: AI Engineer at Ecommerce Steem",
     "text": "May 2026 – Present. Architecting core AI chat software for high-end wearables (Whoop), focused on ultra-low-latency and lightweight edge inference. Engineering a full-stack computer vision platform that tracks humans and animals in real time, with context-aware AI insights and real-time dashboard analytics. Designing interactive full-stack application modules integrated with custom RAG frameworks. Building automation pipelines with the Model Context Protocol (MCP) to bridge LLMs with external developer tools.",
     "tokens": 92
   },
   {
-    "id": "facts#role:-ai-&-computer-vision-developer-at-quidsol#12",
+    "id": "facts#role:-ai-&-computer-vision-developer-at-quidsol#13",
     "source": "src/content/index.ts",
     "heading": "Role: AI & Computer Vision Developer at QUIDSol",
     "text": "Nov 2025 – June 2026. Project Horus (student identification): built an automated CV pipeline using YOLO/SCRFD for real-time face detection and ArcFace for identity assignment via FAISS vector matching. Silmaril AI: built a platform for venture capital with an AI-driven parsing engine that extracts financial metrics from pitch decks and delivers growth recommendations, Company Scores, and Founder insights. Improved pipeline reliability by optimizing asynchronous data flows across varied edge-case environments. Managed database logging and results triage for high-speed processing.",
     "tokens": 107
   },
   {
-    "id": "facts#role:-teacher's-assistant-at-information-technology-university#13",
+    "id": "facts#role:-teacher's-assistant-at-information-technology-university#14",
     "source": "src/content/index.ts",
     "heading": "Role: Teacher's Assistant at Information Technology University",
     "text": "Nov 2025 – Feb 2026. Mentored graduate-level students in agentic AI, including autonomous multi-agent systems and RAG deployment. Facilitated technical workshops on agent orchestration and evaluated student-led workflows for production-level scalability.",
     "tokens": 42
   },
   {
-    "id": "facts#skills#14",
+    "id": "facts#skills#15",
     "source": "src/content/index.ts",
     "heading": "Skills",
     "text": "AI/ML & Orchestration: Agentic AI, RAG Pipelines, Model Context Protocol (MCP), LLM Fine-Tuning (QLoRA), Workflow Automation (n8n), LLM Serving & Quantization, FAISS Vector DB. Backend Development: Node.js, Express, NestJS, TypeScript, Python, FastAPI, C++, SQL, RESTful APIs, WebSocket. Cloud & Deployment: AWS (EC2, Bedrock), GCP, Docker, Kafka, Nginx, CI/CD Pipelines, Linux/Ubuntu System Administration. Frontend & Graphics: React, Next.js, Flutter, Three.js, Blender, UI/UX Micro-Interactions, State Management.",
