@@ -271,6 +271,47 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   control takes its own back. The footer separately spends `--dock-clearance` to keep its last line
   out from under the launcher pill.
 
+**Security headers — the policy is verified in a browser, never by reading it:**
+- `vercel.json` carries the site's `Content-Security-Policy` and the rest of the security
+  headers. `npm run check:csp` serves the built `dist/` through a server that replays those
+  exact headers and loads it in Chrome. Neither `npm run dev` nor `vite preview` sends any of
+  them, so this is the only local check that can see a policy break at all — every other gate
+  passes on a page the live site would refuse to render.
+- **`script-src` needs `'unsafe-eval'`, and that is not laziness.** The Basis/KTX2 transcoder
+  is an Emscripten **embind** build: `__embind_register_function` -> `craftInvokerFunction` ->
+  `new Function`. It runs inside a Blob worker, and a Blob worker inherits the document's
+  policy, so there is nowhere looser to put it. Removing it does not degrade the 3D — every
+  KTX2 texture fails to decode and no model reaches the stage. Fixing it properly means
+  recompiling the transcoder with `-sDYNAMIC_EXECUTION=0`, not editing this header.
+  What the policy still buys with it present: no inline `<script>`, no script from an
+  unlisted origin, no framing, no `<base>` rewrite, no `<object>`. The delivery vectors are
+  shut; only string-to-code inside already-trusted script is open.
+- That failure arrives as an uncaught `EvalError`, **not** as a `securitypolicyviolation`
+  event, because it happens inside the worker. The check listens on `pageerror` and `console`
+  for that reason; a violation-event-only check reports a clean pass on a broken site.
+- `connect-src` needs `blob:` (the loaders fetch their own worker payloads), `www.gstatic.com`
+  (drei fetches the Draco decoder from a CDN — `useGLTF(url, true, ...)`), and
+  `api.web3forms.com` (the contact form posts there from the browser).
+- `window.__modelReady` is a **map of rig id to `true`**, not a boolean. A `=== true` wait is
+  always false and makes any check built on it meaningless in both directions.
+
+**The chat API's trust boundary:**
+- `api/_core/request.ts` decides who is calling. `clientIp` reads `x-vercel-forwarded-for` or
+  `x-real-ip` — headers the platform sets — and falls back to the **LAST** `x-forwarded-for`
+  entry. Never entry `[0]`: a proxy appends, so the front of that list is written by the
+  caller, and a rate limiter keyed on it is a formality anyone can bypass with a random value
+  per request.
+- `/api/chat` refuses any request whose `Origin` is not his site (403), ahead of the rate
+  limiter so a rejected caller cannot spend a visitor's allowance. Preview deployments are
+  allowed by setting `CHAT_ALLOWED_ORIGINS` in the Vercel project — deliberately not a
+  `*.vercel.app` wildcard, which anyone can deploy under.
+- The rate limiter stays in-memory and per-instance. It is a brake on casual abuse, not the
+  spend control: a **hard credit cap on the OpenRouter key** is the only limit an attacker
+  cannot outrun by arriving on a second instance.
+- `npm run dev` binds **loopback only**, because the dev middleware holds the real
+  `OPENROUTER_API_KEY`. `npm run dev:lan` publishes it to the network for phone testing; that
+  is a deliberate choice, not the default.
+
 ## 3D model pipeline (salvaged)
 
 Three character models ship with KTX2 ETC1S texture compression:

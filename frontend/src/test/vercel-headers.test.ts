@@ -48,9 +48,71 @@ describe('vercel cache headers', () => {
     // index.html carries the hashed asset URLs; caching it would strand a
     // visitor on an old build. Vercel's default (max-age=0) is what we want, so
     // the rule to check is that nothing here overrides it.
-    const overridesRoot = config.headers.some(
+    //
+    // This used to assert that NO rule matched the root, which is a stricter
+    // thing than the sentence above it and a different one: the security headers
+    // have to apply site-wide, document included, and they touch no cache
+    // directive. What must stay true is that no root-matching rule sets
+    // `Cache-Control` — so that is what is asserted.
+    const rootRules = config.headers.filter(
       (h) => h.source === '/' || h.source === '/(.*)' || h.source === '/index.html',
     )
-    expect(overridesRoot).toBe(false)
+    const cacheOverrides = rootRules.flatMap((r) =>
+      r.headers.filter((h) => h.key.toLowerCase() === 'cache-control'),
+    )
+    expect(cacheOverrides).toEqual([])
+  })
+})
+
+/**
+ * The headers themselves. `npm run check:csp` proves the policy lets the real
+ * site run; this proves the policy is still THERE, which a browser check cannot
+ * do — delete the header and that check has nothing to load and nothing to fail.
+ */
+describe('vercel security headers', () => {
+  const siteWide = config.headers.find((h) => h.source === '/(.*)')
+
+  function value(key: string): string {
+    const header = siteWide?.headers.find((h) => h.key.toLowerCase() === key.toLowerCase())
+    expect(header, `no ${key} applied site-wide`).toBeDefined()
+    return header!.value
+  }
+
+  it('applies a content security policy to every path, the document included', () => {
+    expect(siteWide, 'no site-wide header rule').toBeDefined()
+    expect(value('Content-Security-Policy')).toContain("default-src 'self'")
+  })
+
+  it('refuses inline script and unlisted script origins', () => {
+    // 'unsafe-eval' IS present and is load-bearing (see CLAUDE.md: the Basis
+    // transcoder is an embind build). 'unsafe-inline' is the one that would
+    // matter for an injected <script>, and it must never appear here.
+    const csp = value('Content-Security-Policy')
+    const scriptSrc = /script-src ([^;]+)/.exec(csp)?.[1] ?? ''
+    expect(scriptSrc).not.toContain("'unsafe-inline'")
+    expect(scriptSrc).not.toContain('*')
+  })
+
+  it('keeps the site out of other people\'s frames', () => {
+    expect(value('Content-Security-Policy')).toContain("frame-ancestors 'none'")
+    expect(value('X-Frame-Options')).toBe('DENY')
+  })
+
+  it('sets the rest of the baseline headers', () => {
+    expect(value('X-Content-Type-Options')).toBe('nosniff')
+    expect(value('Referrer-Policy')).toBe('strict-origin-when-cross-origin')
+    expect(value('Strict-Transport-Security')).toMatch(/max-age=\d{7,}/)
+    expect(value('Permissions-Policy')).toContain('camera=()')
+  })
+
+  it('allows exactly the third parties the site actually uses, and no others', () => {
+    // Each of these is load-bearing and was verified in a browser by
+    // `npm run check:csp`: fonts, the Draco decoder, the contact form.
+    const csp = value('Content-Security-Policy')
+    expect(csp).toContain('https://fonts.gstatic.com')
+    expect(csp).toContain('https://fonts.googleapis.com')
+    expect(csp).toContain('https://www.gstatic.com')
+    expect(csp).toContain('https://api.web3forms.com')
+    expect(csp).not.toContain('http://')
   })
 })

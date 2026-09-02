@@ -11,12 +11,14 @@
     "persona": "node tools/build_persona_index.mjs",
     "eval:chat": "node tools/eval_chat.mjs",
     "shoot": "node tools/shoot.mjs",
-    "shoot:hero": "node tools/shoot_hero.mjs && (cwebp -q 82 public/shots/hero-wizard.png -o public/shots/hero-wizard.webp && rm public/shots/hero-wizard.png || echo 'cwebp not installed (sudo apt install webp) \u2014 keeping public/shots/hero-wizard.png as the fallback asset')",
+    "shoot:hero": "node tools/shoot_hero.mjs && (cwebp -q 82 public/shots/hero-wizard.png -o public/shots/hero-wizard.webp && rm public/shots/hero-wizard.png || echo 'cwebp not installed (sudo apt install webp) — keeping public/shots/hero-wizard.png as the fallback asset')",
     "check:models": "node tools/check_models.mjs",
     "check:contrast": "node tools/check_contrast.mjs",
     "check:motion": "node tools/check_motion.mjs",
     "check:scramble": "node tools/check_scramble.mjs",
-    "check:stations": "node tools/check_stations.mjs"
+    "check:stations": "node tools/check_stations.mjs",
+    "dev:lan": "VITE_LAN=1 vite --host",
+    "check:csp": "node tools/check_csp.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.0",
@@ -35,13 +37,14 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/three": "^0.169.0",
-    "@vercel/node": "^5.8.12",
+    "@vercel/node": "^12.0.0",
     "@vitejs/plugin-react": "^4.3.3",
+    "@vitest/coverage-v8": "^4.1.11",
     "esbuild": "^0.21.5",
     "jsdom": "^30.0.1",
-    "puppeteer-core": "^23.11.1",
+    "puppeteer-core": "^25.9.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.10",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.11"
   }
 }

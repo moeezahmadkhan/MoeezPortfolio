@@ -92,6 +92,14 @@ export const CASCADE_BUDGET_MS = 25_000
 // --- Caps (bound token spend) ---
 export const MAX_MESSAGE_CHARS = 1000 // single user message; longer is truncated
 export const MAX_TURNS = 12 // most recent messages forwarded to the model
+/**
+ * Hard ceiling on how many messages a request may CONTAIN, as opposed to how
+ * many are forwarded. The platform accepts a multi-megabyte JSON body, and
+ * `capMessages` used to walk every element of it before keeping the last few —
+ * so a body full of tiny messages bought an attacker a lot of work per request.
+ * Anything past this is refused whole, before it is walked.
+ */
+export const MAX_INPUT_MESSAGES = 100
 export const MAX_OUTPUT_TOKENS = 256 // hard cap on reply length; keeps answers tight & cheap
 
 // --- Rate limit (per IP, in-memory/best-effort) ---

@@ -18,10 +18,12 @@ import {
   MODELS,
   NOTES_CLOSE,
   NOTES_OPEN,
+  MAX_INPUT_MESSAGES,
   RATE_PER_HOUR,
   RATE_PER_MIN,
   SYSTEM_PROMPT,
 } from './persona'
+import { PRODUCTION_ORIGINS } from './request'
 import type { Chunk } from './retrieval'
 
 const u = (content: string): ChatMessage => ({ role: 'user', content })
@@ -65,6 +67,7 @@ function ask(over: Partial<Parameters<typeof handleChatRequest>[0]> = {}) {
   return handleChatRequest({
     messages: [u(COVERED)],
     ip: 'x',
+    origin: PRODUCTION_ORIGINS[0],
     apiKey: 'key',
     now: 10,
     rateLimiter: createRateLimiter(),
@@ -146,6 +149,26 @@ describe('createRateLimiter', () => {
     const tLast = t + (RATE_PER_HOUR - 1) * 5_000
     expect(rl.check('a', tLast).allowed).toBe(false)
     expect(rl.check('a', tLast + 3_601_000).allowed).toBe(true)
+  })
+
+  it('forgets an address once its whole window has expired', () => {
+    // The map is keyed on caller address and lives as long as the instance. With
+    // nothing evicting spent entries, a long-lived instance accumulates one entry
+    // per address seen, forever.
+    const rl = createRateLimiter()
+    rl.check('a', 0)
+    rl.check('b', 0)
+    expect(rl.size()).toBe(2)
+
+    rl.check('c', 3_600_001)
+    expect(rl.size()).toBe(1)
+  })
+
+  it('keeps an address whose window is still live', () => {
+    const rl = createRateLimiter()
+    rl.check('a', 0)
+    rl.check('b', 60_000)
+    expect(rl.size()).toBe(2)
   })
 })
 
@@ -257,6 +280,7 @@ describe('retrieval in the request path', () => {
     await handleChatRequest({
       messages: [u('What is Silmaril AI?')],
       ip: 'default-corpus',
+      origin: PRODUCTION_ORIGINS[0],
       apiKey: 'key',
       now: 10,
       rateLimiter: createRateLimiter(),
@@ -489,5 +513,74 @@ describe('the cascade has a wall clock, not just per-model timeouts', () => {
     // And the budget must still afford a second attempt after a slow primary,
     // or raising the deadline would just trade one failure mode for another.
     expect(Math.floor(CASCADE_BUDGET_MS / MODEL_TIMEOUT_MS)).toBeGreaterThanOrEqual(2)
+  })
+})
+
+
+describe('the request has to come from his site', () => {
+  it('refuses a request with no Origin, and never reaches a model', async () => {
+    // A script pointed at the endpoint sends no Origin. Every browser POST does.
+    const fetchImpl = okFetch('answer')
+    const res = await ask({ origin: undefined, fetchImpl: fetchImpl as unknown as typeof fetch })
+
+    expect(res.status).toBe(403)
+    expect(res.body.reply).toBe(FALLBACK_REPLY)
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
+  it('refuses a request from someone else\'s site, and never reaches a model', async () => {
+    const fetchImpl = okFetch('answer')
+    const res = await ask({
+      origin: 'https://evil.example',
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    })
+
+    expect(res.status).toBe(403)
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
+  it('spends no rate-limit budget on a rejected origin', async () => {
+    // Otherwise anyone could exhaust a visitor's allowance on their behalf.
+    const rl = createRateLimiter()
+    await ask({ origin: 'https://evil.example', rateLimiter: rl })
+    expect(rl.size()).toBe(0)
+  })
+
+  it('serves a request from the production site', async () => {
+    for (const origin of PRODUCTION_ORIGINS) {
+      const res = await ask({ origin })
+      expect(res.status).toBe(200)
+      expect(res.body.reply).toBe('answer')
+    }
+  })
+
+  it('serves a request from an origin supplied by configuration', async () => {
+    const res = await ask({
+      origin: 'https://preview.example',
+      allowedOrigins: ['https://preview.example'],
+    })
+    expect(res.status).toBe(200)
+  })
+})
+
+describe('an oversized payload is refused before it is walked', () => {
+  it('refuses more messages than the cap, without calling a model', async () => {
+    const fetchImpl = okFetch('answer')
+    const messages = Array.from({ length: MAX_INPUT_MESSAGES + 1 }, () => u(COVERED))
+    const res = await ask({ messages, fetchImpl: fetchImpl as unknown as typeof fetch })
+
+    expect(res.status).toBe(400)
+    expect(res.body.reply).toBe(FALLBACK_REPLY)
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
+  it('still serves a payload exactly at the cap', async () => {
+    const messages = Array.from({ length: MAX_INPUT_MESSAGES }, () => u(COVERED))
+    const res = await ask({ messages })
+    expect(res.status).toBe(200)
+  })
+
+  it('leaves room for far more turns than the model is ever sent', () => {
+    expect(MAX_INPUT_MESSAGES).toBeGreaterThan(MAX_TURNS)
   })
 })

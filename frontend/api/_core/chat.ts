@@ -4,6 +4,7 @@ import {
   buildSystemPrompt,
   fence,
   FALLBACK_REPLY,
+  MAX_INPUT_MESSAGES,
   MAX_MESSAGE_CHARS,
   MAX_OUTPUT_TOKENS,
   MAX_TURNS,
@@ -14,6 +15,7 @@ import {
   RATE_PER_HOUR,
   RATE_PER_MIN,
 } from './persona.js'
+import { isAllowedOrigin } from './request.js'
 import { retrieve, type Chunk } from './retrieval.js'
 
 export type ChatRole = 'user' | 'assistant'
@@ -86,14 +88,34 @@ export function buildRequestBody(
   }
 }
 
-export type RateLimiter = { check: (ip: string, now: number) => { allowed: boolean } }
+export type RateLimiter = {
+  check: (ip: string, now: number) => { allowed: boolean }
+  /** Addresses currently held. Exposed so the eviction below is observable. */
+  size: () => number
+}
 
-// In-memory, best-effort (resets on cold start; not shared across instances). IP keys are never pruned — safe only on short-lived serverless instances.
+const WINDOW_MS = 3_600_000
+
+/**
+ * In-memory and best-effort: it resets on a cold start and is not shared across
+ * instances, so the real ceiling is looser than the constants suggest. It is a
+ * brake on casual abuse, not the spend control — that is a hard credit cap on
+ * the OpenRouter key, which is the only limit an attacker cannot outrun by
+ * arriving on a second instance.
+ *
+ * Entries whose whole window has expired are dropped on each call. Without that
+ * the map grows by one entry per address for the life of the instance, which on
+ * a warm one is a slow leak an attacker controls the rate of.
+ */
 export function createRateLimiter(): RateLimiter {
   const hits = new Map<string, number[]>()
   return {
     check(ip, now) {
-      const recent = (hits.get(ip) ?? []).filter((t) => now - t < 3_600_000)
+      for (const [key, times] of hits) {
+        if (times.length === 0 || now - times[times.length - 1] >= WINDOW_MS) hits.delete(key)
+      }
+
+      const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS)
       const lastMin = recent.filter((t) => now - t < 60_000).length
       if (lastMin >= RATE_PER_MIN || recent.length >= RATE_PER_HOUR) {
         hits.set(ip, recent)
@@ -103,6 +125,7 @@ export function createRateLimiter(): RateLimiter {
       hits.set(ip, recent)
       return { allowed: true }
     },
+    size: () => hits.size,
   }
 }
 
@@ -114,6 +137,10 @@ export type ChatResult = { status: number; body: { reply: string } }
 export type HandleArgs = {
   messages: ChatMessage[]
   ip: string
+  /** The request's `Origin` header. Absent means a caller that is not a browser. */
+  origin: string | undefined
+  /** Extra origins beyond the production site — preview deploys, and the dev server. */
+  allowedOrigins?: string[]
   apiKey: string | undefined
   now?: number
   rateLimiter?: RateLimiter
@@ -135,6 +162,18 @@ export async function handleChatRequest(args: HandleArgs): Promise<ChatResult> {
   const now = args.now ?? Date.now()
   const rl = args.rateLimiter ?? defaultLimiter
   const doFetch = args.fetchImpl ?? fetch
+
+  // Origin first, ahead of the rate limiter: a rejected caller must not be able
+  // to spend a real visitor's allowance, or to put an entry in the limiter's map.
+  if (!isAllowedOrigin(args.origin, args.allowedOrigins)) {
+    return { status: 403, body: { reply: FALLBACK_REPLY } }
+  }
+
+  // Then size, before anything walks the array. Refusing whole is the point:
+  // truncating would still have touched every element to decide what to keep.
+  if (Array.isArray(args.messages) && args.messages.length > MAX_INPUT_MESSAGES) {
+    return { status: 400, body: { reply: FALLBACK_REPLY } }
+  }
 
   if (!args.apiKey) {
     console.warn('[chat] OPENROUTER_API_KEY is not set')

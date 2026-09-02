@@ -2,10 +2,18 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { handleChatRequest } from './api/_core/chat'
+import { isLoopbackOrigin, parseAllowedOrigins } from './api/_core/request'
 
-// Dev-only: mount the same core the Vercel function uses at /api/chat,
-// so `npm run dev` works without `vercel dev`. Reads the key from .env.
-function chatDevApi(apiKey: string | undefined): Plugin {
+/**
+ * Dev-only: mount the same core the Vercel function uses at /api/chat,
+ * so `npm run dev` works without `vercel dev`. Reads the key from .env.
+ *
+ * This middleware holds his real OpenRouter key, so who may call it matters even
+ * here. On the default (loopback) bind only pages from this machine can; in LAN
+ * mode he has deliberately published the server to the network, so the origin
+ * check cannot add a guarantee and does not pretend to.
+ */
+function chatDevApi(apiKey: string | undefined, lan: boolean): Plugin {
   return {
     name: 'chat-dev-api',
     apply: 'serve',
@@ -30,7 +38,17 @@ function chatDevApi(apiKey: string | undefined): Plugin {
             messages = undefined
           }
           const ip = req.socket.remoteAddress || 'local'
-          const result = await handleChatRequest({ messages, ip, apiKey })
+          const origin = req.headers.origin
+          const result = await handleChatRequest({
+            messages,
+            ip,
+            origin,
+            allowedOrigins:
+              lan && origin
+                ? [origin]
+                : parseAllowedOrigins(isLoopbackOrigin(origin) ? origin : undefined),
+            apiKey,
+          })
           res.statusCode = result.status
           res.setHeader('Content-Type', 'application/json')
           res.end(JSON.stringify(result.body))
@@ -42,12 +60,20 @@ function chatDevApi(apiKey: string | undefined): Plugin {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+
+  // The dev server mounts /api/chat with his real OPENROUTER_API_KEY in it, so
+  // binding it to every interface publishes that key to everyone on the network
+  // — a cafe or an office LAN included. It stays on loopback unless he asks:
+  // `npm run dev:lan` sets VITE_LAN=1 for the phone-testing case, which is the
+  // only reason the option exists.
+  const lan = env.VITE_LAN === '1'
+
   return {
-    plugins: [react(), chatDevApi(env.OPENROUTER_API_KEY)],
-    // host:true exposes the dev server on the LAN (reachable at http://<LAN-IP>:5173
-    // from other devices); cors:true sends Access-Control-Allow-Origin so cross-origin
-    // requests aren't blocked.
-    server: { host: true, cors: true },
+    plugins: [react(), chatDevApi(env.OPENROUTER_API_KEY, lan)],
+    // cors stays off: the site calls its own origin, so nothing here needs
+    // Access-Control-Allow-Origin, and sending one invites other pages to read
+    // dev responses.
+    server: { host: lan, cors: false },
     build: {
       rollupOptions: {
         output: {
