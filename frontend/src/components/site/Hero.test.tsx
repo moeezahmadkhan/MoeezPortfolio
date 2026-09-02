@@ -16,7 +16,7 @@ describe('Hero', () => {
     expect(screen.getByRole('link', { name: /résumé/i })).toHaveAttribute('href', profile.cvUrl)
     expect(screen.getByRole('link', { name: /github/i })).toHaveAttribute(
       'href',
-      'https://github.com/moeezahmadkhan',
+      'https://github.com/moeezahmadkhangit',
     )
   })
 

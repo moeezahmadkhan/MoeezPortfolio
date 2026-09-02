@@ -181,6 +181,7 @@ function factsFromContent({ profile, projects, skills, experience }) {
         ...p.detail,
         `Built with ${p.stack.join(', ')}.`,
         p.links?.repo ? `Source: ${p.links.repo}` : '',
+        p.links?.demo ? `Live site: ${p.links.demo}` : '',
       ]
         .filter(Boolean)
         .join(' '),

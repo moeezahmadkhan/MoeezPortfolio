@@ -10,7 +10,7 @@
     "id": "facts#how-to-reach-me-and-where-to-find-me-online#1",
     "source": "src/content/index.ts",
     "heading": "How to reach me and where to find me online",
-    "text": "The best way to contact me is email: kmoeez2018@gmail.com. You can also reach me, connect, or message me on LinkedIn: https://www.linkedin.com/in/moeez-ahmad-khan-68a403364/. My code is on GitHub: https://github.com/moeezahmadkhan. My site is https://moeezahmadkhan.com. If you want to hire me, talk about a role, or just get in touch, LinkedIn and email both work.",
+    "text": "The best way to contact me is email: kmoeez2018@gmail.com. You can also reach me, connect, or message me on LinkedIn: https://www.linkedin.com/in/moeez-ahmad-khan-68a403364/. My code is on GitHub: https://github.com/moeezahmadkhangit. My site is https://moeezahmadkhan.com. If you want to hire me, talk about a role, or just get in touch, LinkedIn and email both work.",
     "tokens": 69
   },
   {
@@ -31,8 +31,8 @@
     "id": "facts#project:-relay#4",
     "source": "src/content/index.ts",
     "heading": "Project: Relay",
-    "text": "Relay is a project I built. A self-healing pull-request pipeline built for the LabLab AMD \"Band of Agents\" AI developer hackathon: hand it a GitHub issue and four AI agents carry it from triage to a human-approved merge. Four agents, each built in a different framework — LangGraph, PydanticAI, CrewAI, and a deterministic no-LLM Python security agent — share no code and no memory between them. They collaborate entirely through a single Band chatroom: every handoff is an @mention, and the review-and-fix loop runs in the room until the reviewer and the security agent both clear. The security gate is deliberately LLM-free — secret scan, dependency diff, and the full test suite in plain Python — so nothing about it can be hallucinated. The live demo fixes a real pricing bug, taking six failing tests to green to a merged PR. Built and running live on GCP behind FastAPI and Caddy over HTTPS. Built with LangGraph, PydanticAI, CrewAI, FastAPI, GCP, Caddy. Source: https://github.com/moeezahmadkhan/relay-demo",
-    "tokens": 221
+    "text": "Relay is a project I built. A self-healing pull-request pipeline built for the LabLab AMD \"Band of Agents\" AI developer hackathon: hand it a GitHub issue and four AI agents carry it from triage to a human-approved merge. Four agents, each built in a different framework — LangGraph, PydanticAI, CrewAI, and a deterministic no-LLM Python security agent — share no code and no memory between them. They collaborate entirely through a single Band chatroom: every handoff is an @mention, and the review-and-fix loop runs in the room until the reviewer and the security agent both clear. The security gate is deliberately LLM-free — secret scan, dependency diff, and the full test suite in plain Python — so nothing about it can be hallucinated. The live demo fixes a real pricing bug, taking six failing tests to green to a merged PR. Built and running live on GCP behind FastAPI and Caddy over HTTPS. Built with LangGraph, PydanticAI, CrewAI, FastAPI, GCP, Caddy. Source: https://github.com/moeezahmadkhangit/Relay-LabLab Live site: https://relay-band.duckdns.org/",
+    "tokens": 225
   },
   {
     "id": "facts#project:-project-horus#5",
@@ -66,8 +66,8 @@
     "id": "facts#project:-querysphere#9",
     "source": "src/content/index.ts",
     "heading": "Project: QuerySphere",
-    "text": "QuerySphere is a project I built. Some people write it Query Sphere. A real-time community messaging platform, built at ITU, wrapped in a soft neumorphic (tactile 3D) interface and backed by an AI microservice that cleans up and summarizes what people write. Carries messages over WebSockets so a conversation stays live across every connected client. Routes text through an Express-based AI microservice that formats grammar automatically and summarizes long threads. Designed around a soft neumorphic design language applied consistently across the whole interface. Built with Flutter, Firebase, WebSockets, Express. Source: https://github.com/moeezahmadkhan/querysphere",
-    "tokens": 123
+    "text": "QuerySphere is a project I built. Some people write it Query Sphere. A real-time community messaging platform, built at ITU, wrapped in a soft neumorphic (tactile 3D) interface and backed by an AI microservice that cleans up and summarizes what people write. Carries messages over WebSockets so a conversation stays live across every connected client. Routes text through an Express-based AI microservice that formats grammar automatically and summarizes long threads. Designed around a soft neumorphic design language applied consistently across the whole interface. Built with Flutter, Firebase, WebSockets, Express. Source: https://github.com/moeezahmadkhangit/querysphere Live site: https://querysphere.moeezahmadkhan.com/",
+    "tokens": 127
   },
   {
     "id": "facts#project:-stay-booking-platform#10",
@@ -80,8 +80,8 @@
     "id": "facts#project:-interactive-3d-portfolio#11",
     "source": "src/content/index.ts",
     "heading": "Project: Interactive 3D Portfolio",
-    "text": "Interactive 3D Portfolio is a project I built. A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender.",
-    "tokens": 69
+    "text": "Interactive 3D Portfolio is a project I built. A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender. Source: https://github.com/moeezahmadkhangit/MoeezPortfolio Live site: https://moeezahmadkhan.com",
+    "tokens": 76
   },
   {
     "id": "facts#role:-ai-engineer-at-ecommerce-steem#12",

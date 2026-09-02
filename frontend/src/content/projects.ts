@@ -12,7 +12,7 @@ export type Project = {
 
 // To attach links to a project, add a `links` object to its entry:
 //   links: {
-//     repo: 'https://github.com/moeezahmadkhan/<repo>',   // source code
+//     repo: 'https://github.com/moeezahmadkhangit/<repo>',   // source code
 //     demo: 'https://<live-url>',                          // live deployment
 //     writeup: 'https://<article-url>',                    // optional write-up
 //   }
@@ -33,7 +33,7 @@ export const projects: Project[] = [
     ],
     stack: ['LangGraph', 'PydanticAI', 'CrewAI', 'FastAPI', 'GCP', 'Caddy'],
     links: {
-      repo: 'https://github.com/moeezahmadkhan/relay-demo',
+      repo: 'https://github.com/moeezahmadkhangit/Relay-LabLab',
       demo: 'https://relay-band.duckdns.org/',
     },
     featured: true,
@@ -98,7 +98,10 @@ export const projects: Project[] = [
       'Designed around a soft neumorphic design language applied consistently across the whole interface.',
     ],
     stack: ['Flutter', 'Firebase', 'WebSockets', 'Express'],
-    links: { repo: 'https://github.com/moeezahmadkhan/querysphere' },
+    links: {
+      repo: 'https://github.com/moeezahmadkhangit/querysphere',
+      demo: 'https://querysphere.moeezahmadkhan.com/',
+    },
     featured: true,
   },
   {
@@ -123,7 +126,10 @@ export const projects: Project[] = [
       'Includes an integrated AI chatbot that handles contextual visitor questions within the experience.',
     ],
     stack: ['Three.js', 'Blender'],
-    links: { demo: 'https://moeezahmadkhan.com' },
+    links: {
+      repo: 'https://github.com/moeezahmadkhangit/MoeezPortfolio',
+      demo: 'https://moeezahmadkhan.com',
+    },
     featured: false,
   },
 ]

@@ -45,7 +45,7 @@ export const profile: Profile = {
     { value: 'Lahore, PK', label: 'Home base' },
   ],
   socials: [
-    { label: 'GitHub', href: 'https://github.com/moeezahmadkhan' },
+    { label: 'GitHub', href: 'https://github.com/moeezahmadkhangit' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/moeez-ahmad-khan-68a403364/' },
     { label: 'Website', href: 'https://moeezahmadkhan.com' },
   ],
