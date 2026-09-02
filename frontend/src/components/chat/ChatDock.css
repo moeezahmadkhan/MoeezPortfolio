@@ -196,6 +196,25 @@
 
 .chat__msg {
   font-size: var(--t-small);
+  /* Each turn arrives rather than blinking into the log. Adapted from the
+     Devsteem site's `ios-msg-pop`, which is a `@keyframes` there — here it is a
+     transition plus `@starting-style`, for the same reason the panel above uses
+     one. A message can be taken away (a new conversation replaces the whole
+     log), and a keyframe entrance has nothing to say about leaving.
+
+     `@starting-style` is what makes the transition fire at all: a browser skips
+     transitions on the first style update of a newly inserted element, so
+     without it every message would simply appear, which is what they did. */
+  transition:
+    opacity 0.24s var(--ease),
+    transform 0.24s var(--ease);
+}
+
+@starting-style {
+  .chat__msg {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
 }
 
 .chat__msg p {
@@ -334,5 +353,11 @@
   .chat__typing span[aria-hidden] {
     animation: none;
     opacity: 0.6;
+  }
+
+  /* With no transition the message lands on its settled state on the first
+     frame, so the `@starting-style` above cannot strand it part-way. */
+  .chat__msg {
+    transition: none;
   }
 }

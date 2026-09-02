@@ -1,5 +1,6 @@
 import type { Project } from '../../content'
 import { clearProjectFocus, setProjectFocus } from '../../lib/focusState'
+import { useScramble } from '../../lib/useScramble'
 import { Tag } from '../ui/Tag'
 import './ProjectCard.css'
 
@@ -36,23 +37,30 @@ export function ProjectCard({ project }: { project: Project }) {
         {project.links && (
           <p className="card__links">
             {project.links.repo && (
-              <a href={project.links.repo} target="_blank" rel="noreferrer noopener">
-                {project.name} code
-              </a>
+              <CardLink href={project.links.repo} label={`${project.name} code`} />
             )}
             {project.links.demo && (
-              <a href={project.links.demo} target="_blank" rel="noreferrer noopener">
-                {project.name} live
-              </a>
+              <CardLink href={project.links.demo} label={`${project.name} live`} />
             )}
             {project.links.writeup && (
-              <a href={project.links.writeup} target="_blank" rel="noreferrer noopener">
-                {project.name} write-up
-              </a>
+              <CardLink href={project.links.writeup} label={`${project.name} write-up`} />
             )}
           </p>
         )}
       </div>
     </article>
+  )
+}
+
+/**
+ * One outbound link, its own component so the decode's hook is called once per
+ * link rather than conditionally inside the card — a project with a demo and
+ * one without would otherwise run a different number of hooks.
+ */
+function CardLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a href={href} target="_blank" rel="noreferrer noopener" {...useScramble(label)}>
+      {label}
+    </a>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { profile } from '../../content'
+import { useScramble } from '../../lib/useScramble'
 import { useSectionObserver } from '../../lib/useSectionObserver'
 import { markerGeometry, markerTransform } from './navMarker'
 import './Nav.css'
@@ -30,6 +31,42 @@ export const NAV_ITEMS = [
  * visitor is up there — which is correct.
  */
 export const SECTION_IDS = ['top', ...NAV_ITEMS.map((i) => i.id)]
+
+/**
+ * One nav item, its own component so the decode's hook is called once per link
+ * rather than inside a `.map` callback.
+ */
+function NavLink({
+  id,
+  label,
+  current,
+  onNavigate,
+}: {
+  id: string
+  label: string
+  current: boolean
+  onNavigate: () => void
+}) {
+  return (
+    <a
+      href={`#${id}`}
+      className="nav__link"
+      aria-current={current ? 'true' : undefined}
+      onClick={onNavigate}
+      {...useScramble(label)}
+    >
+      {label}
+    </a>
+  )
+}
+
+function CvLink() {
+  return (
+    <a className="nav__cv" href={profile.cvUrl} target="_blank" rel="noreferrer" {...useScramble('Résumé')}>
+      Résumé
+    </a>
+  )
+}
 
 export function Nav() {
   const ids = useMemo(() => SECTION_IDS, [])
@@ -93,19 +130,15 @@ export function Nav() {
           ref={listRef}
         >
           {NAV_ITEMS.map((item) => (
-            <a
+            <NavLink
               key={item.id}
-              href={`#${item.id}`}
-              className="nav__link"
-              aria-current={active === item.id ? 'true' : undefined}
-              onClick={() => setOpen(false)}
-            >
-              {item.label}
-            </a>
+              id={item.id}
+              label={item.label}
+              current={active === item.id}
+              onNavigate={() => setOpen(false)}
+            />
           ))}
-          <a className="nav__cv" href={profile.cvUrl} target="_blank" rel="noreferrer">
-            Résumé
-          </a>
+          <CvLink />
           <span className="nav__marker" ref={markerRef} aria-hidden="true" />
         </nav>
       </div>

@@ -15,6 +15,7 @@
     "check:models": "node tools/check_models.mjs",
     "check:contrast": "node tools/check_contrast.mjs",
     "check:motion": "node tools/check_motion.mjs",
+    "check:scramble": "node tools/check_scramble.mjs",
     "check:stations": "node tools/check_stations.mjs"
   },
   "dependencies": {

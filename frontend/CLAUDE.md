@@ -19,6 +19,7 @@ npm run shoot          # screenshot every section at both widths (needs a previe
 npm run check:contrast # measure body-copy contrast against the LIVE backdrop, every section
 npm run check:motion   # assert every state change actually animates, in a real browser
 npm run check:stations # assert the push-in and the mobile station travel actually move
+npm run check:scramble # assert the nav's hover decode and the chat message entrance run
 ```
 
 The build fails if TypeScript errors exist. Type-check without bundling: `npx tsc -b`.
@@ -138,6 +139,18 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   LIT throughout, and that a section change catches the figure in flight rather than at its
   destination. Assertions are on values and wall-clock, never on frame counts — SwiftShader's rAF is
   12Hz and a frame-count floor measures the harness.
+- **The hover decode is text, so its cost is layout.** `lib/scramble.ts` + `lib/useScramble.ts` swap a
+  label's characters for terminal glyphs on hover and resolve them back left to right (adapted from
+  the Devsteem site, which drives the same effect with GSAP's ScrambleTextPlugin — this is thirty
+  lines and no dependency). Every glyph in a proportional font has its own advance, so the element's
+  width is frozen with one measurement on `mouseenter` and released on the way out: one reflow per
+  hover instead of one per frame. `aria-label` holds the accessible name still while `textContent` is
+  punctuation, and nothing runs under reduced motion or on a coarse pointer, where `mouseenter` fires
+  on a tap. `npm run check:scramble` measures the neighbour drift that justifies all of it.
+- **A chat message arrives on a transition, like the panel around it.** `.chat__msg` starts from
+  `@starting-style` rather than a `@keyframes` for exactly the reason above it in this list — the log
+  is replaced wholesale on a new conversation, and a keyframe entrance has nothing to say about
+  leaving.
 - `tools/shoot.mjs` waits on three things per section, and needs all three: the page to hold still for
   several polls (`scroll-behavior: smooth` means `scrollIntoView` returns before the scroll starts),
   the section's expected rig to report ready, and every `Reveal` in view to reach full opacity. Its
