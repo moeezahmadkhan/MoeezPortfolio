@@ -45,26 +45,28 @@ const box = await page.evaluate(() => {
   const r = link.getBoundingClientRect()
   return { x: r.x + r.width / 2, y: r.y + r.height / 2 }
 })
-await page.mouse.move(box.x, box.y)
 
-// Sample every frame for a third of a second: the decode is 500ms, so this
-// lands squarely inside it.
-const during = await page.evaluate(
-  () =>
-    new Promise((resolve) => {
-      const seen = []
-      const rights = []
-      const t0 = performance.now()
-      const step = () => {
-        const links = [...document.querySelectorAll('.nav__link')]
-        seen.push(links[1].textContent)
-        rights.push(links.map((l) => l.getBoundingClientRect().right))
-        if (performance.now() - t0 < 330) requestAnimationFrame(step)
-        else resolve({ seen, rights })
-      }
-      requestAnimationFrame(step)
-    }),
-)
+// The sampler is installed BEFORE the hover, not after it. Starting it in a
+// second `evaluate` would put a CDP round trip inside a 500ms animation: on a
+// slow connection the decode is over before the first sample, and the check
+// fails on the harness rather than on the code. The window is deliberately
+// longer than the decode for the same reason.
+const WINDOW_MS = 900
+await page.evaluate((ms) => {
+  window.__scramble = { seen: [], rights: [] }
+  const t0 = performance.now()
+  const step = () => {
+    const links = [...document.querySelectorAll('.nav__link')]
+    window.__scramble.seen.push(links[1].textContent)
+    window.__scramble.rights.push(links.map((l) => l.getBoundingClientRect().right))
+    if (performance.now() - t0 < ms) requestAnimationFrame(step)
+  }
+  requestAnimationFrame(step)
+}, WINDOW_MS)
+
+await page.mouse.move(box.x, box.y)
+await new Promise((r) => setTimeout(r, WINDOW_MS + 100))
+const during = await page.evaluate(() => window.__scramble)
 
 const scrambled = during.seen.filter((t) => t !== before.labels[1])
 report(

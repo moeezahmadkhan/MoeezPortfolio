@@ -80,8 +80,8 @@
     "id": "facts#project:-interactive-3d-portfolio#11",
     "source": "src/content/index.ts",
     "heading": "Project: Interactive 3D Portfolio",
-    "text": "Interactive 3D Portfolio is a project I built. Some people write it Interactive 3 D Portfolio. A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender.",
-    "tokens": 80
+    "text": "Interactive 3D Portfolio is a project I built. A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender.",
+    "tokens": 69
   },
   {
     "id": "facts#role:-ai-engineer-at-ecommerce-steem#12",

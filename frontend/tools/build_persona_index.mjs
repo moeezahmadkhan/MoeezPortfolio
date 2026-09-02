@@ -79,9 +79,17 @@ function socialHref(profile, label) {
   return profile.socials.find((s) => s.label === label)?.href
 }
 
-/** "QuerySphere" -> "Query Sphere"; a name with no internal capital is unchanged. */
+/**
+ * "QuerySphere" -> "Query Sphere"; a name with no internal capital is unchanged.
+ *
+ * Lowercase before the capital, never a digit: with `[a-z0-9]` here, "Interactive
+ * 3D Portfolio" split into "Interactive 3 D Portfolio" and the notes went out
+ * claiming people write it that way. Nobody does. An alias the corpus invents is
+ * worse than no alias — it is the one kind of sentence this whole file exists to
+ * keep out of the bot's mouth.
+ */
 function spacedName(name) {
-  return name.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+  return name.replace(/([a-z])([A-Z])/g, '$1 $2')
 }
 
 /** Turns the typed content into prose the retriever can score. */

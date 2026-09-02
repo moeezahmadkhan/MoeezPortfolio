@@ -269,6 +269,38 @@ describe('retrieve answers the questions qa.md was written to cover', () => {
   })
 })
 
+/**
+ * The corpus is generated, and a generator can invent. `spacedName` in
+ * `tools/build_persona_index.mjs` teaches the retriever the spaced spelling of a
+ * compound name ("QuerySphere" -> "Query Sphere") so a visitor typing the two
+ * words scores against the chunk that is entirely about it. Its first version
+ * split on a digit too, and shipped a corpus that told the bot people write
+ * "Interactive 3 D Portfolio". Nobody does. A grounded bot that repeats an
+ * invented spelling is inventing, however small the invention.
+ */
+describe('the generated aliases are spellings, not inventions', () => {
+  it('never teaches a spelling with a stranded single letter in it', () => {
+    for (const chunk of real) {
+      for (const m of chunk.text.matchAll(/Some people write it ([^.]+)\./g)) {
+        expect(m[1], chunk.heading).not.toMatch(/(^| )[A-Za-z]( |$)/)
+      }
+    }
+  })
+
+  it('only differs from the name it aliases by the spaces in it', () => {
+    const names = new Set(
+      real.flatMap((c) =>
+        c.heading.startsWith('Project: ') ? [c.heading.slice('Project: '.length)] : [],
+      ),
+    )
+    for (const chunk of real) {
+      for (const m of chunk.text.matchAll(/Some people write it ([^.]+)\./g)) {
+        expect(names).toContain(m[1].replace(/ /g, ''))
+      }
+    }
+  })
+})
+
 describe('the relevance floor is calibrated, not guessed', () => {
   const covered = [
     'How does Project Horus match faces?',
