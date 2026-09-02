@@ -31,8 +31,8 @@
     "id": "facts#project:-relay#4",
     "source": "src/content/index.ts",
     "heading": "Project: Relay",
-    "text": "Relay is a project I built. A self-healing pull-request pipeline built for the LabLab AMD \"Band of Agents\" AI developer hackathon: hand it a GitHub issue and four AI agents carry it from triage to a human-approved merge. Four agents, each built in a different framework — LangGraph, PydanticAI, CrewAI, and a deterministic no-LLM Python security agent — share no code and no memory between them. They collaborate entirely through a single Band chatroom: every handoff is an @mention, and the review-and-fix loop runs in the room until the reviewer and the security agent both clear. The security gate is deliberately LLM-free — secret scan, dependency diff, and the full test suite in plain Python — so nothing about it can be hallucinated. The live demo fixes a real pricing bug, taking six failing tests to green to a merged PR. Built and running live on GCP behind FastAPI and Caddy over HTTPS. Built with LangGraph, PydanticAI, CrewAI, FastAPI, GCP, Caddy. Source: https://github.com/moeezahmadkhangit/Relay-LabLab Live site: https://relay-band.duckdns.org/",
-    "tokens": 225
+    "text": "Relay is a project I built. A self-healing pull-request pipeline built for the LabLab AMD \"Band of Agents\" AI developer hackathon: hand it a GitHub issue and four AI agents carry it from triage to a human-approved merge. Four agents, each built in a different framework — LangGraph, PydanticAI, CrewAI, and a deterministic no-LLM Python security agent — share no code and no memory between them. They collaborate entirely through a single Band chatroom: every handoff is an @mention, and the review-and-fix loop runs in the room until the reviewer and the security agent both clear. The security gate is deliberately LLM-free — secret scan, dependency diff, and the full test suite in plain Python — so nothing about it can be hallucinated. The hackathon demo fixes a real pricing bug, taking six failing tests to green to a merged PR. It ran for the event on GCP behind FastAPI and Caddy over HTTPS. Built with LangGraph, PydanticAI, CrewAI, FastAPI, GCP, Caddy. Source: https://github.com/moeezahmadkhangit/Relay-LabLab",
+    "tokens": 222
   },
   {
     "id": "facts#project:-project-horus#5",
@@ -80,8 +80,8 @@
     "id": "facts#project:-interactive-3d-portfolio#11",
     "source": "src/content/index.ts",
     "heading": "Project: Interactive 3D Portfolio",
-    "text": "Interactive 3D Portfolio is a project I built. A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender. Source: https://github.com/moeezahmadkhangit/MoeezPortfolio Live site: https://moeezahmadkhan.com",
-    "tokens": 76
+    "text": "Interactive 3D Portfolio is a project I built. A personal 3D portfolio site with a wizarding-themed, gamified environment showcasing production engineering projects. Built with Three.js and custom Blender models for a premium interactive feel. Includes an integrated AI chatbot that handles contextual visitor questions within the experience. Built with Three.js, Blender. Source: https://github.com/moeezahmadkhangit/MoeezPortfolio",
+    "tokens": 72
   },
   {
     "id": "facts#role:-ai-engineer-at-ecommerce-steem#12",

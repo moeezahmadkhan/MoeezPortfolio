@@ -29,13 +29,10 @@ export const projects: Project[] = [
       'Four agents, each built in a different framework — LangGraph, PydanticAI, CrewAI, and a deterministic no-LLM Python security agent — share no code and no memory between them.',
       'They collaborate entirely through a single Band chatroom: every handoff is an @mention, and the review-and-fix loop runs in the room until the reviewer and the security agent both clear.',
       'The security gate is deliberately LLM-free — secret scan, dependency diff, and the full test suite in plain Python — so nothing about it can be hallucinated.',
-      'The live demo fixes a real pricing bug, taking six failing tests to green to a merged PR. Built and running live on GCP behind FastAPI and Caddy over HTTPS.',
+      'The hackathon demo fixes a real pricing bug, taking six failing tests to green to a merged PR. It ran for the event on GCP behind FastAPI and Caddy over HTTPS.',
     ],
     stack: ['LangGraph', 'PydanticAI', 'CrewAI', 'FastAPI', 'GCP', 'Caddy'],
-    links: {
-      repo: 'https://github.com/moeezahmadkhangit/Relay-LabLab',
-      demo: 'https://relay-band.duckdns.org/',
-    },
+    links: { repo: 'https://github.com/moeezahmadkhangit/Relay-LabLab' },
     featured: true,
   },
   {
@@ -126,10 +123,7 @@ export const projects: Project[] = [
       'Includes an integrated AI chatbot that handles contextual visitor questions within the experience.',
     ],
     stack: ['Three.js', 'Blender'],
-    links: {
-      repo: 'https://github.com/moeezahmadkhangit/MoeezPortfolio',
-      demo: 'https://moeezahmadkhan.com',
-    },
+    links: { repo: 'https://github.com/moeezahmadkhangit/MoeezPortfolio' },
     featured: false,
   },
 ]
