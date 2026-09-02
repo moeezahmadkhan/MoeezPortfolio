@@ -14,7 +14,10 @@ export function Button({ variant = 'solid', children, className = '', ...rest }:
   const label = typeof children === 'string' ? children : ''
   const scramble = useScramble(label)
   return (
-    <a className={`btn btn--${variant} ${className}`.trim()} {...rest} {...(label ? scramble : {})}>
+    // The decode's props go on FIRST so a caller's own `aria-label`, `ref` or
+    // `onMouseEnter` still wins. A button that needs one of those needs it more
+    // than it needs the flourish.
+    <a className={`btn btn--${variant} ${className}`.trim()} {...(label ? scramble : {})} {...rest}>
       {children}
     </a>
   )

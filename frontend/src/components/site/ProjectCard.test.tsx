@@ -54,6 +54,17 @@ describe('ProjectCard', () => {
     expect(focusState.source).toBe('keyboard')
   })
 
+  it('keeps every outbound link nameable while its text is decoding', () => {
+    // The hover decode rewrites the link's own text, so the accessible name has
+    // to come from somewhere the animation cannot touch. Asserting it here is
+    // also the only thing that notices if the decode is ever unwired from the
+    // card: the hook's own tests would still pass.
+    render(<ProjectCard project={project} />)
+    for (const link of screen.getAllByRole('link')) {
+      expect(link).toHaveAttribute('aria-label', link.textContent)
+    }
+  })
+
   it('clears project focus when the tabbed-to link blurs', async () => {
     const user = userEvent.setup()
     render(<ProjectCard project={project} />)

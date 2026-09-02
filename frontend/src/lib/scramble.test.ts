@@ -45,6 +45,14 @@ describe('scrambleFrame', () => {
     expect(scrambleFrame('View work', 'View work'.length, first)).toBe('View work')
   })
 
+  it('replaces a character outside the BMP as one character, not two halves', () => {
+    // Indexing a string walks UTF-16 code units; this label is 2 units long and
+    // 1 character long, and a half-replaced surrogate renders as a tofu box.
+    const frame = scrambleFrame('\u{1F701}', 0, first)
+    expect(frame).toBe(GLYPHS[0])
+    expect(revealedCount('\u{1F701}', 1)).toBe(1)
+  })
+
   it('draws only from the glyph set', () => {
     const frame = scrambleFrame('GitHub', 0, Math.random)
     for (const char of frame) expect(GLYPHS).toContain(char)

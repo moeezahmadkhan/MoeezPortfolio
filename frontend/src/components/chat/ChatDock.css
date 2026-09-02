@@ -240,6 +240,19 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  /* The waiting row is inserted and removed like any other turn, so it arrives
+     like one. Its own rule rather than a shared selector: the message entrance
+     is asserted by name in dock-panel-motion.test.tsx. */
+  transition:
+    opacity 0.24s var(--ease),
+    transform 0.24s var(--ease);
+}
+
+@starting-style {
+  .chat__typing {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
 }
 
 .chat__typing span[aria-hidden] {
@@ -357,7 +370,8 @@
 
   /* With no transition the message lands on its settled state on the first
      frame, so the `@starting-style` above cannot strand it part-way. */
-  .chat__msg {
+  .chat__msg,
+  .chat__typing {
     transition: none;
   }
 }

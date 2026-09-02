@@ -60,10 +60,19 @@ function NavLink({
   )
 }
 
+/** Written once: the decode resolves back to this exact string. */
+const CV_LABEL = 'Résumé'
+
 function CvLink() {
   return (
-    <a className="nav__cv" href={profile.cvUrl} target="_blank" rel="noreferrer" {...useScramble('Résumé')}>
-      Résumé
+    <a
+      className="nav__cv"
+      href={profile.cvUrl}
+      target="_blank"
+      rel="noreferrer"
+      {...useScramble(CV_LABEL)}
+    >
+      {CV_LABEL}
     </a>
   )
 }

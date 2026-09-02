@@ -73,6 +73,6 @@ describe('a message arrives rather than appearing', () => {
 
   it('lands on the settled state immediately under reduced motion', () => {
     const reduced = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'))
-    expect(reduced).toMatch(/\.chat__msg\s*\{\s*transition:\s*none;?\s*\}/)
+    expect(reduced).toMatch(/\.chat__msg,\s*\.chat__typing\s*\{\s*transition:\s*none;?\s*\}/)
   })
 })

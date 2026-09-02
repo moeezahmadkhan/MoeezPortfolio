@@ -33,6 +33,26 @@ describe('Hero', () => {
     )
   })
 
+  it('keeps every call to action nameable while its text is decoding', () => {
+    // The hover decode rewrites a button's own text, so its accessible name has
+    // to come from somewhere the animation cannot touch. Asserting it here is
+    // also the only thing that notices if the decode is ever unwired: the hook's
+    // own tests would still pass.
+    //
+    // The scroll cue is deliberately not in this list. Its text is an arrow and
+    // its name is already written by hand — which is the case the decode must
+    // never overwrite, and the reason `Button` spreads it before `...rest`.
+    render(<Hero />)
+    for (const name of [/view work/i, /résumé/i, /linkedin/i, /github/i]) {
+      const link = screen.getByRole('link', { name })
+      expect(link, String(name)).toHaveAttribute('aria-label', link.textContent)
+    }
+    expect(screen.getByRole('link', { name: 'Scroll to About' })).toHaveAttribute(
+      'aria-label',
+      'Scroll to About',
+    )
+  })
+
   it('opens every external call to action safely in a new tab', () => {
     render(<Hero />)
     for (const name of [/résumé/i, /linkedin/i, /github/i]) {
