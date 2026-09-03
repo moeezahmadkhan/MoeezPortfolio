@@ -175,3 +175,15 @@
     position: relative;
   }
 }
+
+@media (pointer: coarse) {
+  /* The mobile menu's rows are the primary navigation on a phone, and a tap on
+     one gives nothing back before the smooth scroll starts moving.
+
+     Colour only: a row that also scaled would shift its neighbours, because in
+     the open panel these are stacked in a column with nothing between them. */
+  .nav__link:active,
+  .nav__cv:active {
+    color: var(--text);
+  }
+}

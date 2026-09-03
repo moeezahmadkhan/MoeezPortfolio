@@ -375,3 +375,15 @@
     transition: none;
   }
 }
+
+@media (pointer: coarse) {
+  /* The launcher has a hover lift that a phone never sees. This is the same
+     gesture, downward, on the press. */
+  .chat__launcher:active {
+    transform: scale(0.97);
+  }
+
+  .chat__starters button:active {
+    border-color: var(--teal);
+  }
+}

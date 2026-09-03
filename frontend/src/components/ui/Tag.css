@@ -6,4 +6,17 @@
   border-radius: var(--r-pill);
   padding: var(--s-1) var(--s-2);
   list-style: none;
+  transition:
+    border-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+
+@media (pointer: coarse) {
+  /* Chips are not links, but they are the right size to be mistaken for them,
+     and a finger lands on one by accident often enough that silence reads as a
+     dead control. Paint only. */
+  .tag:active {
+    border-color: rgb(var(--gold-rgb) / 0.4);
+    color: var(--text);
+  }
 }

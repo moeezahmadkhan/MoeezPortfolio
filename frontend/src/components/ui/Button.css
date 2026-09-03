@@ -12,7 +12,8 @@
   transition:
     background 0.2s var(--ease),
     border-color 0.2s var(--ease),
-    color 0.2s var(--ease);
+    color 0.2s var(--ease),
+    transform 0.2s var(--ease);
 }
 
 .btn--solid {
@@ -37,4 +38,25 @@
 .btn--ghost:focus-visible {
   border-color: rgb(var(--gold-rgb) / 0.5);
   color: var(--gold);
+}
+
+@media (pointer: coarse) {
+  /* A tap has no hover in front of it. Without this the only confirmation a
+     button was pressed is the page having already changed, which on a slow
+     connection is a second of nothing at all.
+
+     `scale` is a transform, so the row the button sits in never re-flows, and
+     it settles on --ease with everything else the base rule transitions. */
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  .btn--solid:active {
+    background: var(--gold-bright);
+  }
+
+  .btn--ghost:active {
+    border-color: rgb(var(--gold-rgb) / 0.5);
+    color: var(--gold);
+  }
 }

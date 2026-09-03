@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const tokens = readFileSync('src/styles/tokens.css', 'utf8')
@@ -34,6 +35,44 @@ describe('design tokens', () => {
       ['--s-9', '128px'],
     ]) {
       expect(tokens).toContain(`${name}: ${value}`)
+    }
+  })
+})
+
+function walk(dir: string, match: RegExp): string[] {
+  return readdirSync(dir).flatMap((entry) => {
+    const full = join(dir, entry)
+    if (statSync(full).isDirectory()) return walk(full, match)
+    return match.test(entry) ? [full] : []
+  })
+}
+
+describe('press feedback', () => {
+  // A tap has no hover in front of it, so without an :active state the only
+  // confirmation a control was hit is the page having already changed.
+  const controls = [
+    ['src/components/ui/Button.css', '.btn:active'],
+    ['src/components/ui/Tag.css', '.tag:active'],
+    ['src/components/layout/Nav.css', '.nav__link:active'],
+    ['src/components/chat/ChatDock.css', '.chat__launcher:active'],
+  ] as const
+
+  for (const [file, selector] of controls) {
+    it(`gives ${selector} a press state behind the coarse-pointer query`, () => {
+      const css = readFileSync(file, 'utf8')
+      expect(css).toContain('@media (pointer: coarse)')
+      expect(css.slice(css.indexOf('@media (pointer: coarse)'))).toContain(selector)
+    })
+  }
+
+  it('never presses with something that would re-flow the row', () => {
+    // `scale` is a transform. A press built from padding or font-size would
+    // re-flow whatever the control sits in, every time anyone touched it.
+    for (const file of walk('src', /\.css$/)) {
+      const css = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+      for (const block of css.matchAll(/([^{}]*:active[^{}]*)\{([^{}]*)\}/g)) {
+        expect(block[2]).not.toMatch(/(?:^|[;\s])(padding|font-size|width|height)\s*:/)
+      }
     }
   })
 })
