@@ -121,7 +121,7 @@ function decay(entry: EntryOffsets, progress: number, out: EntryOffsets): EntryO
  * starts while the push is still travelling — so what you see is a figure
  * turning away as it comes toward you and going as it arrives.
  */
-export type HeroExit = { yaw: number; scale: number; z: number; dissolve: number }
+export type HeroExit = { yaw: number; scale: number; z: number; x: number; dissolve: number }
 
 /** Where each phase starts and ends within the exit, 0..1. */
 export const TURN_PHASE = { from: 0, to: 0.55 }
@@ -153,6 +153,18 @@ export const HERO_EXIT_SCALE = 0.85
 export const HERO_EXIT_Z = 1.6
 
 /**
+ * How far it drifts sideways as it pushes in, in world units, as a FRACTION of
+ * wherever the caller says its home is.
+ *
+ * Desktop stands the figure in the right-hand column (RIGS[''] x = 1.4) with the
+ * copy beside it, so a straight push toward the camera grows it into the edge of
+ * the frame. Drifting it back toward centre as it grows keeps the whole figure
+ * in shot for the whole zoom. Mobile's figure is already centred, so its caller
+ * passes 0 and this term does nothing there.
+ */
+export const HERO_EXIT_X_FRACTION = -0.8
+
+/**
  * The exit that does nothing, for every rig and every layout that has none.
  * Frozen and shared: this is read in a frame loop and must not allocate.
  */
@@ -160,6 +172,7 @@ export const NO_EXIT: Readonly<HeroExit> = Object.freeze({
   yaw: 0,
   scale: 0,
   z: 0,
+  x: 0,
   dissolve: 0,
 })
 
@@ -176,13 +189,16 @@ function phase(p: number, span: { from: number; to: number }): number {
  * desktop layout, or a short phone — is left exactly as it was. The caller adds
  * these to the station's own pose rather than replacing it.
  */
-export function heroExit(p: number): HeroExit {
+export function heroExit(p: number, homeX = 0): HeroExit {
   const turn = phase(p, TURN_PHASE)
   const push = phase(p, PUSH_PHASE)
   return {
     yaw: HERO_EXIT_YAW * turn,
     scale: HERO_EXIT_SCALE * push,
     z: HERO_EXIT_Z * push,
+    // Relative to where the figure actually stands, so a layout that centres it
+    // gets no drift at all rather than a hard-coded shove.
+    x: homeX * HERO_EXIT_X_FRACTION * push,
     dissolve: phase(p, DISSOLVE_PHASE),
   }
 }

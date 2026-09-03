@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  HERO_EXIT_X_FRACTION,
   DISSOLVE_PHASE,
   HERO_EXIT_SCALE,
   HERO_EXIT_YAW,
@@ -99,5 +100,54 @@ describe('heroExit', () => {
       expect(now.dissolve).toBeGreaterThanOrEqual(previous.dissolve)
       previous = now
     }
+  })
+})
+
+describe('the exit is smooth by construction', () => {
+  // Frame timing cannot be measured in this project's harnesses — Puppeteer
+  // under SwiftShader runs rAF at 12Hz and an unfocused tab at ~1.3Hz, so a
+  // frame count measures the harness. What CAN be proved is that the curve the
+  // damping follows has no steps in it: a continuous input can only ever
+  // produce continuous motion, whatever rate reads it.
+
+  it('never jumps — a small step in progress moves every term a small amount', () => {
+    const STEP = 0.001
+    // Generous bounds: each term's full travel times a few steps' worth. The
+    // point is to catch a discontinuity, not to pin the exact slope.
+    let previous = heroExit(0, 1.4)
+    for (let p = STEP; p <= 1.0001; p += STEP) {
+      const now = heroExit(p, 1.4)
+      expect(Math.abs(now.yaw - previous.yaw)).toBeLessThan(0.05)
+      expect(Math.abs(now.scale - previous.scale)).toBeLessThan(0.05)
+      expect(Math.abs(now.z - previous.z)).toBeLessThan(0.05)
+      expect(Math.abs(now.x - previous.x)).toBeLessThan(0.05)
+      expect(Math.abs(now.dissolve - previous.dissolve)).toBeLessThan(0.05)
+      previous = now
+    }
+  })
+
+  it('starts and ends at rest on every term, so nothing snaps at either edge', () => {
+    for (const term of ['yaw', 'scale', 'z', 'x', 'dissolve'] as const) {
+      expect(Math.abs(heroExit(0, 1.4)[term])).toBeCloseTo(0, 10)
+    }
+    // And clamps rather than continuing past the end.
+    expect(heroExit(1.5, 1.4)).toEqual(heroExit(1, 1.4))
+  })
+})
+
+describe('the sideways drift', () => {
+  it('is relative to where the layout actually stands the figure', () => {
+    // Desktop stands it in the right-hand column at x 1.4; mobile centres it.
+    const desktop = heroExit(1, 1.4)
+    expect(desktop.x).toBeCloseTo(1.4 * HERO_EXIT_X_FRACTION, 5)
+    expect(desktop.x).toBeLessThan(0) // back toward centre, not further out
+  })
+
+  it('does nothing at all for a centred figure', () => {
+    // Mobile passes 0, so the drift term cannot shove a centred figure sideways.
+    // toBeCloseTo, not toBe: 0 * a negative fraction is -0, which deep equality
+    // distinguishes from +0 while nothing that reads it ever could.
+    expect(heroExit(1, 0).x).toBeCloseTo(0, 10)
+    expect(heroExit(0.5, 0).x).toBeCloseTo(0, 10)
   })
 })

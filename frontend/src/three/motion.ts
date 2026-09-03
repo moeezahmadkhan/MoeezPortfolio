@@ -49,6 +49,20 @@ export const STATION_LAMBDA = 1.5
  * screen a visitor ever sees, and it is the only motion on the page at that
  * moment — nothing else is competing for the eye, so it can afford the time.
  */
+/**
+ * How fast the hero's exit chases its own progress.
+ *
+ * Deliberately FAST — close to the SCROLL_LAMBDA (6) that already smoothed the
+ * progress feeding it — because this motion tracks a scroll rather than
+ * travelling between two places. STATION_LAMBDA (1.5) is the rate for the
+ * latter: a journey across the screen, ~0.67s of time constant, which on a
+ * scroll-driven value reads as the figure lagging behind the reader's thumb
+ * rather than responding to it. The input is already eased, so all this damp
+ * has left to do is take the edge off; a slow rate here stacks a second, much
+ * heavier curve on a value that already has one.
+ */
+export const HERO_EXIT_LAMBDA = 5
+
 export const INTRO_LAMBDA = 1.2
 
 /** How fast a released drag-orbit unwinds back to the rig's resting yaw. */

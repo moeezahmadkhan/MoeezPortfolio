@@ -1,14 +1,25 @@
 .hero {
   position: relative;
-  min-height: 100svh;
-  display: flex;
-  align-items: center;
-  padding-top: var(--nav-h);
+  /* Taller than one screen at both breakpoints, and the extra height is the
+     ONLY thing the exit sequence has to play in — `heroExitProgress` in
+     lib/scrollState.ts reads exactly this element's height against the
+     viewport's. Set it to 100svh and the sequence never runs at all. */
+  min-height: 160svh;
+  display: block;
+  padding-top: 0;
 }
 
+/* The first screen. Everything the reader lands on lives here, so the hero can
+   be taller than the viewport without the copy drifting below the fold —
+   centring the copy in `.hero` itself would put it half a screen down. */
 .hero__inner {
   width: min(100% - var(--s-5) * 2, var(--maxw));
   margin-inline: auto;
+  min-height: 100svh;
+  padding-top: var(--nav-h);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .hero__role {
@@ -157,27 +168,21 @@
      flex column would have centred the copy in 180svh, i.e. half a screen
      below the fold. */
   .hero {
+    /* A phone gets the longest runway: the figure owns most of the screen here,
+       so the sequence is the main event rather than a flourish beside the copy. */
     min-height: 180svh;
-    display: block;
-    padding-top: 0;
   }
 
-  /* The first screen. Everything the reader lands on lives here, and it keeps
-     the exact composition the hero had before it grew: the nav's height off the
-     top, the figure's band off the bottom, and the leftover split 3:1. */
   .hero__inner {
-    min-height: 100svh;
-    padding-top: var(--nav-h);
     /* Reserve the bottom strip for the figure, the same way the desktop rule
        below reserves the right column for it. The copy is lifted clear of the
        strip rather than merely given space under it — the model used to stand
        behind the button row and was dimmed to stop it competing. */
     padding-bottom: var(--figure-band);
-    /* Column, and stretch rather than centre: in a column `align-items: center`
-       would shrink the copy to its own content width instead of letting it fill
-       the measure. */
-    display: flex;
-    flex-direction: column;
+    /* Stretch rather than centre: in a column `align-items: center` would
+       shrink the copy to its own content width instead of letting it fill the
+       measure. The 3:1 spacers below do the vertical placement, so the base
+       rule's `justify-content: center` has nothing left to divide. */
     align-items: stretch;
   }
 
@@ -237,7 +242,17 @@
 
 @media (min-width: 900px) {
   .hero__inner {
-    /* Leave the right half clear — Plan 2 puts the wizard there. */
+    /* Leave the right half clear — the figure stands there (RIGS[''] x = 1.4). */
     padding-right: 42%;
+  }
+
+  /* A shorter runway than mobile's 180svh. Desktop shows the figure beside the
+     copy rather than beneath it, so the exit is a flourish on the way to About
+     rather than the screen's whole subject — and 80svh of near-empty scroll
+     reads as a dead patch on a wide screen where the copy has already been
+     read. 60svh still gives the turn, the push and the dissolve room to
+     separate. */
+  .hero {
+    min-height: 160svh;
   }
 }

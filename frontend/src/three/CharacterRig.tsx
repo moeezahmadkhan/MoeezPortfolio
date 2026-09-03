@@ -13,6 +13,7 @@ import { useKtx2Gltf } from './ktx2'
 import { markModelReady } from './modelReadiness'
 import { exposeRigTelemetry, rigTelemetry } from './rigTelemetry'
 import {
+  HERO_EXIT_LAMBDA,
   INTENSITY_LAMBDA,
   INTRO_LAMBDA,
   LIFT_LAMBDA,
@@ -282,7 +283,18 @@ export function CharacterRig({
     // station on mobile, and `heroExit` there would fight that journey. On a
     // hero with no extra height (desktop, or a short phone) `smooth.heroExit`
     // is 0 and every term below is 0, so this costs one object and no motion.
-    const exit = isHero && atHeroStation ? heroExit(scrollState.smooth.heroExit) : NO_EXIT
+    // `basePosition[0]` is where this layout stands the figure — 1.4 on desktop's
+    // right-hand column, 0 on mobile's centre — so the sideways drift is relative
+    // to its own home and a centred layout gets none.
+    const exit =
+      isHero && atHeroStation
+        ? heroExit(scrollState.smooth.heroExit, basePosition[0])
+        : NO_EXIT
+    // Scroll-tracked motion gets its own rate. STATION_LAMBDA is for a journey
+    // between two stations and is the slowest on the rig; on a value the reader
+    // is scrubbing with their thumb it reads as lag rather than as weight.
+    const exiting = exit.dissolve > 0 || exit.scale > 0 || exit.yaw !== 0
+    const travelLambda = exiting ? HERO_EXIT_LAMBDA : mobile ? STATION_LAMBDA : LIFT_LAMBDA
 
     const t = state.clock.elapsedTime
 
@@ -333,20 +345,25 @@ export function CharacterRig({
     // damped toward the active station at STATION_LAMBDA, the slowest of the
     // rig's rates, because this is a journey rather than a settle. On desktop
     // the target is the spec's own constant, so these two damps are no-ops.
-    g.position.x = damp(g.position.x, basePosition[0], STATION_LAMBDA, dt)
-    g.position.z = damp(g.position.z, basePosition[2] + introDolly + exit.z, STATION_LAMBDA, dt)
+    g.position.x = damp(
+      g.position.x,
+      basePosition[0] + exit.x,
+      exiting ? HERO_EXIT_LAMBDA : STATION_LAMBDA,
+      dt,
+    )
+    g.position.z = damp(
+      g.position.z,
+      basePosition[2] + introDolly + exit.z,
+      exiting ? HERO_EXIT_LAMBDA : STATION_LAMBDA,
+      dt,
+    )
     // `scale` was a fixed prop until now. Setting it here as well is safe —
     // three reads the object's own scale each frame, and the prop only seeds it.
     // STATION_LAMBDA on mobile so size travels with position; a scale that
     // arrived at LIFT_LAMBDA while the figure was still crossing read as the
     // model growing in place and then sliding.
     g.scale.setScalar(
-      damp(
-        g.scale.x,
-        baseScale * (1 + entry.scale + exit.scale),
-        mobile ? STATION_LAMBDA : LIFT_LAMBDA,
-        dt,
-      ),
+      damp(g.scale.x, baseScale * (1 + entry.scale + exit.scale), travelLambda, dt),
     )
 
     // The dissolve rides ON pose.opacity rather than replacing it, so the exit

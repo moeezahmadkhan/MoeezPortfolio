@@ -202,6 +202,21 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   the hero element can reach this one. `heroVisible` cannot do the job: it is `bottom /
   viewportHeight` clamped to 1, so on a hero taller than the screen it sits pinned at 1 through all
   the extra height and only moves in the final viewport.
+- **The exit runs on BOTH breakpoints now, and it gets its own damping rate.** `HERO_EXIT_LAMBDA`
+  (5) is deliberately fast — close to the `SCROLL_LAMBDA` (6) that already smoothed the progress
+  feeding it. `STATION_LAMBDA` (1.5) is the rate for a journey between two stations, a ~0.67s time
+  constant, and on a value the reader is scrubbing with their thumb that reads as the figure lagging
+  behind them rather than as weight. The input is already eased; all this damp has left to do is
+  take the edge off. A slow rate here stacks a second, much heavier curve on a value that has one.
+- **Desktop drifts the figure sideways as it zooms; mobile does not.** `HERO_EXIT_X_FRACTION` is
+  applied to the figure's OWN home x, so desktop's right-column figure (`RIGS['']` x 1.4) drifts back
+  toward centre as it grows — a straight push would otherwise grow it into the edge of the frame —
+  and mobile's centred figure passes 0 and gets no drift at all. Measured on desktop: x 1.4 → 0.28,
+  z 0 → 1.6, scale 1.3 → 2.4, opacity 1 → 0.
+- **The hero's runway differs by breakpoint: 180svh mobile, 160svh desktop.**
+  Desktop shows the figure beside the copy rather than beneath it, so the exit is a flourish on the
+  way to About rather than the screen's whole subject, and 80svh of near-empty scroll reads as a
+  dead patch on a wide screen where the copy has already been read.
 - **The mobile hero is `180svh`, and the extra 80svh IS the sequence's runway.** Shrink the token
   and the sequence plays faster; set it to 100svh and it never runs, which is exactly what desktop
   does (`heroExitProgress` returns 0 when there is no extra height). The copy centres in
