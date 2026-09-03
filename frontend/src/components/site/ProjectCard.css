@@ -112,3 +112,63 @@
     box-shadow: 0 12px 24px -18px rgb(var(--gold-rgb) / 0.45);
   }
 }
+
+/* The disclosure is deliberately not animated.
+
+   Opening it re-flows the card and everything under it, and the only way to
+   ease that is to animate a layout property — exactly what the motion rules
+   forbid. `::details-content` with `interpolate-size` would do it honestly and
+   is not Baseline. So the panel snaps and the CHEVRON carries the motion: a
+   transform, on the shared curve, on an element nothing else depends on.
+
+   This is also off the scroll path. That rule is about anything re-flowing the
+   document while the page is moving; a disclosure only ever opens on a tap. */
+.card__more-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  /* A tap target, not a line of text. */
+  min-height: 44px;
+  margin-top: var(--s-3);
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+  transition: color 0.2s var(--ease);
+}
+
+/* Safari draws its own triangle through this pseudo-element, which
+   `list-style: none` does not reach. */
+.card__more-summary::-webkit-details-marker {
+  display: none;
+}
+
+.card__more-summary::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 0.2s var(--ease);
+}
+
+.card__more[open] .card__more-summary::after {
+  transform: rotate(-135deg) translate(-2px, -2px);
+}
+
+.card__more-summary:hover,
+.card__more-summary:focus-visible {
+  color: var(--text);
+}
+
+@media (min-width: 900px) {
+  /* Desktop is open and stays open, so the control is noise there. `display`,
+     not `visibility`, so it takes no row in the card either. */
+  .card__more-summary {
+    display: none;
+  }
+}
