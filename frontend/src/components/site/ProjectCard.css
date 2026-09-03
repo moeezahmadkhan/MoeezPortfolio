@@ -22,7 +22,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .card:hover,
-  .card:focus-within {
+  .card:focus-within,
+  .card.is-near {
     transform: none;
   }
 }
@@ -93,5 +94,21 @@
     align-items: center;
     min-height: 44px;
     min-width: 44px;
+  }
+
+  /* What a phone gets instead of :hover.
+
+     `is-near` is written by lib/useNearFocus.ts onto whichever card is deepest
+     into the middle of the screen — the card the reader is actually looking
+     at. The declarations are the :hover rule's, character for character, and
+     deliberately so: this is the same affordance reaching the same person by a
+     different route, not a weaker consolation for having no cursor.
+
+     Behind the pointer query because a fine pointer already has :hover, and a
+     card that ALSO lit on scroll there would contradict the cursor. */
+  .card.is-near {
+    border-color: rgb(var(--gold-rgb) / 0.36);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -18px rgb(var(--gold-rgb) / 0.45);
   }
 }

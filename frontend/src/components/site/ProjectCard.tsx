@@ -1,14 +1,17 @@
 import type { Project } from '../../content'
 import { clearProjectFocus, setProjectFocus } from '../../lib/focusState'
+import { useNearFocus } from '../../lib/useNearFocus'
 import { useScramble } from '../../lib/useScramble'
 import { Tag } from '../ui/Tag'
 import './ProjectCard.css'
 
 export function ProjectCard({ project }: { project: Project }) {
   const headingId = `project-${project.slug}`
+  const nearRef = useNearFocus<HTMLElement>()
   return (
     <article
       className="card"
+      ref={nearRef}
       aria-labelledby={headingId}
       onPointerEnter={() => setProjectFocus(project.slug, 'pointer')}
       onPointerLeave={() => clearProjectFocus(project.slug)}

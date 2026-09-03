@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -74,5 +75,23 @@ describe('ProjectCard', () => {
 
     expect(focusState.projectSlug).toBe(null)
     expect(focusState.source).toBe(null)
+  })
+})
+
+describe('the touch stand-in for hover', () => {
+  const css = readFileSync('src/components/site/ProjectCard.css', 'utf8')
+
+  it('gives .card.is-near the same affordance as :hover, on a coarse pointer only', () => {
+    // The lift must live behind the pointer query. A fine pointer already has
+    // :hover, and a card that ALSO lit on scroll there would fight the cursor.
+    const coarse = css.slice(css.indexOf('@media (pointer: coarse)'))
+    expect(css).toContain('@media (pointer: coarse)')
+    expect(coarse).toContain('.card.is-near')
+  })
+
+  it('strips the lift from .is-near under reduced motion, keeping the tint', () => {
+    const reduced = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'))
+    expect(reduced).toContain('.card.is-near')
+    expect(reduced).toContain('transform: none')
   })
 })
