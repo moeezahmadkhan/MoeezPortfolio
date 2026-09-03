@@ -194,6 +194,33 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   because scrolling moves a control under a stationary pointer, but with every offset already 0 the
   tick sets `busy = false` and stops. Reduced motion still opts out entirely: that exclusion is
   about the movement, not the input device.
+- **The hero has an exit sequence on mobile, and it is NOT a scroll-fraction table.** The figure
+  turns away, pushes toward the reader, and dissolves, across `scrollState.smooth.heroExit` — one
+  progress computed by `heroExitProgress(heroTop, heroHeight, viewportHeight)` from the hero's OWN
+  rect and its OWN height. The rule that got v1 deleted was a table keyed to fractions of the whole
+  DOCUMENT, where adding a section silently re-timed every animation on the site; nothing outside
+  the hero element can reach this one. `heroVisible` cannot do the job: it is `bottom /
+  viewportHeight` clamped to 1, so on a hero taller than the screen it sits pinned at 1 through all
+  the extra height and only moves in the final viewport.
+- **The mobile hero is `180svh`, and the extra 80svh IS the sequence's runway.** Shrink the token
+  and the sequence plays faster; set it to 100svh and it never runs, which is exactly what desktop
+  does (`heroExitProgress` returns 0 when there is no extra height). The copy centres in
+  `.hero__inner`, a 100svh first screen — leaving `.hero` a flex column would have centred the copy
+  in 180svh, half a screen below the fold. The 3:1 spacer split moved onto `.hero__inner` with it,
+  and `.hero__cue` is anchored by `top` to the foot of the FIRST screen, because `bottom` would
+  park it most of a screen below the fold.
+- **The figure cannot actually wrap itself in its cloak, so it turns its back instead.**
+  `wizard_improved.glb` is 1 node, 1 mesh, 1 material, **0 skins and 0 animations** — a single
+  static Tripo mesh with no separable garment and no skeleton. Nothing about it can be posed or
+  wrapped. `HERO_EXIT_YAW` turns it away so the cloak ends up between the reader and the figure,
+  which is the same picture arrived at honestly. The sign was measured, not reasoned: at +1.9 it
+  rotated the WRONG way, bringing the face round to camera, because the station's rest pose is
+  already three-quarters turned. It is -1.3.
+- **The exit's phases overlap on purpose** (`TURN_PHASE`, `PUSH_PHASE`, `DISSOLVE_PHASE` in
+  `choreography.ts`). End to end, the figure visibly stops between beats and reads as three
+  animations rather than one exit. The dissolve multiplies `pose.opacity` rather than replacing it,
+  so the exit can only ever make the figure dimmer than the pose already asked for — it can never
+  brighten a rig that is mid-cross-fade.
 - **A chat message arrives on a transition, like the panel around it.** `.chat__msg` starts from
   `@starting-style` rather than a `@keyframes` for exactly the reason above it in this list — the log
   is replaced wholesale on a new conversation, and a keyframe entrance has nothing to say about

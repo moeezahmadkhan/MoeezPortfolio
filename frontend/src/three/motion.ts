@@ -87,9 +87,11 @@ export const BACKDROP_TINT_LAMBDA = 2
  */
 export type ScrollChannels = {
   heroVisible: number
+  /** 0..1 across the hero's own extra height; drives the exit sequence. */
+  heroExit: number
   progress: number
   pinnedProgress: number
-  smooth: { heroVisible: number; progress: number; pinnedProgress: number }
+  smooth: { heroVisible: number; heroExit: number; progress: number; pinnedProgress: number }
 }
 
 /** One frame of a rig's own cross-fade, toward present (1) or gone (0). */

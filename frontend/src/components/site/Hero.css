@@ -142,20 +142,41 @@
 }
 
 @media (max-width: 899px) {
-  /* Reserve the bottom strip for the figure, the same way the desktop rule
-     below reserves the right column for it. The hero centres its copy, so the
-     padding lifts that copy clear of the strip rather than merely adding space
-     under it — which is exactly what was wanted: the model used to stand
-     behind the button row and was dimmed to stop it competing.
+  /* The hero is taller than the screen, and the extra height is the ONLY thing
+     the exit sequence has to play in.
 
-     `padding-bottom`, not `margin`: this is inside the hero's own box, so
-     `min-height: 100svh` still measures the whole screen and the section does
-     not grow a gap between itself and About. */
+     `lib/scrollState.ts`'s `heroExitProgress` reads exactly this: 0 while the
+     first screen is in place, 1 once the hero's bottom edge reaches the bottom
+     of the viewport. So 180svh buys 80svh of scroll for the figure to turn,
+     push in and dissolve across. Make this number smaller and the sequence
+     simply plays faster; make it 100svh and it never runs at all, which is
+     what desktop does.
+
+     `display: block`, because the copy no longer centres in the hero — it
+     centres in the FIRST SCREEN, which is `.hero__inner` below. Leaving this a
+     flex column would have centred the copy in 180svh, i.e. half a screen
+     below the fold. */
   .hero {
+    min-height: 180svh;
+    display: block;
+    padding-top: 0;
+  }
+
+  /* The first screen. Everything the reader lands on lives here, and it keeps
+     the exact composition the hero had before it grew: the nav's height off the
+     top, the figure's band off the bottom, and the leftover split 3:1. */
+  .hero__inner {
+    min-height: 100svh;
+    padding-top: var(--nav-h);
+    /* Reserve the bottom strip for the figure, the same way the desktop rule
+       below reserves the right column for it. The copy is lifted clear of the
+       strip rather than merely given space under it — the model used to stand
+       behind the button row and was dimmed to stop it competing. */
     padding-bottom: var(--figure-band);
     /* Column, and stretch rather than centre: in a column `align-items: center`
        would shrink the copy to its own content width instead of letting it fill
        the measure. */
+    display: flex;
     flex-direction: column;
     align-items: stretch;
   }
@@ -170,25 +191,18 @@
      the pair stopped reading as one composition and became two things at
      opposite ends of a void. Slack above the headline reads as breathing room;
      slack between the headline and the figure reads as a mistake, so most of it
-     goes above. */
-  .hero::before {
+     goes above.
+
+     On `.hero__inner` rather than `.hero` now that the hero is taller than one
+     screen: these divide the FIRST screen's leftover, not the sequence's room. */
+  .hero__inner::before {
     content: '';
     flex: 3 0 0;
   }
 
-  .hero::after {
+  .hero__inner::after {
     content: '';
     flex: 1 0 0;
-  }
-
-  /* Off the centre line, because the figure is on it. Centred, this arrow came
-     down squarely on the wizard's chest — a scroll hint drawn on top of the one
-     thing the hero is showing off. The content column's left edge is clear of
-     the figure at every width in this branch. */
-  .hero__cue {
-    left: var(--s-5);
-    translate: 0 0;
-    bottom: var(--s-3);
   }
 
   /* One step down from the fluid size, on a phone only.
@@ -201,6 +215,23 @@
      cut off at the fold. */
   .hero__thesis {
     font-size: var(--t-body);
+  }
+
+  /* Off the centre line, because the figure is on it. Centred, this arrow came
+     down squarely on the wizard's chest — a scroll hint drawn on top of the one
+     thing the hero is showing off. The content column's left edge is clear of
+     the figure at every width in this branch.
+
+     Anchored by `top` to the foot of the FIRST screen, not by `bottom` to the
+     foot of the hero: the hero is 180svh now, so `bottom` would park the cue
+     most of a screen below the fold, where the one thing it exists to say —
+     "there is more" — cannot be read. Nothing animates this; it is where a
+     static element sits, not a property in a transition. */
+  .hero__cue {
+    left: var(--s-5);
+    translate: 0 0;
+    bottom: auto;
+    top: calc(100svh - 44px - var(--s-3));
   }
 }
 

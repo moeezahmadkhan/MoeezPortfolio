@@ -13,6 +13,7 @@ export const scrollState = {
   pointerX: 0, // -1 (left edge) .. 1 (right edge)
   pointerY: 0, // -1 (top) .. 1 (bottom)
   heroVisible: 1, // 1 while the hero owns the screen, 0 once it has gone
+  heroExit: 0, // 0..1 across the hero's OWN extra height — drives the exit sequence
   pinnedProgress: 0, // 0..1, how far through the pinned section the viewport has travelled
   /**
    * The same three scroll measures, eased toward the raw ones once per frame.
@@ -24,6 +25,7 @@ export const scrollState = {
   smooth: {
     progress: 0,
     heroVisible: 1,
+    heroExit: 0,
     pinnedProgress: 0,
   },
 }
@@ -74,6 +76,38 @@ export function heroVisibility(heroBottom: number, viewportHeight: number): numb
   return Math.min(1, Math.max(0, heroBottom / viewportHeight))
 }
 
+/**
+ * Pure: how far the reader has scrolled through the hero's own EXTRA height.
+ *
+ * 0 while the first screen is still in place, 1 once the hero's bottom edge has
+ * reached the bottom of the viewport — which is exactly the moment About is
+ * about to take over. Everything between is the room the taller hero buys for
+ * the exit sequence.
+ *
+ * This is NOT the scroll-fraction table that got v1 deleted, and the difference
+ * matters. That table keyed motion to fractions of the WHOLE DOCUMENT, so
+ * adding a section silently re-timed every animation on the site. This is
+ * derived from one element's own rect and its own height: make the hero taller
+ * or shorter and the sequence simply has more or less room, and no other
+ * section can affect it at all.
+ *
+ * `heroVisible` cannot do this job. It is `bottom / viewportHeight` clamped to
+ * 1, so on a hero taller than the screen it sits pinned at 1 through all of the
+ * extra height and only starts moving in the last viewport — the sequence would
+ * do nothing for most of the scroll it was given.
+ */
+export function heroExitProgress(
+  heroTop: number,
+  heroHeight: number,
+  viewportHeight: number,
+): number {
+  const extra = heroHeight - viewportHeight
+  // A hero no taller than the screen has no room to play a sequence in, so it
+  // never starts one. This is the desktop case and the short-phone case both.
+  if (extra <= 0) return 0
+  return Math.min(1, Math.max(0, -heroTop / extra))
+}
+
 /** Pure: how far the viewport has travelled through a section, 0 → 1. */
 export function sectionProgress(
   rect: { top: number; height: number },
@@ -93,13 +127,14 @@ export function sectionProgress(
  */
 export function advanceSmooth(
   smooth: SmoothScroll,
-  target: { progress: number; heroVisible: number; pinnedProgress: number },
+  target: { progress: number; heroVisible: number; heroExit: number; pinnedProgress: number },
   dt: number,
   lambda: number = SCROLL_LAMBDA,
 ): void {
   const step = Math.min(dt, MAX_FRAME_DT)
   smooth.progress = damp(smooth.progress, target.progress, lambda, step)
   smooth.heroVisible = damp(smooth.heroVisible, target.heroVisible, lambda, step)
+  smooth.heroExit = damp(smooth.heroExit, target.heroExit, lambda, step)
   smooth.pinnedProgress = damp(smooth.pinnedProgress, target.pinnedProgress, lambda, step)
 }
 
@@ -133,8 +168,12 @@ export function useScrollTracker(): void {
       scrollState.raw = window.scrollY
       scrollState.progress = max > 0 ? window.scrollY / max : 0
       if (hero) {
-        scrollState.heroVisible = heroVisibility(
-          hero.getBoundingClientRect().bottom,
+        // One rect read, two measures off it.
+        const heroRect = hero.getBoundingClientRect()
+        scrollState.heroVisible = heroVisibility(heroRect.bottom, window.innerHeight)
+        scrollState.heroExit = heroExitProgress(
+          heroRect.top,
+          heroRect.height,
           window.innerHeight,
         )
       }
@@ -178,6 +217,7 @@ export function useScrollTracker(): void {
     readScroll()
     scrollState.smooth.progress = scrollState.progress
     scrollState.smooth.heroVisible = scrollState.heroVisible
+    scrollState.smooth.heroExit = scrollState.heroExit
     scrollState.smooth.pinnedProgress = scrollState.pinnedProgress
 
     frame = requestAnimationFrame(tick)

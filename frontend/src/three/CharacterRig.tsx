@@ -26,8 +26,11 @@ import {
   HERO_INTRO,
   HERO_INTRO_DOLLY,
   entryOffsets,
+  NO_EXIT,
+  heroExit,
   introOffsets,
   type EntryOffsets,
+  type HeroExit,
 } from './choreography'
 import { pinnedYaw, rigPose, type Pose } from './rigPose'
 import { targetIntensity, wizardState } from './wizardState'
@@ -273,6 +276,14 @@ export function CharacterRig({
       entry.scale += introEntry.scale
     }
 
+    // The hero's exit: it turns, then pushes toward the reader, then dissolves,
+    // across the hero's own extra height. Only the hero rig standing at its own
+    // station runs it — below the hero this same rig is travelling to another
+    // station on mobile, and `heroExit` there would fight that journey. On a
+    // hero with no extra height (desktop, or a short phone) `smooth.heroExit`
+    // is 0 and every term below is 0, so this costs one object and no motion.
+    const exit = isHero && atHeroStation ? heroExit(scrollState.smooth.heroExit) : NO_EXIT
+
     const t = state.clock.elapsedTime
 
     // Written as a statement, not a nested ternary with an inline call: this
@@ -304,6 +315,7 @@ export function CharacterRig({
         orbit +
         pinnedTurn +
         entry.yaw +
+        exit.yaw +
         Math.sin(t * 0.18) * 0.06,
       TURN_LAMBDA,
       dt,
@@ -322,18 +334,27 @@ export function CharacterRig({
     // rig's rates, because this is a journey rather than a settle. On desktop
     // the target is the spec's own constant, so these two damps are no-ops.
     g.position.x = damp(g.position.x, basePosition[0], STATION_LAMBDA, dt)
-    g.position.z = damp(g.position.z, basePosition[2] + introDolly, STATION_LAMBDA, dt)
+    g.position.z = damp(g.position.z, basePosition[2] + introDolly + exit.z, STATION_LAMBDA, dt)
     // `scale` was a fixed prop until now. Setting it here as well is safe —
     // three reads the object's own scale each frame, and the prop only seeds it.
     // STATION_LAMBDA on mobile so size travels with position; a scale that
     // arrived at LIFT_LAMBDA while the figure was still crossing read as the
     // model growing in place and then sliding.
     g.scale.setScalar(
-      damp(g.scale.x, baseScale * (1 + entry.scale), mobile ? STATION_LAMBDA : LIFT_LAMBDA, dt),
+      damp(
+        g.scale.x,
+        baseScale * (1 + entry.scale + exit.scale),
+        mobile ? STATION_LAMBDA : LIFT_LAMBDA,
+        dt,
+      ),
     )
 
+    // The dissolve rides ON pose.opacity rather than replacing it, so the exit
+    // can only ever make the figure dimmer than the pose already asked for —
+    // it can never brighten a rig that is mid-cross-fade.
+    const bodyOpacity = pose.opacity * (1 - exit.dissolve)
     for (let i = 0; i < materials.length; i++) {
-      materials[i].opacity = pose.opacity
+      materials[i].opacity = bodyOpacity
     }
 
     // Published for `tools/check_stations.mjs`, which is the only thing that can
@@ -347,7 +368,7 @@ export function CharacterRig({
       rigTelemetry.y = g.position.y
       rigTelemetry.z = g.position.z
       rigTelemetry.scale = g.scale.x
-      rigTelemetry.opacity = pose.opacity
+      rigTelemetry.opacity = bodyOpacity
       rigTelemetry.intro = intro.current
       // Published only once there is something real to read. Exposing it from an
       // effect instead let a probe sample the untouched singleton — all zeros —

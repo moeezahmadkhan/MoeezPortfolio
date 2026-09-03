@@ -59,15 +59,15 @@ describe('scrollState', () => {
       progress: 0,
       pointerX: 0,
       pointerY: 0,
-      heroVisible: 1,
+      heroVisible: 1, heroExit: 0,
       pinnedProgress: 0,
     })
   })
 })
 
 describe('advanceSmooth', () => {
-  const target = { progress: 1, heroVisible: 0, pinnedProgress: 1 }
-  const fresh = () => ({ progress: 0, heroVisible: 1, pinnedProgress: 0 })
+  const target = { progress: 1, heroVisible: 0, heroExit: 0, pinnedProgress: 1 }
+  const fresh = () => ({ progress: 0, heroVisible: 1, heroExit: 0, pinnedProgress: 0 })
 
   it('leaves the smoothed value untouched when dt is zero or negative', () => {
     const s = fresh()
@@ -241,18 +241,18 @@ describe('scrollLambda', () => {
 
 describe('advanceSmooth on touch', () => {
   it('closes more of the gap per frame at the touch rate than at the mouse rate', () => {
-    const target = { progress: 1, heroVisible: 1, pinnedProgress: 1 }
-    const mouse = { progress: 0, heroVisible: 0, pinnedProgress: 0 }
-    const touch = { progress: 0, heroVisible: 0, pinnedProgress: 0 }
+    const target = { progress: 1, heroVisible: 1, heroExit: 0, pinnedProgress: 1 }
+    const mouse = { progress: 0, heroVisible: 0, heroExit: 0, pinnedProgress: 0 }
+    const touch = { progress: 0, heroVisible: 0, heroExit: 0, pinnedProgress: 0 }
     advanceSmooth(mouse, target, 1 / 60, SCROLL_LAMBDA)
     advanceSmooth(touch, target, 1 / 60, SCROLL_LAMBDA_TOUCH)
     expect(touch.progress).toBeGreaterThan(mouse.progress)
   })
 
   it('defaults to the mouse rate when no lambda is given', () => {
-    const explicit = { progress: 0, heroVisible: 0, pinnedProgress: 0 }
-    const implied = { progress: 0, heroVisible: 0, pinnedProgress: 0 }
-    const target = { progress: 1, heroVisible: 1, pinnedProgress: 1 }
+    const explicit = { progress: 0, heroVisible: 0, heroExit: 0, pinnedProgress: 0 }
+    const implied = { progress: 0, heroVisible: 0, heroExit: 0, pinnedProgress: 0 }
+    const target = { progress: 1, heroVisible: 1, heroExit: 0, pinnedProgress: 1 }
     advanceSmooth(explicit, target, 1 / 60, SCROLL_LAMBDA)
     advanceSmooth(implied, target, 1 / 60)
     expect(implied.progress).toBeCloseTo(explicit.progress, 12)

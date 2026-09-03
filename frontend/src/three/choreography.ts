@@ -105,3 +105,84 @@ function decay(entry: EntryOffsets, progress: number, out: EntryOffsets): EntryO
   out.scale = entry.scale * remaining
   return out
 }
+
+/**
+ * The hero's exit: it turns, then pushes toward the reader, then dissolves.
+ *
+ * Driven by `scrollState.smooth.heroExit` — one progress across the hero's own
+ * extra height — and by nothing else. That is deliberately not the banned
+ * pattern: the rule that killed v1 was a table keyed to fractions of the WHOLE
+ * DOCUMENT, where adding a section silently re-timed every animation. This
+ * reads one element's own rect, so no other section can reach it.
+ *
+ * The phases OVERLAP on purpose. Run them end to end and the figure visibly
+ * stops between beats, which reads as three animations rather than one exit.
+ * The turn is most of the way through before the push begins, and the dissolve
+ * starts while the push is still travelling — so what you see is a figure
+ * turning away as it comes toward you and going as it arrives.
+ */
+export type HeroExit = { yaw: number; scale: number; z: number; dissolve: number }
+
+/** Where each phase starts and ends within the exit, 0..1. */
+export const TURN_PHASE = { from: 0, to: 0.55 }
+export const PUSH_PHASE = { from: 0.35, to: 1 }
+export const DISSOLVE_PHASE = { from: 0.5, to: 1 }
+
+/**
+ * How far the figure turns, in radians. NEGATIVE: it turns away from the
+ * reader, not toward them.
+ *
+ * This is what stands in for the cloak wrapping around it. The model is a
+ * single mesh with no skeleton and no separable garment — 1 node, 1 material,
+ * 0 skins, 0 animations — so nothing about it can actually be wrapped. Turning
+ * it away puts the cloak between the reader and the figure, which is the same
+ * picture arrived at honestly.
+ *
+ * The sign was measured, not reasoned. At +1.9 the figure rotated the WRONG
+ * way: the station's resting pose is already three-quarters turned, so a
+ * positive yaw brought the face round to camera — the opposite of vanishing
+ * into a cloak. -1.3 carries the same rest pose through profile and on to the
+ * back.
+ */
+export const HERO_EXIT_YAW = -1.3
+
+/** How much bigger it gets as it pushes in. */
+export const HERO_EXIT_SCALE = 0.85
+
+/** How far it travels toward the camera, in world units. The camera sits at z 4.2. */
+export const HERO_EXIT_Z = 1.6
+
+/**
+ * The exit that does nothing, for every rig and every layout that has none.
+ * Frozen and shared: this is read in a frame loop and must not allocate.
+ */
+export const NO_EXIT: Readonly<HeroExit> = Object.freeze({
+  yaw: 0,
+  scale: 0,
+  z: 0,
+  dissolve: 0,
+})
+
+/** Pure: 0 before a phase, 1 after it, linear across it. */
+function phase(p: number, span: { from: number; to: number }): number {
+  const t = (p - span.from) / (span.to - span.from)
+  return t < 0 ? 0 : t > 1 ? 1 : t
+}
+
+/**
+ * Pure: the hero's exit offsets at progress `p`.
+ *
+ * Every term is 0 at p = 0, so a hero with no room to play the sequence — the
+ * desktop layout, or a short phone — is left exactly as it was. The caller adds
+ * these to the station's own pose rather than replacing it.
+ */
+export function heroExit(p: number): HeroExit {
+  const turn = phase(p, TURN_PHASE)
+  const push = phase(p, PUSH_PHASE)
+  return {
+    yaw: HERO_EXIT_YAW * turn,
+    scale: HERO_EXIT_SCALE * push,
+    z: HERO_EXIT_Z * push,
+    dissolve: phase(p, DISSOLVE_PHASE),
+  }
+}

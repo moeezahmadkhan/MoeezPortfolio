@@ -20,9 +20,10 @@ import { HERO_RIG_ID } from './rigs'
 function channels(heroVisible = 1): ScrollChannels {
   return {
     heroVisible,
+    heroExit: 0,
     progress: 0,
     pinnedProgress: 0,
-    smooth: { heroVisible, progress: 0, pinnedProgress: 0 },
+    smooth: { heroVisible, heroExit: 0, progress: 0, pinnedProgress: 0 },
   }
 }
 
@@ -140,9 +141,10 @@ describe('rigVisibility', () => {
 describe('rigVisibility and the mobile stations', () => {
   const scroll = {
     heroVisible: 0,
+    heroExit: 0,
     progress: 0,
     pinnedProgress: 0,
-    smooth: { heroVisible: 0, progress: 0, pinnedProgress: 0 },
+    smooth: { heroVisible: 0, heroExit: 0, progress: 0, pinnedProgress: 0 },
   }
 
   it('still fades the hero out with its section when the hero station owns the screen', () => {
