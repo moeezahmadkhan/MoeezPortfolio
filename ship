@@ -1,19 +1,26 @@
 #!/usr/bin/env bash
 #
-# Puts the site live on Vercel.
+# Puts the site live, and puts the same commit on GitHub.
 #
-# Pushing to GitHub deploys nothing — Actions and the Vercel GitHub App are
-# locked to the EMU account — so this script is the deploy. It runs the gates
-# first, because the whole point of having them is that nothing ships past them.
+# Pushing to GitHub deploys NOTHING here — Actions and the Vercel GitHub App are
+# locked to the EMU account — so the push and the deploy are two separate acts
+# that have to be done together or the live site and the remote drift apart.
+# The gates run first, because the whole point of having them is that nothing
+# ships past them.
 #
-#   ./ship              full gates, then deploy to production
-#   ./ship --quick      skip the browser gates (unit tests + build still run)
-#   ./ship --preview    deploy to a preview URL instead of production
-#   ./ship --yes        do not stop to confirm
-#   ./ship --gates-only run every gate and stop; deploy nothing
+# One command: gates, then push, then deploy. What is live and what is on
+# GitHub end up the same commit, which is the whole point of doing both here.
 #
-# Exit codes: 0 shipped (or gates passed under --gates-only), 1 a gate failed
-# or the deploy was refused.
+#   ./ship                 gates, push to `both`, deploy to production
+#   ./ship --commit "msg"  commit every tracked change first, then the above
+#   ./ship --no-push       deploy without pushing (the live site will be ahead)
+#   ./ship --quick         skip the browser gates (unit tests + build still run)
+#   ./ship --preview       deploy to a preview URL instead of production
+#   ./ship --yes           do not stop to confirm
+#   ./ship --gates-only    run every gate and stop; push and deploy nothing
+#
+# Exit codes: 0 shipped (or gates passed under --gates-only), 1 a gate failed,
+# the push failed, or the deploy was refused.
 
 set -euo pipefail
 
@@ -35,19 +42,34 @@ QUICK=0
 PREVIEW=0
 ASSUME_YES=0
 GATES_ONLY=0
+PUSH=1
+COMMIT_MSG=""
 
-for arg in "$@"; do
+while [[ $# -gt 0 ]]; do
+  arg="$1"
   case "$arg" in
     --quick)      QUICK=1 ;;
     --preview)    PREVIEW=1 ;;
     --yes|-y)     ASSUME_YES=1 ;;
     --gates-only) GATES_ONLY=1 ;;
+    --no-push)    PUSH=0 ;;
+    --commit)
+      shift
+      [[ $# -gt 0 ]] || { echo "ship: --commit needs a message" >&2; exit 1; }
+      COMMIT_MSG="$1"
+      ;;
     # The header block IS the help, so the two cannot drift apart: print the
     # comment lines from line 3 and stop at the first line that is not one.
     -h|--help)    awk 'NR>=3 { if ($0 !~ /^#/) exit; sub(/^# ?/, ""); print }' "${BASH_SOURCE[0]}"; exit 0 ;;
     *) echo "ship: unknown option '$arg' (try --help)" >&2; exit 1 ;;
   esac
+  shift
 done
+
+# The remote that fans out to both GitHub accounts. `git remote -v` shows it
+# with two push URLs — github.com/moeezahmadkhan and github-new/moeezahmadkhangit
+# — so one push keeps the pair in step. Override with SHIP_REMOTE=origin.
+REMOTE="${SHIP_REMOTE:-both}"
 
 bold() { printf '\033[1m%s\033[0m\n' "$*"; }
 fail() { printf '\033[31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
@@ -81,12 +103,16 @@ DIRTY="$(git status --porcelain)"
 
 bold "Shipping $BRANCH @ $SHA"
 
-if [[ -n "$DIRTY" ]]; then
-  # A warning, not a refusal: this deploys the working tree, so uncommitted work
-  # DOES go live. Worth seeing before it does, not worth blocking on — the
-  # repo routinely carries an unrelated modified file from a parallel session.
-  printf '\033[33m! uncommitted changes — these WILL be deployed:\033[0m\n'
+if [[ -n "$DIRTY" && -z "$COMMIT_MSG" ]]; then
+  # The asymmetry that matters, stated plainly: `vercel --prod` uploads the
+  # WORKING TREE, and `git push` sends only what is committed. So uncommitted
+  # work goes live and does not go to GitHub — the live site ends up carrying
+  # code that exists on no remote. A warning rather than a refusal, because the
+  # repo routinely carries an unrelated modified file from a parallel session;
+  # `--commit "msg"` is the way to close the gap.
+  printf '\033[33m! uncommitted changes — these DEPLOY but do NOT push:\033[0m\n'
   echo "$DIRTY" | sed 's/^/    /'
+  printf '\033[33m  (use --commit "msg" to commit them first)\033[0m\n'
 fi
 
 if ! git diff --quiet HEAD "@{u}" 2>/dev/null; then
@@ -155,6 +181,43 @@ ok "corpus matches src/content/"
 if [[ "$GATES_ONLY" -eq 1 ]]; then
   bold "--gates-only: everything passed, nothing deployed"
   exit 0
+fi
+
+# --- commit and push -------------------------------------------------------
+#
+# Before the deploy, never after: if the push is going to be rejected — someone
+# else pushed, the branch has no upstream, the key is wrong — it is far better
+# to find out while the live site is still the old one.
+
+if [[ -n "$COMMIT_MSG" ]]; then
+  if [[ -z "$DIRTY" ]]; then
+    printf '\033[33m! --commit given but the tree is clean; nothing to commit\033[0m\n'
+  else
+    bold "Committing"
+    # -a: tracked files only. An untracked file is far more often a scratch
+    # note or a stray screenshot than something meant to ship, and `git add -A`
+    # inside a deploy script is how those reach a public repo.
+    git commit -a -m "$COMMIT_MSG"
+    SHA="$(git rev-parse --short HEAD)"
+    ok "committed $SHA"
+    UNTRACKED="$(git ls-files --others --exclude-standard)"
+    if [[ -n "$UNTRACKED" ]]; then
+      printf '\033[33m! untracked files were NOT committed (add them by hand if they should ship):\033[0m\n'
+      echo "$UNTRACKED" | sed 's/^/    /'
+    fi
+  fi
+fi
+
+if [[ "$PUSH" -eq 1 ]]; then
+  bold "Pushing $BRANCH to $REMOTE"
+  git remote get-url --push "$REMOTE" >/dev/null 2>&1 ||
+    fail "no remote named '$REMOTE' (set SHIP_REMOTE, or add it)"
+  # -u so a branch that has never been pushed gets its upstream set here rather
+  # than failing; on a branch that already has one this is a no-op.
+  git push -u "$REMOTE" "$BRANCH" || fail "push failed — nothing has been deployed"
+  ok "pushed $BRANCH @ $(git rev-parse --short HEAD)"
+else
+  printf '\033[33m! --no-push: the live site will be ahead of the remote\033[0m\n'
 fi
 
 # --- deploy ----------------------------------------------------------------
