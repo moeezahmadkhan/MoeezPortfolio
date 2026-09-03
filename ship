@@ -229,9 +229,25 @@ if [[ "$ASSUME_YES" -ne 1 ]]; then
 fi
 
 bold "Deploying"
+
+# From the REPO ROOT, not from frontend/, and this is the whole trick.
+#
+# The Vercel project's Root Directory setting is `frontend`, so Vercel resolves
+# the app as <cwd>/frontend. Everything above this line runs in frontend/ —
+# that is where package.json is — and deploying from there made Vercel look for
+# frontend/frontend and fail with:
+#
+#   Error: The specified Root Directory "frontend" does not exist.
+#
+# Both the root and frontend/ carry a .vercel link to the same project
+# (moeezahmadkhan-com), which is what made this easy to get wrong: the deploy
+# STARTS fine from either and only fails once the build resolves the path.
+cd "$ROOT"
+[[ -f "$ROOT/.vercel/project.json" ]] ||
+  fail "no .vercel/project.json at the repo root — run 'npx vercel link' here first"
+
 # --prod is the only difference between a preview and the live site. The project
-# is already linked (frontend/.vercel/project.json -> moeezahmadkhan-com), so
-# this needs no --scope or --name.
+# is already linked, so this needs no --scope or --name.
 if [[ "$PREVIEW" -eq 1 ]]; then
   npx vercel
 else
