@@ -29,7 +29,7 @@ the hero is 1024px, also an exact fit.
 
 | Gate | Result |
 |---|---|
-| `npm test` | **511 passed**, 55 files |
+| `npm test` | **513 passed**, 55 files (511 before the magnetic work below) |
 | `npm run build` (`tsc -b` first) | clean |
 | `npm run check:motion` | all 8 scenarios animate |
 | `npm run check:contrast` | all 14 samples clear 4.5:1 |
