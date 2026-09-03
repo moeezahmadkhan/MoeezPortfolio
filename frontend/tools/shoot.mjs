@@ -134,10 +134,21 @@ async function waitForRevealsSettled(page) {
   const start = Date.now()
   await page.waitForFunction(
     () => {
-      const viewportHeight = window.innerHeight
+      // The same question `Reveal` itself asks, and it has to be, or this waits
+      // for something that is never coming.
+      //
+      // Reveal.tsx observes with `rootMargin: '0px 0px -12% 0px'`: an element
+      // whose top is inside the bottom 12% of the viewport has NOT intersected
+      // and is correctly still at opacity 0. This wait used to measure the full
+      // viewport, so any such element made it spin until the timeout — it just
+      // never happened to catch one until the project cards got shorter and a
+      // card landed with its top at 785 in an 844px viewport, 42px inside the
+      // band the observer excludes.
+      const REVEAL_BOTTOM_MARGIN = 0.12
+      const trigger = window.innerHeight * (1 - REVEAL_BOTTOM_MARGIN)
       for (const el of document.querySelectorAll('.reveal')) {
         const rect = el.getBoundingClientRect()
-        if (rect.bottom < 0 || rect.top > viewportHeight) continue
+        if (rect.bottom < 0 || rect.top > trigger) continue
         if (Number(getComputedStyle(el).opacity) < 0.99) return false
       }
       return true
