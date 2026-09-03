@@ -175,6 +175,25 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   legible heading at 1.03:1. It now fills a 1x1 canvas with the computed colour and reads the pixel
   back, which resolves any syntax the browser can parse down to the sRGB it will actually paint,
   gamut clipping included — which is the thing being measured anyway.
+- **`Magnetic` is live on touch, and the release is what makes that safe.** The lean used to be
+  excluded on a coarse pointer, nominally because a fingertip covers the control it leans toward.
+  That is true of the control UNDER the finger and false of its neighbours — the activation band
+  reaches `MAGNETIC_RADIUS_PX` (96px) from a control's edge, so a drag passing 50-70px away leaves a
+  visible 1.6-3.1px lean. What the exclusion actually bought was avoiding a stale pointer: a mouse is
+  always somewhere and `pointermove` keeps `pointer` fresh, but a finger only exists between
+  `pointerdown` and `pointerup`, so after it lifts the last touched position would sit in `pointer`
+  forever and every nearby control would lean at a finger that is no longer on the glass.
+  `releasePointer` sends the pointer to `-Infinity` on `pointerup` AND `pointercancel` — both,
+  because a drag the browser takes over for scrolling fires only `pointercancel`, which is exactly
+  the gesture a phone makes most. Infinity rather than a flag, so `magneticOffset`'s existing
+  radius check does the work and the lean eases home on the curve it arrived on.
+  `releasePointer` ignores a mouse `pointerup`, or every click would drop the cursor.
+- **The magnetic loop does not spin during a scroll, and that was measured.** Scrolling the whole
+  8170px page cost exactly ONE tick — 4 style writes for 4 controls — before the loop idled out,
+  and reading all four rects costs 0.0033ms against a 16.7ms budget. `wake()` is bound to `scroll`
+  because scrolling moves a control under a stationary pointer, but with every offset already 0 the
+  tick sets `busy = false` and stops. Reduced motion still opts out entirely: that exclusion is
+  about the movement, not the input device.
 - **A chat message arrives on a transition, like the panel around it.** `.chat__msg` starts from
   `@starting-style` rather than a `@keyframes` for exactly the reason above it in this list — the log
   is replaced wholesale on a new conversation, and a keyframe entrance has nothing to say about

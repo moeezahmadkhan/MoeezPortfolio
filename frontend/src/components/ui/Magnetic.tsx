@@ -160,19 +160,39 @@ function wake(): void {
 }
 
 function readPointer(event: PointerEvent | MouseEvent): void {
-  // A hybrid laptop reports both a fine and a coarse pointer; a finger dragging
-  // across a button should still not drag the button with it.
-  if ((event as PointerEvent).pointerType === 'touch') return
   pointer.x = event.clientX
   pointer.y = event.clientY
   wake()
 }
 
 /**
+ * Sends the pointer away, so every control relaxes back to rest.
+ *
+ * This is what a touch pointer needs and a mouse does not, and it is the whole
+ * reason touch was excluded before rather than merely untested. A mouse is
+ * always somewhere: `pointermove` keeps firing, so `pointer` is never stale. A
+ * finger only exists between `pointerdown` and `pointerup` — after it lifts no
+ * further event arrives, so the last touched position would stay in `pointer`
+ * forever and every control near it would sit leaning at a finger that is no
+ * longer on the glass.
+ *
+ * Infinity rather than a flag, because `magneticOffset` already returns a zero
+ * offset for a pointer beyond MAGNETIC_RADIUS_PX — the release needs no special
+ * case anywhere else, and the lean eases home on the same damped curve it
+ * arrived on instead of snapping.
+ */
+function releasePointer(event: PointerEvent): void {
+  if (event.pointerType !== 'touch') return
+  pointer.x = Number.NEGATIVE_INFINITY
+  pointer.y = Number.NEGATIVE_INFINITY
+  wake()
+}
+
+/**
  * Adds an element to the shared loop. Returns the teardown. The window
  * listeners exist only while at least one element is registered, which is how
- * a coarse-pointer or reduced-motion visitor pays nothing at all: no element
- * ever registers, so nothing is ever listened for.
+ * a reduced-motion visitor pays nothing at all: no element ever registers, so
+ * nothing is ever listened for.
  */
 export function registerMagnetic(el: HTMLElement): () => void {
   const node: MagneticNode = { el, x: 0, y: 0 }
@@ -181,6 +201,12 @@ export function registerMagnetic(el: HTMLElement): () => void {
     // Scrolling moves the control under a stationary cursor, which changes the
     // target without a pointer event to announce it.
     window.addEventListener('scroll', wake, { passive: true })
+    // A finger that has left the glass is not a pointer any more. Both events,
+    // because a gesture the browser takes over for scrolling ends in
+    // `pointercancel` and never fires `pointerup` at all — miss that one and
+    // the lean sticks after exactly the gesture a phone makes most.
+    window.addEventListener('pointerup', releasePointer, { passive: true })
+    window.addEventListener('pointercancel', releasePointer, { passive: true })
   }
   nodes.add(node)
   wake()
@@ -192,6 +218,8 @@ export function registerMagnetic(el: HTMLElement): () => void {
     if (nodes.size === 0) {
       window.removeEventListener('pointermove', readPointer)
       window.removeEventListener('scroll', wake)
+      window.removeEventListener('pointerup', releasePointer)
+      window.removeEventListener('pointercancel', releasePointer)
       if (frame !== 0) cancelAnimationFrame(frame)
       frame = 0
       previous = -1
@@ -200,21 +228,29 @@ export function registerMagnetic(el: HTMLElement): () => void {
 }
 
 /**
- * Wraps one control so it leans a few pixels toward the cursor as the cursor
- * approaches. The wrapper renders on every device — so the hero's button row is
- * the same size everywhere — but only becomes magnetic on a fine pointer with
- * motion allowed.
+ * Wraps one control so it leans a few pixels toward the pointer as the pointer
+ * approaches — a cursor, or a finger while it is on the glass.
+ *
+ * Touch was excluded at first on the reasoning that a fingertip covers the
+ * control it is leaning toward. That is true of the control directly under the
+ * finger and false of its neighbours: the activation band reaches
+ * MAGNETIC_RADIUS_PX (96px) from a control's edge, and a finger occludes
+ * roughly half that, so the buttons a finger passes NEAR lean visibly while it
+ * drags. What the exclusion actually bought was avoiding the stale-pointer
+ * problem, and `releasePointer` above solves that directly.
  *
  * There is no keyboard equivalent of the lean, and there should not be: it
  * carries no information. What a keyboard user gets instead is the focus
  * affordance on the control itself (see Button.css), which is styled to read as
  * strongly as the hover state so a focused CTA never looks dead beside a
  * hovered sibling.
+ *
+ * Reduced motion still opts out entirely, and that is the one exclusion that
+ * remains: it is about the movement, not about the input device.
  */
 export function Magnetic({ children }: { children: ReactNode }) {
-  const coarse = useMatchMedia('(pointer: coarse)')
   const reduced = useMatchMedia('(prefers-reduced-motion: reduce)')
-  const live = !coarse && !reduced
+  const live = !reduced
   const ref = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {

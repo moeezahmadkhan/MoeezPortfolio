@@ -26,9 +26,10 @@
   min-height: var(--magnetic-min-target);
 }
 
-/* Promoted only where the offset can actually change. On a coarse pointer or
-   under reduced motion this class is absent, so no layer is created for an
-   element that will never move. */
+/* Promoted only where the offset can actually change. Under reduced motion this
+   class is absent, so no layer is created for an element that will never move.
+   A coarse pointer IS live now — a finger on the glass is a pointer, and the
+   controls it passes near lean toward it (see Magnetic.tsx). */
 .magnetic--live {
   will-change: transform;
 }

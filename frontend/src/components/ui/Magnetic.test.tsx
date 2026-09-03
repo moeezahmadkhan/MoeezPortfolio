@@ -193,15 +193,24 @@ describe('<Magnetic>', () => {
     expect(screen.getByRole('link', { name: 'View work' })).toHaveAttribute('href', '#work')
   })
 
-  it('costs no pointer listener on a coarse pointer', () => {
+  it('is live on a coarse pointer — a finger on the glass is a pointer', () => {
+    // Inverted deliberately. Touch was excluded on the reasoning that a
+    // fingertip covers the control it leans toward, which is true of the
+    // control UNDER the finger and false of its neighbours: the activation band
+    // reaches 96px from a control's edge and a finger occludes roughly half
+    // that, so controls a drag passes near lean visibly.
     stubMedia(['(pointer: coarse)'])
     const { container } = render(
       <Magnetic>
         <a href="#work">View work</a>
       </Magnetic>,
     )
-    expect(container.querySelector('.magnetic--live')).toBeNull()
-    expect(added).not.toContain('pointermove')
+    expect(container.querySelector('.magnetic--live')).not.toBeNull()
+    expect(added).toContain('pointermove')
+    // The release is what makes touch safe at all; without it the last touched
+    // position stays in `pointer` after the finger lifts.
+    expect(added).toContain('pointerup')
+    expect(added).toContain('pointercancel')
   })
 
   it('costs no pointer listener under prefers-reduced-motion', () => {
@@ -215,8 +224,73 @@ describe('<Magnetic>', () => {
     expect(added).not.toContain('pointermove')
   })
 
-  it('holds the offset at exactly zero on a coarse pointer', () => {
+  it('releases the lean when a finger leaves the glass', () => {
+    // The failure this exists to catch: a mouse is always somewhere, so
+    // `pointermove` keeps `pointer` fresh; a finger only exists between
+    // pointerdown and pointerup. Without releasePointer the last touched
+    // position stays in `pointer` and the control sits leaning at a finger that
+    // is no longer touching the screen — for the rest of the visit.
     stubMedia(['(pointer: coarse)'])
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({
+      left: REST.left,
+      top: REST.top,
+      width: REST.width,
+      height: REST.height,
+      right: REST.left + REST.width,
+      bottom: REST.top + REST.height,
+      x: REST.left,
+      y: REST.top,
+      toJSON: () => ({}),
+    } as DOMRect)
+    const step = stubFrames()
+    const { container } = render(
+      <Magnetic>
+        <a href="#work">View work</a>
+      </Magnetic>,
+    )
+    const wrapper = container.querySelector('.magnetic') as HTMLElement
+
+    // A finger dragging past the control's right edge.
+    act(() => {
+      window.dispatchEvent(
+        new MouseEvent('pointermove', {
+          clientX: REST.left + REST.width + 10,
+          clientY: REST.top + REST.height / 2,
+        }),
+      )
+    })
+    for (let i = 0; i < 40; i++) step()
+    const leaning = Number(wrapper.style.getPropertyValue('--magnetic-x').replace('px', ''))
+    expect(leaning).toBeGreaterThan(0)
+
+    // The finger lifts. pointerup carries pointerType, which is how the release
+    // tells a finger from a cursor.
+    act(() => {
+      const up = new MouseEvent('pointerup')
+      Object.defineProperty(up, 'pointerType', { value: 'touch' })
+      window.dispatchEvent(up)
+    })
+    for (let i = 0; i < 40; i++) step()
+    expect(Number(wrapper.style.getPropertyValue('--magnetic-x').replace('px', ''))).toBe(0)
+    expect(Number(wrapper.style.getPropertyValue('--magnetic-y').replace('px', ''))).toBe(0)
+  })
+
+  it('releases on pointercancel, which is how a scroll gesture actually ends', () => {
+    // A drag the browser takes over for scrolling fires pointercancel and never
+    // fires pointerup at all. Listening only for pointerup would leave the lean
+    // stuck after exactly the gesture a phone makes most.
+    stubMedia(['(pointer: coarse)'])
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({
+      left: REST.left,
+      top: REST.top,
+      width: REST.width,
+      height: REST.height,
+      right: REST.left + REST.width,
+      bottom: REST.top + REST.height,
+      x: REST.left,
+      y: REST.top,
+      toJSON: () => ({}),
+    } as DOMRect)
     const step = stubFrames()
     const { container } = render(
       <Magnetic>
@@ -227,15 +301,68 @@ describe('<Magnetic>', () => {
     act(() => {
       window.dispatchEvent(
         new MouseEvent('pointermove', {
-          clientX: REST.left + REST.width + 8,
-          clientY: REST.top + 10,
+          clientX: REST.left + REST.width + 10,
+          clientY: REST.top + REST.height / 2,
         }),
       )
     })
-    step()
-    step()
-    expect(wrapper.style.getPropertyValue('--magnetic-x')).toBe('')
-    expect(wrapper.style.getPropertyValue('--magnetic-y')).toBe('')
+    for (let i = 0; i < 40; i++) step()
+    expect(
+      Number(wrapper.style.getPropertyValue('--magnetic-x').replace('px', '')),
+    ).toBeGreaterThan(0)
+
+    act(() => {
+      const cancel = new MouseEvent('pointercancel')
+      Object.defineProperty(cancel, 'pointerType', { value: 'touch' })
+      window.dispatchEvent(cancel)
+    })
+    for (let i = 0; i < 40; i++) step()
+    expect(Number(wrapper.style.getPropertyValue('--magnetic-x').replace('px', ''))).toBe(0)
+  })
+
+  it('a mouse button release does not send the cursor away', () => {
+    // releasePointer must ignore a mouse: a click should not make every control
+    // on the page relax and then lean back in as the cursor keeps moving.
+    stubMedia([])
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({
+      left: REST.left,
+      top: REST.top,
+      width: REST.width,
+      height: REST.height,
+      right: REST.left + REST.width,
+      bottom: REST.top + REST.height,
+      x: REST.left,
+      y: REST.top,
+      toJSON: () => ({}),
+    } as DOMRect)
+    const step = stubFrames()
+    const { container } = render(
+      <Magnetic>
+        <a href="#work">View work</a>
+      </Magnetic>,
+    )
+    const wrapper = container.querySelector('.magnetic') as HTMLElement
+    act(() => {
+      window.dispatchEvent(
+        new MouseEvent('pointermove', {
+          clientX: REST.left + REST.width + 10,
+          clientY: REST.top + REST.height / 2,
+        }),
+      )
+    })
+    for (let i = 0; i < 40; i++) step()
+    const leaning = Number(wrapper.style.getPropertyValue('--magnetic-x').replace('px', ''))
+
+    act(() => {
+      const up = new MouseEvent('pointerup')
+      Object.defineProperty(up, 'pointerType', { value: 'mouse' })
+      window.dispatchEvent(up)
+    })
+    for (let i = 0; i < 40; i++) step()
+    expect(Number(wrapper.style.getPropertyValue('--magnetic-x').replace('px', ''))).toBeCloseTo(
+      leaning,
+      3,
+    )
   })
 
   it('eases a bounded offset toward the pointer on a fine pointer, then releases it', () => {
