@@ -217,6 +217,18 @@
   }
 }
 
+/* Teal, not --accent: this is the chat surface, and the whole point of the
+   reservation is that the machine's voice looks different from the page. */
+.chat__msg a {
+  color: var(--teal);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  /* The same reason .chat__msg p breaks anywhere: a full LinkedIn URL in a
+     343px panel has to break mid-token or it pushes a horizontal scrollbar
+     into the dock. */
+  overflow-wrap: anywhere;
+}
+
 .chat__msg p {
   white-space: pre-wrap;
   /* The refusal quotes a full LinkedIn URL. In a 343px panel that has to break
