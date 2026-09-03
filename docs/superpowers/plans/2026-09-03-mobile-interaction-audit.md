@@ -132,17 +132,38 @@ previous one. And this harness's rAF runs at roughly 2Hz in an unfocused tab,
 which freezes the animation clock — sample synchronous signals
 (`getAnimations()`, a synchronously-set style) rather than frame counts.
 
+## Magnetic on touch — done after the fact
+
+Deferred at first, then requested and implemented. It needed one thing the
+original exclusion was quietly hiding: **a release**. A mouse is always
+somewhere, so `pointermove` keeps `pointer` fresh; a finger only exists between
+`pointerdown` and `pointerup`, so without `releasePointer` the last touched
+position stays in `pointer` and every nearby control leans at a finger that has
+left the glass — for the rest of the visit. It listens on `pointerup` **and**
+`pointercancel`, because a drag the browser takes over for scrolling fires only
+the latter, which is the gesture a phone makes most.
+
+Measured at 390x844 with touch emulation:
+
+| | Result |
+|---|---|
+| Lean, finger 30px past a hero button's edge | `--magnetic-x: 4.12px` (hand-computed target 4.125px) |
+| `pointerup` (touch) | returns to exactly `0.00px` |
+| `pointercancel` (touch) | `3.59px` → `0.00px` |
+| `pointerup` (mouse) | ignored — the cursor is not sent away |
+| Full 8170px page scroll | **one tick**, 4 style writes, then the loop idles out |
+| Reading all four rects | 0.0033ms against a 16.7ms budget |
+
+Honest note on the effect itself, which is why it was deferred in the first
+place: the lean is at most 6px and decays linearly to nothing at 96px from a
+control's edge, so a finger 50-70px away leaves 1.6-3.1px of movement and a
+finger closer than that occludes most of what it causes. It is real, cheap and
+correct — it is not a large effect. Reduced motion still opts out entirely;
+that exclusion is about the movement, not the input device.
+
 ## Deferred, deliberately
 
-1. **Magnetic buttons following a touch drag.** Requested at approval and called
-   out then. `readPointer` returns on `pointerType === 'touch'` and two tests
-   pin that down; reversing it spends a `pointermove` listener on every phone to
-   produce a ~6px lean underneath the finger causing it. The press-scale added in
-   this work is the visible touch equivalent. To do it: delete the `pointerType`
-   guard, invert `costs no pointer listener on a coarse pointer` and `holds the
-   offset at exactly zero on a coarse pointer`, register on coarse pointers.
-
-2. **`content/persona/qa.md` and `voice.md` are still empty.** All 16 corpus
+1. **`content/persona/qa.md` and `voice.md` are still empty.** All 16 corpus
    chunks come from `src/content/index.ts`; **zero** are in Moeez's own voice.
    The corpus is current, not stale — `npm run persona` rebuilds it byte for
    byte — so this is the single biggest remaining lever on chat quality, and it
