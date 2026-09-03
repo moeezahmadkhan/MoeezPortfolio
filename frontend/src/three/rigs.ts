@@ -149,7 +149,7 @@ export const MOBILE_STATIONS: Readonly<Record<string, Station>> = {
   // 557, the head is at ~620 — no overlap, nothing newly cropped, check:stations
   // and check:contrast both clean. rigs.test.ts pins the two values together so
   // the next change to either has to look at the other.
-  [HERO_SECTION_ID]: { position: [0, -1.25, 0], scale: 1.15, yaw: 0, presence: 0.8 },
+  [HERO_SECTION_ID]: { position: [0, -0.94, 0], scale: 0.95, yaw: 0, presence: 0.8 },
   about: { position: [0.52, -1.35, -1.1], scale: 0.68, yaw: -0.45, presence: 0.34 },
   work: { position: [-0.55, -1.4, -1.2], scale: 0.66, yaw: 0.42, presence: 0.32 },
   skills: { position: [0.56, -1.45, -1.3], scale: 0.64, yaw: -0.55, presence: 0.3 },

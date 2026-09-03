@@ -217,8 +217,16 @@ describe('the hero station and --figure-band', () => {
     // growing the scale left 17% of empty screen above an unchanged head, which
     // is why CLAUDE.md says they move together.
     //
-    // This time the band shrank (38svh -> 34svh, to stop the hero overflowing an
-    // 844px screen) and the scale deliberately did NOT follow. The band is space
+    // The band shrank once (38svh -> 34svh, to stop the hero overflowing an
+    // 844px screen) and the scale did not follow, because narrowing the band
+    // moves the copy and not the model.
+    //
+    // The scale came down separately, and for a different reason: the figure
+    // was CROPPED. Measured at 491x763, the band gives 0.983 world units of
+    // room (frame height 2.892 units at 263.8px/unit) and the bust at scale
+    // 1.15 needs 1.15 — 17% too tall for its own strip, anchored low so every
+    // pixel of the overflow fell off the bottom of the screen. 0.95 fits, and
+    // y moves to -0.94 to centre it in the band rather than hang it below. The band is space
     // reserved in the COPY's layout; the figure lives in a fixed, full-viewport
     // canvas and is placed by this table alone, so narrowing the band moves the
     // copy and not the figure. Measured at 390x844 after the change: copy ends at
@@ -229,6 +237,6 @@ describe('the hero station and --figure-band', () => {
     // Asserted together so the next change to either has to look at the other.
     const tokens = readFileSync('src/styles/tokens.css', 'utf8')
     expect(tokens).toContain('--figure-band: clamp(200px, 34svh, 300px)')
-    expect(MOBILE_STATIONS[HERO_SECTION_ID].scale).toBeCloseTo(1.15, 2)
+    expect(MOBILE_STATIONS[HERO_SECTION_ID].scale).toBeCloseTo(0.95, 2)
   })
 })
