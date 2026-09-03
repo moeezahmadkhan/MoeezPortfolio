@@ -41,19 +41,39 @@ function NavLink({
   label,
   current,
   onNavigate,
+  openSeq,
+  index,
 }: {
   id: string
   label: string
   current: boolean
   onNavigate: () => void
+  /** Increments each time the mobile panel opens; 0 means it never has. */
+  openSeq: number
+  index: number
 }) {
+  const { run, ...decode } = useScramble(label)
+
+  // Staggered on the panel OPENING, never on a tap. A tap would put the decode
+  // between the press and the navigation, which is the exact reason
+  // `onMouseEnter` refuses to run on a coarse pointer — opening the menu is a
+  // different gesture on a different control, so nothing is delayed here.
+  //
+  // The timer is cleared on the way out, so a menu closed mid-stagger leaves no
+  // decode running against a panel nobody can see.
+  useEffect(() => {
+    if (openSeq === 0) return
+    const timer = window.setTimeout(run, index * 60)
+    return () => window.clearTimeout(timer)
+  }, [openSeq, index, run])
+
   return (
     <a
       href={`#${id}`}
       className="nav__link"
       aria-current={current ? 'true' : undefined}
       onClick={onNavigate}
-      {...useScramble(label)}
+      {...decode}
     >
       {label}
     </a>
@@ -64,14 +84,9 @@ function NavLink({
 const CV_LABEL = 'Résumé'
 
 function CvLink() {
+  const { run: _run, ...decode } = useScramble(CV_LABEL)
   return (
-    <a
-      className="nav__cv"
-      href={profile.cvUrl}
-      target="_blank"
-      rel="noreferrer"
-      {...useScramble(CV_LABEL)}
-    >
+    <a className="nav__cv" href={profile.cvUrl} target="_blank" rel="noreferrer" {...decode}>
       {CV_LABEL}
     </a>
   )
@@ -81,6 +96,9 @@ export function Nav() {
   const ids = useMemo(() => SECTION_IDS, [])
   const active = useSectionObserver(ids)
   const [open, setOpen] = useState(false)
+  // Bumped on every open so each NavLink can replay its decode. A boolean would
+  // only fire the first time.
+  const [openSeq, setOpenSeq] = useState(0)
   const listRef = useRef<HTMLElement>(null)
   const markerRef = useRef<HTMLSpanElement>(null)
 
@@ -128,7 +146,12 @@ export function Nav() {
           className="nav__toggle"
           aria-expanded={open}
           aria-controls="nav-links"
-          onClick={() => setOpen((v) => !v)}
+          onClick={() =>
+            setOpen((v) => {
+              if (!v) setOpenSeq((n) => n + 1)
+              return !v
+            })
+          }
         >
           {open ? 'Close' : 'Menu'}
         </button>
@@ -138,13 +161,15 @@ export function Nav() {
           className={`nav__links${open ? ' is-open' : ''}`}
           ref={listRef}
         >
-          {NAV_ITEMS.map((item) => (
+          {NAV_ITEMS.map((item, index) => (
             <NavLink
               key={item.id}
               id={item.id}
               label={item.label}
               current={active === item.id}
               onNavigate={() => setOpen(false)}
+              openSeq={openSeq}
+              index={index}
             />
           ))}
           <CvLink />

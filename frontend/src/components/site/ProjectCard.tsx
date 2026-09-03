@@ -61,8 +61,9 @@ export function ProjectCard({ project }: { project: Project }) {
  * one without would otherwise run a different number of hooks.
  */
 function CardLink({ href, label }: { href: string; label: string }) {
+  const { run: _run, ...decode } = useScramble(label)
   return (
-    <a href={href} target="_blank" rel="noreferrer noopener" {...useScramble(label)}>
+    <a href={href} target="_blank" rel="noreferrer noopener" {...decode}>
       {label}
     </a>
   )

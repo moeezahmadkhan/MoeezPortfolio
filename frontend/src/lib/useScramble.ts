@@ -44,9 +44,22 @@ export function useScramble(label: string) {
     nodeRef.current = node
   }, [])
 
-  const onMouseEnter = useCallback(() => {
+  /**
+   * Runs the decode outright, whatever the pointer is.
+   *
+   * `onMouseEnter` bails on a coarse pointer because `mouseenter` fires on a
+   * TAP there, and a decode sitting between the press and the navigation is a
+   * delay the visitor did not ask for. That reasoning is about the tap, not
+   * about the effect: opening the mobile menu is a different gesture on a
+   * different control, and the links it reveals are not being pressed. So the
+   * menu calls this on open and a phone finally sees the decode the desktop
+   * nav has always had.
+   *
+   * Reduced motion still stops it. That bail is about the motion itself.
+   */
+  const run = useCallback(() => {
     const node = nodeRef.current
-    if (!node || prefersReducedMotion() || isCoarsePointer()) return
+    if (!node || prefersReducedMotion()) return
     settle()
     node.style.width = `${node.getBoundingClientRect().width}px`
     const started = performance.now()
@@ -59,10 +72,17 @@ export function useScramble(label: string) {
     frameRef.current = requestAnimationFrame(step)
   }, [label, settle])
 
+  const onMouseEnter = useCallback(() => {
+    if (isCoarsePointer()) return
+    run()
+  }, [run])
+
   // A hover that leaves mid-decode restores the label outright rather than
   // playing the rest of it out: the pointer has gone, so the animation has no
   // audience, and a label frozen on glyphs is the one failure that matters.
   useEffect(() => settle, [settle])
 
-  return { ref, onMouseEnter, onMouseLeave: settle, 'aria-label': label }
+  // `run` is not a DOM attribute: every consumer destructures it off before
+  // spreading the rest onto an element, or React warns about it by name.
+  return { ref, run, onMouseEnter, onMouseLeave: settle, 'aria-label': label }
 }

@@ -28,6 +28,21 @@ function Link({ label }: { label: string }) {
   return <a href="#work" {...useScramble(label)}>{label}</a>
 }
 
+/** Fires the decode on demand, the way the mobile menu does on open. */
+function RunLink({ label }: { label: string }) {
+  const { run, ...decode } = useScramble(label)
+  return (
+    <>
+      <a href="#work" {...decode}>
+        {label}
+      </a>
+      <button type="button" onClick={run}>
+        run
+      </button>
+    </>
+  )
+}
+
 beforeEach(() => {
   pending = new Map()
   nextId = 0
@@ -127,5 +142,50 @@ describe('useScramble', () => {
 
     unmount()
     expect(pending.size).toBe(0)
+  })
+})
+
+describe('run()', () => {
+  it('decodes on a coarse pointer, where onMouseEnter deliberately will not', () => {
+    // The coarse bail on onMouseEnter exists because mouseenter fires on a TAP
+    // there, and a decode between the press and the navigation is a delay
+    // nobody asked for. That reasoning is about the tap, not about the effect:
+    // opening a menu is a different gesture on a different control, and the
+    // links it reveals are not being pressed.
+    stubMatchMedia(['(pointer: coarse)'])
+    render(<RunLink label="View work" />)
+    const link = screen.getByRole('link')
+
+    fireEvent.mouseEnter(link)
+    expect(pending.size).toBe(0)
+    expect(link.textContent).toBe('View work')
+
+    fireEvent.click(screen.getByRole('button', { name: 'run' }))
+    nextFrame(0)
+    expect(link.textContent).not.toBe('View work')
+    for (const char of link.textContent!.replace(/ /g, '')) expect(GLYPHS).toContain(char)
+
+    nextFrame(500)
+    expect(link.textContent).toBe('View work')
+  })
+
+  it('still does nothing under reduced motion', () => {
+    // That bail is about the motion itself, not about the tap, so it stays.
+    stubMatchMedia(['(prefers-reduced-motion: reduce)'])
+    render(<RunLink label="View work" />)
+    const link = screen.getByRole('link')
+
+    fireEvent.click(screen.getByRole('button', { name: 'run' }))
+    expect(pending.size).toBe(0)
+    expect(link.textContent).toBe('View work')
+    expect(link.style.width).toBe('')
+  })
+
+  it('freezes the box for the decode, as the hover path does', () => {
+    stubMatchMedia(['(pointer: coarse)'])
+    render(<RunLink label="View work" />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'run' }))
+    expect(screen.getByRole('link').style.width).toBe('84px')
   })
 })
