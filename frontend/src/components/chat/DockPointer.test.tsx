@@ -13,7 +13,6 @@ import {
   TRAIL_LENGTH,
   arrowProgress,
   forgetDockOpened,
-  COMPACT_TRAIL_LENGTH,
 } from './DockPointer'
 
 /**
@@ -203,43 +202,26 @@ describe('DockPointer', () => {
       dispatchEvent: () => false,
     }) as unknown as MediaQueryList
 
-  it('falls back to the compact trail on a screen with no gutter', () => {
-    // Below POINTER_MIN_WIDTH the copy runs to the edge, so the full trail would
-    // come down on a paragraph — measured: at 390 all three land on body text.
-    // It does not follow that a narrow screen should get nothing: that is where
-    // the launcher competes hardest for attention. So the trail shrinks into the
-    // dock's own corner, above the launcher, where the dock already floats over
-    // the content and no paragraph is disturbed.
+  it('renders nothing at all below POINTER_MIN_WIDTH', () => {
+    // Measured at 390x844 with the compact trail in place: both chevrons
+    // centred at x=342, and document.elementsFromPoint returned
+    // ['card__body', 'card', 'reveal is-shown', 'work__grid'] for each. The
+    // trail was drawing on Moeez's writing.
+    //
+    // POINTER_MIN_WIDTH's own comment had already reached that conclusion —
+    // "below that it has nowhere to stand ... so on a narrower screen this
+    // says nothing". The compact variant walked it back, into the one corner
+    // that is only empty until the page scrolls under it. The launcher's own
+    // pulse says the same thing without borrowing anyone's space.
     vi.stubGlobal('matchMedia', narrowScreen)
-    const frames = stubFrames()
     const { container } = render(<DockPointer visible />)
-    const arrows = container.querySelectorAll('[data-arrow]')
-    expect(arrows).toHaveLength(COMPACT_TRAIL_LENGTH)
-    expect(container.querySelector('.dock-pointer--compact')).not.toBeNull()
-    // Still decorative, still animated, still never a hit target.
-    expect(container.querySelector('.dock-pointer')).toHaveAttribute('aria-hidden', 'true')
-    expect(frames.requests).toBeGreaterThan(0)
+    expect(container.querySelector('.dock-pointer')).toBeNull()
+    expect(container.querySelector('[data-arrow]')).toBeNull()
   })
 
-  it('keeps the compact trail shorter than the full one, and still ordered', () => {
-    // The corner has room for a hint, not for a parade.
-    expect(COMPACT_TRAIL_LENGTH).toBeLessThan(TRAIL_LENGTH)
-    expect(COMPACT_TRAIL_LENGTH).toBeGreaterThanOrEqual(1)
-    for (const progress of [0, 0.25, 0.5, 0.75, 1]) {
-      for (let i = 1; i < COMPACT_TRAIL_LENGTH; i++) {
-        const ahead = arrowProgress(progress, i - 1, COMPACT_TRAIL_LENGTH)
-        const behind = arrowProgress(progress, i, COMPACT_TRAIL_LENGTH)
-        expect(ahead, `arrow ${i} must never lead arrow ${i - 1}`).toBeGreaterThanOrEqual(behind)
-      }
-    }
-  })
-
-  it('parks the compact trail at the launcher by the foot of the page', () => {
-    // Whatever the trail length, the last arrow must still arrive — a hint that
-    // never lands reads as broken rather than as travel.
-    const lastIndex = COMPACT_TRAIL_LENGTH - 1
-    expect(arrowProgress(1, lastIndex, COMPACT_TRAIL_LENGTH)).toBe(1)
-    expect(arrowProgress(0, 0, COMPACT_TRAIL_LENGTH)).toBe(0)
+  it('no longer exports a compact trail length', async () => {
+    const module = await import('./DockPointer')
+    expect('COMPACT_TRAIL_LENGTH' in module).toBe(false)
   })
 
   it('still retires on a narrow screen once the dock has been opened', () => {

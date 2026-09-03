@@ -387,3 +387,52 @@
     border-color: var(--teal);
   }
 }
+
+/* The narrow-screen replacement for the pointer trail.
+
+   A ring on a pseudo-element rather than on the button itself, so nothing about
+   the launcher's box, shadow or hit area changes while it plays.
+
+   Two beats, not `infinite`: this is a hint, not a beacon, and a control that
+   pulses forever in the corner of a portfolio is an advertisement. That is also
+   why --ease is right here and --ease-loop is not — it arrives and settles,
+   twice, rather than repeating.
+
+   It carries a transition as well as the animation, and that transition is the
+   way OUT: when the class comes off, opacity eases the ring away instead of
+   cutting it. An animation alone would have nothing to say about leaving, which
+   is the smell src/test/motion-language.test.ts exists to catch. */
+.chat__launcher {
+  position: relative;
+}
+
+.chat__launcher::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid var(--teal);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease);
+}
+
+.chat__launcher--hint::after {
+  animation: dock-hint 1.6s var(--ease) 2 both;
+  /* Declared here as well as on the base rule, and not redundantly: this is the
+     block that animates, so this is the block that has to carry the way out.
+     When the class comes off — the visitor opens the dock — the ring eases to
+     `opacity: 0` instead of being cut mid-beat. */
+  transition: opacity 0.3s var(--ease);
+}
+
+@keyframes dock-hint {
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
