@@ -9,12 +9,13 @@
   gap: var(--s-2);
   padding: var(--s-5) 0;
   border-top: 1px solid var(--line);
+  transition: border-top-color 0.25s var(--ease);
 }
 
 .timeline__period {
   font-family: var(--font-mono);
   font-size: var(--t-micro);
-  color: var(--gold);
+  color: var(--accent);
   letter-spacing: 0.06em;
 }
 
@@ -38,5 +39,17 @@
   .timeline__item {
     grid-template-columns: 200px 1fr;
     gap: var(--s-5);
+  }
+}
+
+@media (pointer: coarse) {
+  /* The timeline's rows are separated by a hairline and nothing else, so on a
+     phone there is no signal at all for which one is being read. `is-near`
+     warms the rule the row sits on.
+
+     Paint only. A row that also lifted would drag every row under it, because
+     unlike a card these are stacked flush against one another. */
+  .timeline__item.is-near {
+    border-top-color: rgb(var(--gold-rgb) / 0.36);
   }
 }

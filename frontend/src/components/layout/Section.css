@@ -1,5 +1,13 @@
 .section {
   padding-block: var(--s-7);
+  /* The nav is fixed and 64px tall, and every in-page link and every
+     scrollIntoView aims at the section's own top edge — which put the heading
+     squarely underneath the header. Measured: scroll-margin-top computed to
+     0px, and Skills and Contact both landed with their titles half covered.
+
+     Not an animated property: nothing transitions this, it only moves where a
+     scroll comes to rest. */
+  scroll-margin-top: calc(var(--nav-h) + var(--s-3));
 }
 
 .section--tight {
@@ -26,5 +34,23 @@
 
   .section--tight {
     padding-block: var(--s-8);
+  }
+}
+
+@media (max-width: 899px) {
+  /* A phone reads a shorter measure, so it needs less air between sections,
+     not the same amount. This file went from 64px straight to the desktop's
+     192px at 900px, which gave a narrow screen the value chosen for a wide
+     one — 192px is nearly a quarter of an 844px screen spent on nothing. */
+  .section {
+    padding-block: var(--s-6);
+  }
+
+  .section--tight {
+    padding-block: var(--s-5);
+  }
+
+  .section__head {
+    margin-bottom: var(--s-5);
   }
 }

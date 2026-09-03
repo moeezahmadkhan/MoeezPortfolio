@@ -139,6 +139,16 @@ export const MOBILE_STATIONS: Readonly<Record<string, Station>> = {
   // head. At z 0 the frame is 2.89 world units tall, the band is ~1.1 of them,
   // and this bust is about one unit tall per unit of scale — so 1.15 puts the
   // head near the top of the band while staying inside the 1.34-unit width.
+  //
+  // The band later came DOWN to 34svh, so that the hero stops overflowing an
+  // 844px screen, and this scale deliberately stayed. The pairing rule is about
+  // the band growing away from the figure: the band is space reserved in the
+  // COPY's layout, while the figure stands in a fixed full-viewport canvas and
+  // is placed by this table alone, so narrowing it moves the copy and not the
+  // model. Measured at 390x844 afterwards: copy ends at 554.6, band starts at
+  // 557, the head is at ~620 — no overlap, nothing newly cropped, check:stations
+  // and check:contrast both clean. rigs.test.ts pins the two values together so
+  // the next change to either has to look at the other.
   [HERO_SECTION_ID]: { position: [0, -1.25, 0], scale: 1.15, yaw: 0, presence: 0.8 },
   about: { position: [0.52, -1.35, -1.1], scale: 0.68, yaw: -0.45, presence: 0.34 },
   work: { position: [-0.55, -1.4, -1.2], scale: 0.66, yaw: 0.42, presence: 0.32 },

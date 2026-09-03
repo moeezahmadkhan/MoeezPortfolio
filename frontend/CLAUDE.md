@@ -147,6 +147,53 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   hover instead of one per frame. `aria-label` holds the accessible name still while `textContent` is
   punctuation, and nothing runs under reduced motion or on a coarse pointer, where `mouseenter` fires
   on a tap. `npm run check:scramble` measures the neighbour drift that justifies all of it.
+- **The section accent (`--accent`) cannot live on `<html>` or `<body>`.** It is a registered
+  `@property` (`syntax: '<color>'`), which is what lets it interpolate at all — an unregistered
+  custom property is an opaque string to the animation engine and swaps between two frames. But
+  registration is only half of it. Measured in Chrome, synchronously, with identical inline setup on
+  all three elements: a plain `<div>` starts the transition (`getAnimations()` reports it) and
+  **`<body>` and `<html>` both report zero**, while `transitionProperty` computes to `--accent` on
+  all three. The declaration is accepted and simply never fires on the two elements that propagate
+  to the viewport. That is why `App.tsx` renders a `.app` wrapper carrying `data-section`, and why
+  `tokens.css` puts the ramp and the transition on `.app` rather than `:root`. The wrapper is
+  `display: contents`, so it creates no box and no containing block and the fixed nav and chat dock
+  still resolve against the viewport. Verified: a contents wrapper runs the transition and its
+  descendants inherit the interpolated `oklab()` value mid-flight.
+- **The ramp rotates hue with lightness and chroma held constant** (`oklch(0.827 0.078 H)`). That is
+  the design, not a detail: identical L and C means identical contrast against a live shader ground
+  by construction rather than by measurement, and it is the reason `check:contrast` still reads the
+  same numbers after the accent moved. `tokens.test.ts` asserts every row shares L and C and that
+  the whole arc stays more than 60 degrees clear of the chat teal (~hue 190). `--gold` is NOT
+  repointed — `--accent` is additive, spent on five things only (skills headings, timeline periods,
+  card metric, tag borders, nav marker); the hero eyebrow, the contact email and the solid button
+  keep the fixed gold.
+- **Measuring a colour means painting it, never scraping the serialization.**
+  `getComputedStyle(el).color` is not always `rgb(...)`: Chrome serializes a colour authored in a
+  modern space in that space, so `color: var(--accent)` comes back as `oklch(0.827 0.078 18)`.
+  `check_contrast.mjs` used to regex three numbers out of that string and read them as R, G, B —
+  turning that oklch into `rgb(0.827, 0.078, 18)`, essentially black, and failing a perfectly
+  legible heading at 1.03:1. It now fills a 1x1 canvas with the computed colour and reads the pixel
+  back, which resolves any syntax the browser can parse down to the sRGB it will actually paint,
+  gamut clipping included — which is the thing being measured anyway.
+- **`Magnetic` is live on touch, and the release is what makes that safe.** The lean used to be
+  excluded on a coarse pointer, nominally because a fingertip covers the control it leans toward.
+  That is true of the control UNDER the finger and false of its neighbours — the activation band
+  reaches `MAGNETIC_RADIUS_PX` (96px) from a control's edge, so a drag passing 50-70px away leaves a
+  visible 1.6-3.1px lean. What the exclusion actually bought was avoiding a stale pointer: a mouse is
+  always somewhere and `pointermove` keeps `pointer` fresh, but a finger only exists between
+  `pointerdown` and `pointerup`, so after it lifts the last touched position would sit in `pointer`
+  forever and every nearby control would lean at a finger that is no longer on the glass.
+  `releasePointer` sends the pointer to `-Infinity` on `pointerup` AND `pointercancel` — both,
+  because a drag the browser takes over for scrolling fires only `pointercancel`, which is exactly
+  the gesture a phone makes most. Infinity rather than a flag, so `magneticOffset`'s existing
+  radius check does the work and the lean eases home on the curve it arrived on.
+  `releasePointer` ignores a mouse `pointerup`, or every click would drop the cursor.
+- **The magnetic loop does not spin during a scroll, and that was measured.** Scrolling the whole
+  8170px page cost exactly ONE tick — 4 style writes for 4 controls — before the loop idled out,
+  and reading all four rects costs 0.0033ms against a 16.7ms budget. `wake()` is bound to `scroll`
+  because scrolling moves a control under a stationary pointer, but with every offset already 0 the
+  tick sets `busy = false` and stops. Reduced motion still opts out entirely: that exclusion is
+  about the movement, not the input device.
 - **A chat message arrives on a transition, like the panel around it.** `.chat__msg` starts from
   `@starting-style` rather than a `@keyframes` for exactly the reason above it in this list — the log
   is replaced wholesale on a new conversation, and a keyframe entrance has nothing to say about
@@ -196,10 +243,21 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   Hero.css spends it as `padding-bottom` to lift the copy clear, and `Stage.css` sizes the no-WebGL
   still to the same strip. `MOBILE_PRESENCE` (`rigPose.ts`) and that still's opacity must stay equal
   — the canvas and the picture standing in for it are the same figure in the same place.
-- The band is `clamp(220px, 38svh, 340px)`. It was 25svh, which made the figure a sliver under the
-  copy. **The band and the hero station's scale move together**: growing the token alone lifted the
-  copy and left 17% of empty screen above an unchanged head. The hero station is scale 1.15 for a
-  band of that size.
+- The band is `clamp(200px, 34svh, 300px)`. It was 25svh, which made the figure a sliver under the
+  copy, then 38svh — which did not FIT: measured at 390x844, 590.37px of copy plus a 320.72px band
+  is 911.09px on an 844px screen, so a fifth of the strip sat below the fold and the figure was
+  cropped at the shoulders on first paint. Both sides gave: the band came down to 34svh and
+  `.hero__thesis` takes one step down below 900px. The hero is now exactly 844px at 390x844 and
+  1024px at 768x1024.
+- **The band and the hero station's scale move together — in ONE direction.** Growing the token
+  alone lifted the copy and left 17% of empty screen above an unchanged head, which is where that
+  rule came from. Shrinking it does not have the same effect and the scale stayed at 1.15: the band
+  is space reserved in the COPY's layout, while the figure stands in a fixed, full-viewport canvas
+  placed by `MOBILE_STATIONS` alone, so narrowing the band moves the copy and not the model.
+  Measured after: copy ends at 554.6, the band starts at 557, the head is at ~620 — no overlap,
+  nothing newly cropped, `check:stations` clean and `check:contrast` 5.62:1 on `.hero__meta`.
+  `rigs.test.ts` asserts the band string and the scale together so the next change to either has to
+  look at the other.
 - **Below the hero there is no reserved strip.** The figure stays low and to one side at a much lower
   `presence` behind `.stage__scrim` (Stage.css), a fixed mobile-only gradient between canvas and copy.
   Reserving a band per section instead would have added roughly 1000px to a 7,877px page. The scrim

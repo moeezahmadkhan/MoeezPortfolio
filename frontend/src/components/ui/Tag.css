@@ -2,8 +2,24 @@
   font-family: var(--font-mono);
   font-size: var(--t-micro);
   color: var(--muted);
-  border: 1px solid var(--line);
+  /* color-mix rather than a second token: --accent transitions, so anything
+     derived from it with color-mix transitions too. An rgb triple could not —
+     a custom property holding "231 194 125" is a string, not a colour. */
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, transparent);
   border-radius: var(--r-pill);
   padding: var(--s-1) var(--s-2);
   list-style: none;
+  transition:
+    border-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+
+@media (pointer: coarse) {
+  /* Chips are not links, but they are the right size to be mistaken for them,
+     and a finger lands on one by accident often enough that silence reads as a
+     dead control. Paint only. */
+  .tag:active {
+    border-color: rgb(var(--gold-rgb) / 0.4);
+    color: var(--text);
+  }
 }

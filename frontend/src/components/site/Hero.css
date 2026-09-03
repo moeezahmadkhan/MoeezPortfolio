@@ -190,6 +190,18 @@
     translate: 0 0;
     bottom: var(--s-3);
   }
+
+  /* One step down from the fluid size, on a phone only.
+
+     The thesis runs to six lines at 390px and every one of them costs the
+     figure a slice of its strip. This is the copy's half of the arithmetic in
+     tokens.css's --figure-band comment: 590px of copy plus a 320px band is
+     911px on an 844px screen, so neither the writing nor the model could have
+     all of what it wanted. Both give a little rather than one of them being
+     cut off at the fold. */
+  .hero__thesis {
+    font-size: var(--t-body);
+  }
 }
 
 @media (min-width: 900px) {

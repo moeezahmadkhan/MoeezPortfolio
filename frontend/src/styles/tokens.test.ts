@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const tokens = readFileSync('src/styles/tokens.css', 'utf8')
@@ -35,5 +36,97 @@ describe('design tokens', () => {
     ]) {
       expect(tokens).toContain(`${name}: ${value}`)
     }
+  })
+})
+
+function walk(dir: string, match: RegExp): string[] {
+  return readdirSync(dir).flatMap((entry) => {
+    const full = join(dir, entry)
+    if (statSync(full).isDirectory()) return walk(full, match)
+    return match.test(entry) ? [full] : []
+  })
+}
+
+describe('press feedback', () => {
+  // A tap has no hover in front of it, so without an :active state the only
+  // confirmation a control was hit is the page having already changed.
+  const controls = [
+    ['src/components/ui/Button.css', '.btn:active'],
+    ['src/components/ui/Tag.css', '.tag:active'],
+    ['src/components/layout/Nav.css', '.nav__link:active'],
+    ['src/components/chat/ChatDock.css', '.chat__launcher:active'],
+  ] as const
+
+  for (const [file, selector] of controls) {
+    it(`gives ${selector} a press state behind the coarse-pointer query`, () => {
+      const css = readFileSync(file, 'utf8')
+      expect(css).toContain('@media (pointer: coarse)')
+      expect(css.slice(css.indexOf('@media (pointer: coarse)'))).toContain(selector)
+    })
+  }
+
+  it('never presses with something that would re-flow the row', () => {
+    // `scale` is a transform. A press built from padding or font-size would
+    // re-flow whatever the control sits in, every time anyone touched it.
+    for (const file of walk('src', /\.css$/)) {
+      const css = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+      for (const block of css.matchAll(/([^{}]*:active[^{}]*)\{([^{}]*)\}/g)) {
+        expect(block[2]).not.toMatch(/(?:^|[;\s])(padding|font-size|width|height)\s*:/)
+      }
+    }
+  })
+})
+
+describe('the section accent ramp', () => {
+  const SECTIONS = ['about', 'work', 'skills', 'experience', 'contact']
+
+  it('registers --accent so it can interpolate at all', () => {
+    // An UNregistered custom property is an opaque string to the animation
+    // engine and swaps between two frames. @property with syntax '<color>' is
+    // what makes the transition below mean anything at all.
+    expect(tokens).toMatch(/@property\s+--accent\s*\{/)
+    expect(tokens).toContain("syntax: '<color>'")
+    expect(tokens).toContain('inherits: true')
+    expect(tokens).toContain('initial-value: #e7c27d')
+  })
+
+  it('gives every observed section below the hero its own accent row', () => {
+    for (const id of SECTIONS) {
+      expect(tokens).toContain(`[data-section='${id}']`)
+    }
+  })
+
+  it('holds lightness and chroma constant across the whole ramp', () => {
+    // This is what stops six colours reading as a rainbow, and it is also what
+    // keeps check:contrast honest: rotating hue alone cannot change how a
+    // colour measures against the ground behind it.
+    const rows = [...tokens.matchAll(/--accent:\s*oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)\)/g)]
+    expect(rows).toHaveLength(SECTIONS.length + 1) // the five sections plus :root
+    expect([...new Set(rows.map((r) => r[1]))]).toEqual(['0.827'])
+    expect([...new Set(rows.map((r) => r[2]))]).toEqual(['0.078'])
+  })
+
+  it('never approaches the chat teal', () => {
+    // Teal is reserved for the AI surface: it is how a visitor tells the
+    // machine's voice from Moeez's page. --teal sits near hue 190.
+    const hues = [...tokens.matchAll(/--accent:\s*oklch\([\d.]+\s+[\d.]+\s+([\d.]+)\)/g)].map(
+      (m) => Number(m[1]),
+    )
+    expect(hues).not.toHaveLength(0)
+    for (const hue of hues) {
+      const raw = Math.abs(hue - 190)
+      expect(Math.min(raw, 360 - raw)).toBeGreaterThan(60)
+    }
+  })
+
+  it('transitions the accent on the shared easing token', () => {
+    expect(tokens).toMatch(/transition:\s*--accent\s+\d+ms\s+var\(--ease\)/)
+  })
+
+  it('does not repoint --gold', () => {
+    // --accent is additive. Repointing --gold would drag the contact email,
+    // the solid button and the hero eyebrow along with it, and check:contrast
+    // samples the first of those.
+    expect(tokens).toContain('--gold: #e7c27d')
   })
 })

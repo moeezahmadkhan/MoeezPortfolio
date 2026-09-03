@@ -2,6 +2,7 @@ import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { ChatDock } from './ChatDock'
+import { ChatMessage } from './ChatMessage'
 
 function mockReply(reply: string, status = 200) {
   const fetchMock = vi.fn().mockResolvedValue({
@@ -178,5 +179,36 @@ describe('ChatDock', () => {
       resolve({ ok: true, status: 200, json: async () => ({ reply: 'done' }) })
     })
     await waitFor(() => expect(container.querySelector('.chat__typing')).toBeNull())
+  })
+})
+
+describe('links in a reply', () => {
+  it('renders a URL the model handed over as a real anchor', () => {
+    render(
+      <ChatMessage
+        message={{
+          role: 'assistant',
+          content: 'My code is on GitHub: https://github.com/moeezahmadkhangit.',
+        }}
+      />,
+    )
+    const link = screen.getByRole('link')
+    expect(link).toHaveAttribute('href', 'https://github.com/moeezahmadkhangit')
+    expect(link).toHaveAttribute('rel', expect.stringContaining('noreferrer'))
+    expect(link).toHaveAttribute('target', '_blank')
+  })
+
+  it('makes the contact address mailable', () => {
+    render(
+      <ChatMessage
+        message={{ role: 'assistant', content: 'Mail me at kmoeez2018@gmail.com and I answer.' }}
+      />,
+    )
+    expect(screen.getByRole('link')).toHaveAttribute('href', 'mailto:kmoeez2018@gmail.com')
+  })
+
+  it('never turns a javascript: string in a reply into a link', () => {
+    render(<ChatMessage message={{ role: 'assistant', content: 'javascript:alert(1)' }} />)
+    expect(screen.queryByRole('link')).toBeNull()
   })
 })

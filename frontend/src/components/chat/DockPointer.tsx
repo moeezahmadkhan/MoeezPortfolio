@@ -10,19 +10,6 @@ import './DockPointer.css'
 export const TRAIL_LENGTH = 3
 
 /**
- * How many arrows the narrow-screen trail carries.
- *
- * Below POINTER_MIN_WIDTH the full trail has no gutter to stand in — measured,
- * it comes down on body copy. But a narrow screen is exactly where the launcher
- * competes hardest for attention, so saying nothing there is the wrong trade.
- * Instead the trail shrinks into the dock's own corner, directly above the
- * launcher: fewer arrows, a shorter path, and entirely inside the footprint the
- * dock already floats over. Two, not three — the corner has room for a hint,
- * not a parade.
- */
-export const COMPACT_TRAIL_LENGTH = 2
-
-/**
  * How far behind its predecessor each arrow sits, measured in scroll progress.
  * The lag is what makes the trail stretch as the leader pulls toward the dock —
  * without it three arrows would move as one rigid stick.
@@ -53,6 +40,16 @@ export const POINTER_PROPERTY = '--dock-pointer-p'
  * worse than saying nothing, so on a narrower screen this says nothing: the
  * launcher is already a fixed, labelled, 44px control in the corner, and on a
  * phone it is the most prominent thing on screen after the copy itself.
+ *
+ * A compact variant was tried below this width — two chevrons tucked into the
+ * dock's own corner rather than three crossing the page — on the reasoning that
+ * a narrow screen is where the launcher competes hardest for attention. It did
+ * not hold. Measured at 390x844, both chevrons centred at x=342 and
+ * `document.elementsFromPoint` returned the project card's body for each: that
+ * corner is only empty until the page scrolls under it, and on a phone the copy
+ * runs edge to edge, so there is no corner. It is removed. The launcher itself
+ * carries the hint instead (`chat__launcher--hint` in ChatDock.css), which
+ * borrows no space it does not already own.
  */
 export const POINTER_MIN_WIDTH = 1360
 export const POINTER_MEDIA = `(min-width: ${POINTER_MIN_WIDTH}px)`
@@ -170,15 +167,11 @@ export function DockPointer({ visible }: { visible: boolean }) {
     return () => cancelAnimationFrame(frame)
   }, [reduced, visible, wide])
 
-  if (!visible) return null
+  if (!visible || !wide) return null
 
   return (
-    <div
-      className={wide ? 'dock-pointer' : 'dock-pointer dock-pointer--compact'}
-      aria-hidden="true"
-      ref={root}
-    >
-      {arrowsFor(wide ? TRAIL_LENGTH : COMPACT_TRAIL_LENGTH).map((index) => (
+    <div className="dock-pointer" aria-hidden="true" ref={root}>
+      {arrowsFor(TRAIL_LENGTH).map((index) => (
         <span className="dock-pointer__arrow" key={index} data-arrow={index}>
           <svg viewBox="0 0 16 9" width="16" height="9" focusable="false">
             <path

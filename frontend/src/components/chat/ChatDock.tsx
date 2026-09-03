@@ -31,12 +31,33 @@ export function ChatDock() {
   // yet. Once they have, it has nothing left to say, so it retires for the rest
   // of the session rather than gesturing at a thing they already know about.
   const [pointed, setPointed] = useState(() => !hasDockOpened());
+  // What replaces the pointer trail on a narrow screen, where the trail had
+  // nowhere to stand and came down on body copy (see DockPointer.tsx). The
+  // launcher is already a fixed, labelled, 44px control in the corner — it does
+  // not need an arrow to be findable, it needs one moment of movement so the eye
+  // lands on it once.
+  //
+  // Fired on leaving the hero rather than on a timer: a hint that arrives while
+  // someone is still reading the first screen is an interruption.
+  const [hinting, setHinting] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     rememberDockOpened();
     setPointed(false);
+    setHinting(false);
   }, [open]);
+
+  useEffect(() => {
+    if (hasDockOpened() || hinting) return;
+    const onScroll = () => {
+      if (window.scrollY < window.innerHeight * 0.8) return;
+      setHinting(true);
+      window.removeEventListener("scroll", onScroll);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [hinting]);
 
   useEffect(() => {
     if (open) input.current?.focus();
@@ -203,7 +224,7 @@ export function ChatDock() {
       <button
         ref={launcher}
         type="button"
-        className="chat__launcher"
+        className={`chat__launcher${hinting && !open ? " chat__launcher--hint" : ""}`}
         aria-expanded={open}
         onClick={() => setOpen(!open)}
       >
