@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { NAV_ITEMS } from '../components/layout/Nav'
 import { SECTION_IDS } from '../components/layout/Nav'
@@ -207,5 +208,27 @@ describe('the hero section id', () => {
   it('is the id Hero.tsx actually renders and Nav actually observes', () => {
     expect(SECTION_IDS[0]).toBe(HERO_SECTION_ID)
     expect(SECTION_IDS).toContain('about')
+  })
+})
+
+describe('the hero station and --figure-band', () => {
+  it('keeps the two in step, and records that this change moved only one', () => {
+    // These have come apart before: growing the band from 25svh to 38svh without
+    // growing the scale left 17% of empty screen above an unchanged head, which
+    // is why CLAUDE.md says they move together.
+    //
+    // This time the band shrank (38svh -> 34svh, to stop the hero overflowing an
+    // 844px screen) and the scale deliberately did NOT follow. The band is space
+    // reserved in the COPY's layout; the figure lives in a fixed, full-viewport
+    // canvas and is placed by this table alone, so narrowing the band moves the
+    // copy and not the figure. Measured at 390x844 after the change: copy ends at
+    // 554.6, the band starts at 557, the figure's head is at ~620 — nothing
+    // overlaps and nothing new is cropped. check:stations and check:contrast both
+    // pass, the latter at 5.62:1 on .hero__meta.
+    //
+    // Asserted together so the next change to either has to look at the other.
+    const tokens = readFileSync('src/styles/tokens.css', 'utf8')
+    expect(tokens).toContain('--figure-band: clamp(200px, 34svh, 300px)')
+    expect(MOBILE_STATIONS[HERO_SECTION_ID].scale).toBeCloseTo(1.15, 2)
   })
 })

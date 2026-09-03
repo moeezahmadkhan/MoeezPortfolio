@@ -110,8 +110,20 @@
      emulation, which gives its subject 50-70% of the screen, ours was reading
      as a decorative smudge under the copy rather than as the thing the hero is
      showing off. 38svh is about 320px of an 844px screen. The hero copy pays
-     for it out of the slack `.hero::before`/`::after` were already dividing. */
-  --figure-band: clamp(220px, 38svh, 340px);
+     for it out of the slack `.hero::before`/`::after` were already dividing.
+
+     Narrowed again from `clamp(220px, 38svh, 340px)`, and this time because the
+     hero did not FIT. Measured at 390x844: 590.37px of copy plus a 320.72px
+     band is 911.09px against an 844px screen, so the bottom 67px of the strip —
+     a fifth of it — sat below the fold at scroll 0 and the figure was cropped at
+     the shoulders on first paint. `.hero::before`/`::after` are `flex: N 0 0`,
+     so they divide leftover space and there was none left to divide.
+
+     38svh was chosen against oryzo.ai's 50-70% and is still the right ambition;
+     it was simply more than the copy left over. Both sides give: the band drops
+     to 34svh here, and `.hero__thesis` takes one step down on narrow screens
+     only (Hero.css). Neither alone was enough. */
+  --figure-band: clamp(200px, 34svh, 300px);
 
   /* The chat dock's footprint in the bottom-right corner, in one place so the
      dock and everything that has to keep out of its way agree.

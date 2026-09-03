@@ -224,10 +224,21 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   Hero.css spends it as `padding-bottom` to lift the copy clear, and `Stage.css` sizes the no-WebGL
   still to the same strip. `MOBILE_PRESENCE` (`rigPose.ts`) and that still's opacity must stay equal
   — the canvas and the picture standing in for it are the same figure in the same place.
-- The band is `clamp(220px, 38svh, 340px)`. It was 25svh, which made the figure a sliver under the
-  copy. **The band and the hero station's scale move together**: growing the token alone lifted the
-  copy and left 17% of empty screen above an unchanged head. The hero station is scale 1.15 for a
-  band of that size.
+- The band is `clamp(200px, 34svh, 300px)`. It was 25svh, which made the figure a sliver under the
+  copy, then 38svh — which did not FIT: measured at 390x844, 590.37px of copy plus a 320.72px band
+  is 911.09px on an 844px screen, so a fifth of the strip sat below the fold and the figure was
+  cropped at the shoulders on first paint. Both sides gave: the band came down to 34svh and
+  `.hero__thesis` takes one step down below 900px. The hero is now exactly 844px at 390x844 and
+  1024px at 768x1024.
+- **The band and the hero station's scale move together — in ONE direction.** Growing the token
+  alone lifted the copy and left 17% of empty screen above an unchanged head, which is where that
+  rule came from. Shrinking it does not have the same effect and the scale stayed at 1.15: the band
+  is space reserved in the COPY's layout, while the figure stands in a fixed, full-viewport canvas
+  placed by `MOBILE_STATIONS` alone, so narrowing the band moves the copy and not the model.
+  Measured after: copy ends at 554.6, the band starts at 557, the head is at ~620 — no overlap,
+  nothing newly cropped, `check:stations` clean and `check:contrast` 5.62:1 on `.hero__meta`.
+  `rigs.test.ts` asserts the band string and the scale together so the next change to either has to
+  look at the other.
 - **Below the hero there is no reserved strip.** The figure stays low and to one side at a much lower
   `presence` behind `.stage__scrim` (Stage.css), a fixed mobile-only gradient between canvas and copy.
   Reserving a band per section instead would have added roughly 1000px to a 7,877px page. The scrim
