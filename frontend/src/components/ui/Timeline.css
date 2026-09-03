@@ -15,7 +15,7 @@
 .timeline__period {
   font-family: var(--font-mono);
   font-size: var(--t-micro);
-  color: var(--gold);
+  color: var(--accent);
   letter-spacing: 0.06em;
 }
 

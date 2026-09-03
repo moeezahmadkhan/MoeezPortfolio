@@ -147,6 +147,34 @@ See `docs/redesign/PLAN.md` and `docs/superpowers/plans/` for the work ahead.
   hover instead of one per frame. `aria-label` holds the accessible name still while `textContent` is
   punctuation, and nothing runs under reduced motion or on a coarse pointer, where `mouseenter` fires
   on a tap. `npm run check:scramble` measures the neighbour drift that justifies all of it.
+- **The section accent (`--accent`) cannot live on `<html>` or `<body>`.** It is a registered
+  `@property` (`syntax: '<color>'`), which is what lets it interpolate at all — an unregistered
+  custom property is an opaque string to the animation engine and swaps between two frames. But
+  registration is only half of it. Measured in Chrome, synchronously, with identical inline setup on
+  all three elements: a plain `<div>` starts the transition (`getAnimations()` reports it) and
+  **`<body>` and `<html>` both report zero**, while `transitionProperty` computes to `--accent` on
+  all three. The declaration is accepted and simply never fires on the two elements that propagate
+  to the viewport. That is why `App.tsx` renders a `.app` wrapper carrying `data-section`, and why
+  `tokens.css` puts the ramp and the transition on `.app` rather than `:root`. The wrapper is
+  `display: contents`, so it creates no box and no containing block and the fixed nav and chat dock
+  still resolve against the viewport. Verified: a contents wrapper runs the transition and its
+  descendants inherit the interpolated `oklab()` value mid-flight.
+- **The ramp rotates hue with lightness and chroma held constant** (`oklch(0.827 0.078 H)`). That is
+  the design, not a detail: identical L and C means identical contrast against a live shader ground
+  by construction rather than by measurement, and it is the reason `check:contrast` still reads the
+  same numbers after the accent moved. `tokens.test.ts` asserts every row shares L and C and that
+  the whole arc stays more than 60 degrees clear of the chat teal (~hue 190). `--gold` is NOT
+  repointed — `--accent` is additive, spent on five things only (skills headings, timeline periods,
+  card metric, tag borders, nav marker); the hero eyebrow, the contact email and the solid button
+  keep the fixed gold.
+- **Measuring a colour means painting it, never scraping the serialization.**
+  `getComputedStyle(el).color` is not always `rgb(...)`: Chrome serializes a colour authored in a
+  modern space in that space, so `color: var(--accent)` comes back as `oklch(0.827 0.078 18)`.
+  `check_contrast.mjs` used to regex three numbers out of that string and read them as R, G, B —
+  turning that oklch into `rgb(0.827, 0.078, 18)`, essentially black, and failing a perfectly
+  legible heading at 1.03:1. It now fills a 1x1 canvas with the computed colour and reads the pixel
+  back, which resolves any syntax the browser can parse down to the sRGB it will actually paint,
+  gamut clipping included — which is the thing being measured anyway.
 - **A chat message arrives on a transition, like the panel around it.** `.chat__msg` starts from
   `@starting-style` rather than a `@keyframes` for exactly the reason above it in this list — the log
   is replaced wholesale on a new conversation, and a keyframe entrance has nothing to say about

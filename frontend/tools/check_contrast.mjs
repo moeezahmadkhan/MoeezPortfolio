@@ -140,7 +140,25 @@ for (const [name, w, h] of [['mobile', 390, 844], ['desktop', 1440, 900]]) {
         const top = Math.max(r.top, 0)
         const bottom = Math.min(r.bottom, window.innerHeight)
         if (bottom - top < MIN_VISIBLE || r.width < 2) continue
-        const ink = getComputedStyle(e).color.match(/[\d.]+/g).slice(0, 3).map(Number)
+        // Through a canvas, never off the serialization.
+        //
+        // `getComputedStyle(e).color` is NOT always `rgb(...)`: Chrome
+        // serializes a colour authored in a modern space in that space, so
+        // `color: var(--accent)` comes back as `oklch(0.827 0.078 18)`. The
+        // first version of this regex-scraped three numbers out of whatever
+        // string arrived and read those as R, G, B — which turned that oklch
+        // into rgb(0.827, 0.078, 18), essentially black, and reported a real
+        // and legible heading as failing at 1.03:1.
+        //
+        // A canvas resolves any colour syntax the browser can parse down to
+        // the sRGB triple it will actually paint, including the gamut clipping
+        // the screen applies, which is the thing being measured here anyway.
+        const canvas = document.createElement('canvas')
+        canvas.width = canvas.height = 1
+        const ctx = canvas.getContext('2d')
+        ctx.fillStyle = getComputedStyle(e).color
+        ctx.fillRect(0, 0, 1, 1)
+        const ink = [...ctx.getImageData(0, 0, 1, 1).data].slice(0, 3)
         return {
           x: Math.round(r.left), y: Math.round(top),
           width: Math.round(r.width), height: Math.round(bottom - top),

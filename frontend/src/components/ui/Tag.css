@@ -2,7 +2,10 @@
   font-family: var(--font-mono);
   font-size: var(--t-micro);
   color: var(--muted);
-  border: 1px solid var(--line);
+  /* color-mix rather than a second token: --accent transitions, so anything
+     derived from it with color-mix transitions too. An rgb triple could not —
+     a custom property holding "231 194 125" is a string, not a colour. */
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, transparent);
   border-radius: var(--r-pill);
   padding: var(--s-1) var(--s-2);
   list-style: none;

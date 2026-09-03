@@ -146,7 +146,7 @@
   bottom: -6px;
   width: 100px; /* MARKER_BASE_WIDTH */
   height: 1px;
-  background: var(--gold);
+  background: var(--accent);
   transform-origin: left;
   opacity: 0;
   pointer-events: none;

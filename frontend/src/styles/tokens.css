@@ -1,3 +1,20 @@
+/* The accent that travels down the page.
+
+   REGISTERED, not merely declared. An unregistered custom property is an opaque
+   string to the animation engine: assigning a new value swaps it between two
+   frames, so the transition at the foot of this file would do nothing at all.
+   `syntax: '<color>'` is what lets it interpolate, in oklab, like any other
+   animatable colour. Baseline since July 2024 (Firefox 128).
+
+   The initial value IS --gold. The ramp starts on the site's own accent rather
+   than beside it, so the hero looks exactly as it always has and the colour
+   only begins to move once the reader does. */
+@property --accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #e7c27d;
+}
+
 :root {
   /* Ground and surfaces. The site is dark by design — there is no light theme. */
   --ink: #07070d;
@@ -10,13 +27,23 @@
   --text: #ece9e4;
   --muted: #9a978f;
 
-  /* Accent. Gold is the ONLY accent on the page. Teal is reserved for the
-     chat/AI surface so that "the machine is talking" reads as a different voice. */
+  /* Gold is the accent the site opens and closes on, and the fixed one: the
+     hero eyebrow, the contact email and the solid button never leave it. What
+     travels is --accent below, a hue rotation off this exact colour. Teal stays
+     reserved for the chat/AI surface so that "the machine is talking" reads as
+     a different voice — the ramp is kept 60 degrees clear of it. */
   --gold: #e7c27d;
   --gold-bright: #f6dfa6;
   --gold-rgb: 231 194 125;
   --teal: #5fd3c6;
   --error: #d97070;
+
+  /* The base of the ramp. oklch(0.827 0.078 84) IS #e7c27d, written in a form
+     the rows at the foot of this file can rotate away from without changing
+     anything else about it. --gold stays exactly where it is: --accent is
+     additive, and repointing --gold would drag the contact email, the solid
+     button and the hero eyebrow along with it. */
+  --accent: oklch(0.827 0.078 84);
 
   /* Type */
   --font-sans: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
@@ -98,4 +125,75 @@
   --dock-inset: var(--s-4);
   --dock-launcher-h: 44px;
   --dock-clearance: calc(var(--dock-launcher-h) + var(--dock-inset) * 2);
+}
+
+/* The element the ramp actually lives on, and it may not be <html> or <body>.
+
+   Measured in Chrome, synchronously, with identical inline setup on all three:
+   a plain <div> starts the `--accent` transition (getAnimations() reports it),
+   and <body> and <html> both report ZERO — while `transitionProperty` computes
+   to `--accent` on all three. The declaration is accepted and simply never
+   fires on the two elements that propagate to the viewport, so the accent
+   snapped between sections instead of easing, with nothing in the CSS to
+   suggest why.
+
+   `display: contents` keeps the wrapper out of layout entirely — it creates no
+   box and no containing block, so the fixed nav and the fixed chat dock still
+   resolve against the viewport exactly as before. Verified: a contents wrapper
+   runs the transition and its descendants inherit the interpolated oklab()
+   value mid-flight. */
+.app {
+  display: contents;
+}
+
+/* Hue rotates; lightness and chroma do not.
+
+   That constraint is the whole design. Six freely-chosen colours read as a
+   rainbow AND measure differently against the ground — and the ground here is a
+   live shader, which is why `npm run check:contrast` exists at all. Holding L
+   and C fixed means every accent on this page has the same contrast as the gold
+   it started from, by construction rather than by measurement, and the only
+   thing that changes is which way the warmth leans.
+
+   The arc runs gold -> copper -> muted rose, and stops well short of the chat
+   teal (hue ~190). Teal is how a visitor tells the machine's voice from Moeez's
+   page; an accent that drifted into it would blur the one distinction the
+   palette is built to carry. tokens.test.ts asserts the whole ramp stays more
+   than 60 degrees away from it.
+
+   Keyed on the ids `useSectionObserver` reports, never on scroll fractions. The
+   hero has no row: it keeps the :root gold above, which is why returning to the
+   top returns to the colour the site opened with. */
+.app[data-section='about'] {
+  --accent: oklch(0.827 0.078 62);
+}
+
+.app[data-section='work'] {
+  --accent: oklch(0.827 0.078 40);
+}
+
+.app[data-section='skills'] {
+  --accent: oklch(0.827 0.078 18);
+}
+
+.app[data-section='experience'] {
+  --accent: oklch(0.827 0.078 352);
+}
+
+.app[data-section='contact'] {
+  --accent: oklch(0.827 0.078 326);
+}
+
+/* Declared on the element whose property actually changes — App.tsx writes the
+   data attribute on <html>, so the transition has to live here or nothing eases.
+
+   700ms is slower than any hover on the site, deliberately. This is not a
+   response to an action: it is the page changing temperature underneath a
+   reader who is looking at something else. Fast enough to have finished before
+   they arrive, slow enough that they never catch it moving.
+
+   base.css's reduced-motion block collapses this to 0.01ms, so a visitor who
+   asked for stillness gets each section's accent outright instead. */
+.app {
+  transition: --accent 700ms var(--ease);
 }
